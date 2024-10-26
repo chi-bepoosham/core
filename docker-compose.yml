@@ -60,7 +60,7 @@ services:
         depends_on:
             - application_1
     application_1:
-        image: chibepoosham-application:latest
+        image: chibepoosham-application_1:latest
         container_name: application_1
         working_dir: /var/www
         restart: always
@@ -76,7 +76,7 @@ services:
         depends_on:
             - postgres
     application_2:
-        image: chibepoosham-application:latest
+        image: chibepoosham-application_1:latest
         container_name: application_2
         working_dir: /var/www
         restart: always
