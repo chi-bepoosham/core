@@ -72,6 +72,30 @@ return [
             'after_commit' => false,
         ],
 
+        'rabbitmq' => [
+            'driver' => 'rabbitmq',
+            'host' => env('RABBITMQ_HOST', '127.0.0.1'),
+            'port' => env('RABBITMQ_PORT', 5672),
+            'vhost' => env('RABBITMQ_VHOST', '/'),
+            'login' => env('RABBITMQ_USER', 'guest'),
+            'password' => env('RABBITMQ_PASSWORD', 'guest'),
+            'queue' => env('RABBITMQ_QUEUE', 'ai_predict_process'), // Ensure this matches your queue name
+            'options' => [
+                'queue' => [
+                    'declare' => true,
+                    'durable' => true, // Ensure durability matches queue declaration in RabbitMQ
+                ],
+                'exchange' => [
+                    'declare' => true,
+                    'type' => 'direct',
+                ],
+            ],
+            'ssl_options' => [
+                'ssl_on' => false,
+                'verify_peer' => false,
+            ],
+        ],
+
     ],
 
     /*

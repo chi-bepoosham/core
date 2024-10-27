@@ -1,7 +1,7 @@
 version: '3.7'
 services:
     haproxy:
-        image: 'haproxy:alpine3.19'
+        image: haproxy:alpine3.19
         container_name: haproxy
         links:
             - application_1
@@ -14,6 +14,24 @@ services:
         volumes:
             - './docker/haproxy/config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
         restart: always
+        networks:
+            - main
+    rabbitmq:
+        image: rabbitmq:3.11-management-alpine
+        container_name: rabbitmq
+        restart: always
+        ports:
+            - "5672:5672"        # Port for RabbitMQ messaging
+            - "15672:15672"      # Port for RabbitMQ management UI
+        environment:
+            RABBITMQ_DEFAULT_USER: "develop"
+            RABBITMQ_DEFAULT_PASS: "Z!^P>C78)g5"
+            RABBITMQ_DEFAULT_VHOST: "rabbitmq"
+        healthcheck:
+            test: rabbitmq-diagnostics -q ping
+            interval: 7s
+            timeout: 2s
+            retries: 15
         networks:
             - main
     postgres:
@@ -93,8 +111,24 @@ services:
             - "1550"
         depends_on:
             - postgres
-    application_django:
-        image: chibepoosham-application_django:latest
+    application_queue:
+        image: chibepoosham-application_1:latest
+        container_name: application_queue
+        working_dir: /var/www
+        command: sh -c "sleep 5 && php artisan queue:work rabbitmq --daemon --sleep=3 --tries=5 --timeout=120"
+        restart: always
+        user: "www"
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+            postgres:
+                condition: service_started
+        volumes:
+            - './:/var/www:rw'
+        networks:
+            - main
+    application_python:
+        image: chibepoosham-application_python:latest
         container_name: application_python
         working_dir: /var/www
         restart: always
@@ -102,6 +136,9 @@ services:
             - './PythonModule/:/var/www'
         expose:
             - "8000"
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
         networks:
             - main
 networks:
