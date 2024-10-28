@@ -2,18 +2,19 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\StartRabbitMQ;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Queue;
 
-class TestRabbitMQ extends Command
+class StartRabbitMQCommand extends Command
 {
-    protected $signature = 'test:rabbitmq';
-    protected $description = 'Test RabbitMQ connection';
+    protected $signature = 'start:rabbitmq';
+    protected $description = 'Start RabbitMQ connection';
 
     public function handle()
     {
         try {
-            Queue::connection('rabbitmq')->pushRaw(json_encode(['test' => 'Hello RabbitMQ']), 'ai_predict_process');
+            StartRabbitMQ::dispatch();
             $this->info("Message sent successfully to ai_predict_process.");
         } catch (\Exception $e) {
             $this->error("Failed to connect: " . $e->getMessage());

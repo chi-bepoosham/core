@@ -79,20 +79,22 @@ return [
             'vhost' => env('RABBITMQ_VHOST', '/'),
             'login' => env('RABBITMQ_USER', 'guest'),
             'password' => env('RABBITMQ_PASSWORD', 'guest'),
-            'queue' => env('RABBITMQ_QUEUE', 'ai_predict_process'), // Ensure this matches your queue name
             'options' => [
-                'queue' => [
-                    'declare' => true,
-                    'durable' => true, // Ensure durability matches queue declaration in RabbitMQ
-                ],
                 'exchange' => [
-                    'declare' => true,
+                    'name' => env('RABBITMQ_EXCHANGE_NAME', 'default'),
                     'type' => 'direct',
+                    'declare' => true,
+                    'durable' => true,
+                    'auto_delete' => false,
                 ],
-            ],
-            'ssl_options' => [
-                'ssl_on' => false,
-                'verify_peer' => false,
+                'queue' => [
+                    'name' => env('RABBITMQ_QUEUE', 'ai_predict_process'),
+                    'declare' => false, // Disable declaration to use the existing queue
+                    'bind' => true,
+                    'durable' => true,
+                    'exclusive' => false,
+                    'auto_delete' => false,
+                ],
             ],
         ],
 

@@ -12,11 +12,12 @@ class ProcessRabbitMQMessage implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $data;
+    public $data;
 
     public function __construct($data)
     {
         $this->data = $data;
+        Log::debug(json_encode($data));
     }
 
     public function handle()

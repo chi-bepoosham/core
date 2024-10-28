@@ -3,6 +3,7 @@ import os
 import json
 import re
 import time
+import base64
 
 # Define custom credentials
 rabbitmq_user = "develop"
@@ -42,7 +43,7 @@ def consume_queue():
         virtual_host=rabbitmq_vhost,
         credentials=credentials
     )
-    os.system("sleep 2")
+    os.system("sleep 10")
 
     for i in range(5):
         try:
@@ -61,7 +62,6 @@ def consume_queue():
 
     channel.start_consuming()
 
-
 def send_message_to_rabbitmq(data):
     credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
     parameters = pika.ConnectionParameters(
@@ -69,7 +69,9 @@ def send_message_to_rabbitmq(data):
         virtual_host=rabbitmq_vhost,
         credentials=credentials
     )
+    os.system("sleep 10")
 
+    # Attempt to establish a connection with retries
     for i in range(5):
         try:
             connection = pika.BlockingConnection(parameters)
@@ -82,10 +84,31 @@ def send_message_to_rabbitmq(data):
         return
 
     channel = connection.channel()
-    channel.queue_declare(queue='ai_predict_process', durable=True)
+    try:
+        # Only check if the queue exists without declaring it again
+        channel.queue_declare(queue='ai_predict_process', durable=True, passive=True)
+    except pika.exceptions.ChannelClosedByBroker:
+        print("Queue 'ai_predict_process' does not exist or settings mismatch.")
+        connection.close()
+        return
 
     # Publish message to the queue
-    message = json.dumps(data)
+    message = json.dumps({
+            "uuid": "d3bb48e4-cd10-42bc-90e3-8b80c381a342",
+            "displayName": "App\\Jobs\\ProcessRabbitMQMessage",
+            "job": "App\\Jobs\\ProcessRabbitMQMessage",
+            "maxTries": None,
+            "maxExceptions": None,
+            "failOnTimeout": False,
+            "backoff": None,
+            "timeout": None,
+            "retryUntil": None,
+            "data": {
+                "commandName": "App\\Jobs\\ProcessRabbitMQMessage",
+                "command": base64.b64encode(data).decode('utf-8')
+            },
+            "id": "02f7d3f2-9234-4d6c-97f4-01c301774560"
+    })
     channel.basic_publish(
         exchange='',
         routing_key='ai_predict_process',
@@ -96,7 +119,6 @@ def send_message_to_rabbitmq(data):
     )
     print(f"Sent message: {message}")
     connection.close()
-
 
 if __name__ == "__main__":
 #     consume_queue()
