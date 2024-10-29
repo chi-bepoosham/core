@@ -5,30 +5,26 @@ namespace App\Jobs;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 class ProcessRabbitMQMessage implements ShouldQueue
 {
-    use InteractsWithQueue, Queueable, SerializesModels;
+    use InteractsWithQueue, Queueable;
 
     public $data;
 
-    public function __construct($data)
+    public function handle($data)
     {
-        $this->data = $data;
-        Log::debug(json_encode($data));
-    }
+        $this->data = $data["data"];
 
-    public function handle()
-    {
-        // Here you can process the incoming message
-        Log::info('Received RabbitMQ message', ['data' => $this->data]);
-
-        // Example of accessing user_id and image_link
+        // Access specific fields from the payload
+        $action = $this->data['action'] ?? null;
         $userId = $this->data['user_id'] ?? null;
-        $imageLink = $this->data['image_link'] ?? null;
+        $description = $this->data['description'] ?? null;
 
-        // Process further based on your requirements
+        Log::info('Action : '.$action);
+        Log::info('User ID : '.$userId);
+        Log::info('Description : '.$description);
+
     }
 }

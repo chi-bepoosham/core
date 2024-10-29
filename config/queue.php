@@ -94,6 +94,7 @@ return [
                     'durable' => true,
                     'exclusive' => false,
                     'auto_delete' => false,
+                    'job' => \App\Queue\CustomRabbitMQQueue::class,
                 ],
             ],
         ],

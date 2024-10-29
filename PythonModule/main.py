@@ -16,16 +16,16 @@ def process_message(ch, method, properties, body):
 
     try:
         # Decode the message body
-        message = json.loads(body)
-        php_serialized_data = message.get("data", {}).get("command")
-
-        # Regular expression to extract the JSON part
-        match = re.search(r's:7:"message";s:\d+:"({.*})";', php_serialized_data)
-        if match:
-
-            # Decode the nested command containing your custom message
-            json_data = match.group(1)
-            messageData = json.loads(json_data)
+        messageData = json.loads(body)
+#         php_serialized_data = message.get("data", {}).get("command")
+#
+#         # Regular expression to extract the JSON part
+#         match = re.search(r's:7:"message";s:\d+:"({.*})";', php_serialized_data)
+#         if match:
+#
+#             # Decode the nested command containing your custom message
+#             json_data = match.group(1)
+#             messageData = json.loads(json_data)
 
 
     except (json.JSONDecodeError, KeyError) as e:
@@ -92,22 +92,12 @@ def send_message_to_rabbitmq(data):
         connection.close()
         return
 
+
     # Publish message to the queue
     message = json.dumps({
-            "uuid": "d3bb48e4-cd10-42bc-90e3-8b80c381a342",
-            "displayName": "App\\Jobs\\ProcessRabbitMQMessage",
-            "job": "App\\Jobs\\ProcessRabbitMQMessage",
-            "maxTries": None,
-            "maxExceptions": None,
-            "failOnTimeout": False,
-            "backoff": None,
-            "timeout": None,
-            "retryUntil": None,
-            "data": {
-                "commandName": "App\\Jobs\\ProcessRabbitMQMessage",
-                "command": base64.b64encode(data).decode('utf-8')
-            },
-            "id": "02f7d3f2-9234-4d6c-97f4-01c301774560"
+            "id": "02f7d3f2-9234-4d6c-97f4-01c301774560",
+            "uuid": "d3bb48ex4-cd0-42bc-90e3-8b80c381a342",
+            "data": data,
     })
     channel.basic_publish(
         exchange='',
