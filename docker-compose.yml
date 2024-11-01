@@ -145,6 +145,8 @@ services:
         depends_on:
             rabbitmq:
                 condition: service_healthy
+            application_queue:
+                condition: service_started
         networks:
             - main
 networks:
