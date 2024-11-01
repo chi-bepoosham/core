@@ -34,10 +34,5 @@ class SendRabbitMQMessage implements ShouldQueue
         if ($data){
             $this->data = $data;
         }
-
-        $this->delete();
-
-        Queue::push(SendRabbitMQMessage::class, $data);
-
     }
 }

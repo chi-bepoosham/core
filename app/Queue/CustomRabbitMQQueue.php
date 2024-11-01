@@ -19,13 +19,19 @@ class CustomRabbitMQQueue extends BaseJob
     public function fire()
     {
         $data = $this->payload();
-        if (count($data) == 0){
+
+        if (count($data) == 0) {
             $this->delete();
+            return;
         }
 
-        $class = $data["job"];
-        $method = 'handle';
+        $class = $data["job"] ?? null;
+        if (!$class) {
+            $this->delete();
+            return;
+        }
 
+        $method = 'handle';
         $this->delete();
 
         ($this->instance = $this->resolve($class))->{$method}($data);

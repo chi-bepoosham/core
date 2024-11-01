@@ -24,5 +24,7 @@ class StartRabbitMQ implements ShouldQueue
      */
     public function handle(): void
     {
+        sleep(7);
+        SendRabbitMQMessage::dispatch(["user_id" => "Initial Test"]);
     }
 }

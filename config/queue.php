@@ -90,7 +90,7 @@ return [
                 ],
                 'queue' => [
                     'name' => env('RABBITMQ_QUEUE', 'ai_predict_process'),
-                    'declare' => false, // Disable declaration to use the existing queue
+                    'declare' => true,
                     'bind' => true,
                     'durable' => true,
                     'exclusive' => false,

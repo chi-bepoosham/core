@@ -102,12 +102,10 @@ def send_message_to_rabbitmq(data):
         properties=pika.BasicProperties(delivery_mode=2,headers={'index': 1})
     )
 
-    print("Sent completion message:", message)
-     # Save extracted data to file
+    # Save extracted data to file
     file_name = "send.txt"
     with open(file_name, "w") as file:
         file.write(str(message))
-    print(f"Message data written to {file_name}")
 
 
     connection.close()
@@ -119,7 +117,6 @@ def consume_queue():
 
     channel.queue_declare(queue='ai_predict_process', durable=True, passive=True)
     channel.basic_consume(queue='ai_predict_process', on_message_callback=process_message)
-    print("Started consuming from 'ai_predict_process' queue.")
     channel.start_consuming()
 
 

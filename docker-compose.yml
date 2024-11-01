@@ -7,8 +7,10 @@ services:
             - application_1
             - application_2
         depends_on:
-            - application_1
-            - application_2
+            application_2:
+                condition: service_healthy
+            rabbitmq:
+                condition: service_healthy
         ports:
             - "8080:8080"
         volumes:
@@ -92,8 +94,8 @@ services:
         networks:
             - main
         depends_on:
-            application_queue:
-                condition: service_started
+            rabbitmq:
+                condition: service_healthy
             postgres:
                 condition: service_started
     application_2:
@@ -113,10 +115,15 @@ services:
         expose:
             - "1550"
         depends_on:
-            application_queue:
-                condition: service_started
+            rabbitmq:
+                condition: service_healthy
             postgres:
                 condition: service_started
+        healthcheck:
+            test: [ "CMD", "curl", "-f", "http://localhost:1550" ]
+            interval: 15s
+            timeout: 2s
+            retries: 1
     application_queue:
         image: chibepoosham-application_1:latest
         container_name: application_queue

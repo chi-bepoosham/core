@@ -6,6 +6,10 @@ use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/ok', function () {
     $data = [
         "action" => "process",
         "user_id" => "16161616",
