@@ -19,13 +19,17 @@ class CustomRabbitMQQueue extends BaseJob
     public function fire()
     {
         $data = $this->payload();
+        if (count($data) == 0){
+            $this->delete();
+        }
 
-        $class = ProcessRabbitMQMessage::class;
+        $class = $data["job"];
         $method = 'handle';
+
+        $this->delete();
 
         ($this->instance = $this->resolve($class))->{$method}($data);
 
-        $this->delete();
     }
 
     /**
@@ -37,11 +41,20 @@ class CustomRabbitMQQueue extends BaseJob
     public function payload(): array
     {
         $payload = json_decode($this->getRawBody(), true);
-        return [
-            'id'  => $payload["id"],
-            'uuid'  => $payload["uuid"],
-            'job'  => ProcessRabbitMQMessage::class,
-            'data' => $payload["data"]
-        ];
+        if (isset($payload["displayName"])){
+            $payload["job"] = $payload["displayName"];
+            return $payload;
+        }
+
+        if (isset($payload["id"])){
+            return [
+                'id'  => $payload["id"],
+                'uuid'  => $payload["uuid"],
+                'job'  => ProcessRabbitMQMessage::class,
+                'data' => $payload["data"]
+            ];
+        }
+
+        return [];
     }
 }
