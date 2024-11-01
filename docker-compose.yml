@@ -92,7 +92,10 @@ services:
         networks:
             - main
         depends_on:
-            - postgres
+            application_queue:
+                condition: service_started
+            postgres:
+                condition: service_started
     application_2:
         image: chibepoosham-application_1:latest
         container_name: application_2
@@ -110,12 +113,15 @@ services:
         expose:
             - "1550"
         depends_on:
-            - postgres
+            application_queue:
+                condition: service_started
+            postgres:
+                condition: service_started
     application_queue:
         image: chibepoosham-application_1:latest
         container_name: application_queue
         working_dir: /var/www
-        command: sh -c "sleep 5 && php artisan start:rabbitmq && sleep 2 &&  php artisan queue:work rabbitmq --daemon --sleep=3 --tries=5 --timeout=120"
+        command: sh -c "sleep 7 && php artisan start:rabbitmq && sleep 2 &&  php artisan rabbitmq:consume --timeout=0"
         restart: always
         user: "www"
         depends_on:

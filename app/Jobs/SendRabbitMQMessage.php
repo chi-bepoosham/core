@@ -2,27 +2,42 @@
 
 namespace App\Jobs;
 
+use App\Services\RabbitmqSendData;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Queue;
+use PhpAmqpLib\Message\AMQPMessage;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class SendRabbitMQMessage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $message;
+    protected $data;
 
-    public function __construct($message)
+    public function __construct($data = null)
     {
-        $this->message = json_encode($message);
+        if ($data){
+            $this->data = $data;
+        }
     }
 
-    public function handle()
+    /**
+     * @throws \Exception
+     */
+    public function handle($data = null)
     {
-        // Send message to RabbitMQ
-        echo "Sending message to RabbitMQ: " . $this->message . "\n";
+        if ($data){
+            $this->data = $data;
+        }
+
+        $this->delete();
+
+        Queue::push(SendRabbitMQMessage::class, $data);
+
     }
 }

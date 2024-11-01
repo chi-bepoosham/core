@@ -79,6 +79,7 @@ return [
             'vhost' => env('RABBITMQ_VHOST', '/'),
             'login' => env('RABBITMQ_USER', 'guest'),
             'password' => env('RABBITMQ_PASSWORD', 'guest'),
+            'response_queue' => env('RABBITMQ_RESPONSE_QUEUE', 'laravel_response_queue'),
             'options' => [
                 'exchange' => [
                     'name' => env('RABBITMQ_EXCHANGE_NAME', 'default'),
@@ -95,6 +96,7 @@ return [
                     'exclusive' => false,
                     'auto_delete' => false,
                     'job' => \App\Queue\CustomRabbitMQQueue::class,
+
                 ],
             ],
         ],

@@ -3,121 +3,126 @@ import os
 import json
 import re
 import time
-import base64
 
-# Define custom credentials
+# Define RabbitMQ credentials and connection settings
 rabbitmq_user = "develop"
 rabbitmq_password = "Z!^P>C78)g5"
 rabbitmq_host = "rabbitmq"
 rabbitmq_vhost = "rabbitmq"
+response_queue = 'ai_predict_process'
 
+
+def process_image():
+    return {
+        "item_name":"image_processed",
+        "item_content":"1d5w1dw4d6w4d6w46d"
+    }
+
+
+
+def establish_connection():
+    credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
+    parameters = pika.ConnectionParameters(
+        host=rabbitmq_host,
+        virtual_host=rabbitmq_vhost,
+        credentials=credentials
+    )
+
+    return pika.BlockingConnection(parameters)
 
 def process_message(ch, method, properties, body):
 
-    try:
-        # Decode the message body
-        messageData = json.loads(body)
-#         php_serialized_data = message.get("data", {}).get("command")
-#
-#         # Regular expression to extract the JSON part
-#         match = re.search(r's:7:"message";s:\d+:"({.*})";', php_serialized_data)
-#         if match:
-#
-#             # Decode the nested command containing your custom message
-#             json_data = match.group(1)
-#             messageData = json.loads(json_data)
-
-
-    except (json.JSONDecodeError, KeyError) as e:
-        messageData = e
-
-    # Write the message body to a new file
-    file_name = f"message.txt"
-    with open(file_name, "w") as file:
-        file.write(str(messageData))  # Save the message in the file
-
-def consume_queue():
-    credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
-    parameters = pika.ConnectionParameters(
-        host=rabbitmq_host,
-        virtual_host=rabbitmq_vhost,
-        credentials=credentials
-    )
-    os.system("sleep 10")
-
-    for i in range(5):
-        try:
-            connection = pika.BlockingConnection(parameters)
-            break
-        except pika.exceptions.AMQPConnectionError:
-            print(f"Connection attempt {i+1} failed, retrying in 5 seconds...")
-            os.system("sleep 5")
+    if properties.headers and properties.headers.get('index') == 1:
+        ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
     else:
-        print("Failed to connect to RabbitMQ after 5 attempts.")
-        return
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+        message = json.loads(body)
+        job_id = message.get("id")
+        job_uuid = message.get("uuid")
+        job_name = message.get("displayName")
 
-    channel = connection.channel()
-    channel.queue_declare(queue='ai_predict_process', durable=True)
-    channel.basic_consume(queue='ai_predict_process', on_message_callback=process_message, auto_ack=True)
+        if job_name == 'App\\Jobs\\SendRabbitMQMessage' :
+            try:
+                try:
+                    php_serialized_data = message.get("data", {}).get("command")
+                    match = re.search(r's:7:"\x00\*\x00data";a:\d+:{(.*)}', php_serialized_data)
+                    if match:
+                        data_content = match.group(1)
+                        # Regex pattern to extract individual key-value pairs
+                        key_value_pairs = re.findall(r's:\d+:"(.*?)";(s|i):\d+:"?([^";]*)"?(?:;|$)', data_content)
+                        # Convert key-value pairs to a dictionary
+                        messageData = {key: int(value) if type_ == 'i' else value for key, type_, value in key_value_pairs}
+                    else:
+                        messageData = None
 
-    channel.start_consuming()
+                except TypeError as e:
+                    messageData = None
+
+            except (json.JSONDecodeError, KeyError) as e:
+                messageData = None
+
+
+
+            if messageData is not None:
+
+                process_image_data = process_image()
+                action = messageData.get("action")
+                uuid = messageData.get("uuid")
+                user_id = messageData.get("user_id")
+                image_link = messageData.get("image_link")
+                time = messageData.get("time")
+
+
+                completion_data =  {
+                    "id": job_id,
+                    "uuid": job_uuid,
+                    "job": job_name,
+                    "data": {
+                        "process_image": process_image_data,
+                        "action": action,
+                        "uuid": uuid,
+                        "user_id": user_id,
+                        "image_link": image_link,
+                        "time": time,
+                    },
+                }
+
+                send_message_to_rabbitmq(completion_data)
 
 def send_message_to_rabbitmq(data):
-    credentials = pika.PlainCredentials(rabbitmq_user, rabbitmq_password)
-    parameters = pika.ConnectionParameters(
-        host=rabbitmq_host,
-        virtual_host=rabbitmq_vhost,
-        credentials=credentials
-    )
-    os.system("sleep 10")
-
-    # Attempt to establish a connection with retries
-    for i in range(5):
-        try:
-            connection = pika.BlockingConnection(parameters)
-            break
-        except pika.exceptions.AMQPConnectionError:
-            print(f"Connection attempt {i+1} failed, retrying in 5 seconds...")
-            os.system("sleep 5")
-    else:
-        print("Failed to connect to RabbitMQ after 5 attempts.")
-        return
-
+    """Send a completion message to the RabbitMQ response queue."""
+    connection = establish_connection()
     channel = connection.channel()
-    try:
-        # Only check if the queue exists without declaring it again
-        channel.queue_declare(queue='ai_predict_process', durable=True, passive=True)
-    except pika.exceptions.ChannelClosedByBroker:
-        print("Queue 'ai_predict_process' does not exist or settings mismatch.")
-        connection.close()
-        return
 
-
-    # Publish message to the queue
-    message = json.dumps({
-            "id": "02f7d3f2-9234-4d6c-97f4-01c301774560",
-            "uuid": "d3bb48ex4-cd0-42bc-90e3-8b80c381a342",
-            "data": data,
-    })
+    message = json.dumps(data)
     channel.basic_publish(
         exchange='',
         routing_key='ai_predict_process',
         body=message,
-        properties=pika.BasicProperties(
-            delivery_mode=2,  # Make message persistent
-        )
+        properties=pika.BasicProperties(delivery_mode=2,headers={'index': 1})
     )
-    print(f"Sent message: {message}")
+
+    print("Sent completion message:", message)
+     # Save extracted data to file
+    file_name = "send.txt"
+    with open(file_name, "w") as file:
+        file.write(str(message))
+    print(f"Message data written to {file_name}")
+
+
     connection.close()
 
-if __name__ == "__main__":
-#     consume_queue()
+def consume_queue():
+    time.sleep(10)
+    connection = establish_connection()
+    channel = connection.channel()
 
-    os.system("sleep 2")
-    # Example message data
-    message_data = {
-        "action": "user_created",
-        "user_id": 1212,
-        "description": "New user created from Python app"
-    }
-    send_message_to_rabbitmq(message_data)
+    channel.queue_declare(queue='ai_predict_process', durable=True, passive=True)
+    channel.basic_consume(queue='ai_predict_process', on_message_callback=process_message)
+    print("Started consuming from 'ai_predict_process' queue.")
+    channel.start_consuming()
+
+
+
+if __name__ == "__main__":
+    consume_queue()

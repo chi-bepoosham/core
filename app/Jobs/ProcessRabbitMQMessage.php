@@ -18,13 +18,19 @@ class ProcessRabbitMQMessage implements ShouldQueue
         $this->data = $data["data"];
 
         // Access specific fields from the payload
+        $processImage = $this->data['process_image'] ?? null;
         $action = $this->data['action'] ?? null;
-        $userId = $this->data['user_id'] ?? null;
-        $description = $this->data['description'] ?? null;
+        $uuid = $this->data['uuid'] ?? null;
+        $user_id = $this->data['user_id'] ?? null;
+        $imageLink = $this->data['image_link'] ?? null;
+        $time = $this->data['time'] ?? null;
 
-        Log::info('Action : '.$action);
-        Log::info('User ID : '.$userId);
-        Log::info('Description : '.$description);
+        Log::info('process Image : ', $processImage);
+        Log::info('action : ' . $action);
+        Log::info('uuid : ' . $uuid);
+        Log::info('user_id : ' . $user_id);
+        Log::info('image Link : ' . $imageLink);
+        Log::info('time : ' . $time);
 
     }
 }

@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class StartRabbitMQ implements ShouldQueue
 {
@@ -19,9 +20,9 @@ class StartRabbitMQ implements ShouldQueue
 
     /**
      * Execute the job.
+     * @throws \Exception
      */
     public function handle(): void
     {
-        //
     }
 }
