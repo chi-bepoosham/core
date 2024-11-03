@@ -18,10 +18,6 @@ use App\Http\Controllers\api\v1\UserController;
  *
 */
 
-Route::get("get/token", function () {
-    return User::query()->first()->createToken("ChiBepoosham-usr-1")->plainTextToken;
-});
-
 
 Route::prefix('v1')->group(function () {
 

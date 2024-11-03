@@ -32,6 +32,12 @@ class UsersService
             throw new Exception(__("custom.user.not_exist"));
         }
 
+        $mobile = $inputs["mobile"];
+        $existUserItem = User::query()->whereNot("id", Auth::id())->where("mobile", $mobile)->first();
+        if ($existUserItem != null) {
+            throw new Exception(__("custom.user.mobile_exist"));
+        }
+
         $deleteAvatar = $inputs["delete_avatar"] ?? null;
         if ((bool)$deleteAvatar === true) {
             $inputs["avatar"] = null;
@@ -69,14 +75,14 @@ class UsersService
 
                 $imageName = uniqid() . time() . random_string() . '.' . $extension;
                 $path = 'user/avatar';
-                $fullPath = Storage::disk('public')->putFileAs(path: $path, file: $image, name: $imageName, options: ['visibility' => 'public', 'directory_visibility' => 'public']);
+                $fullPath = Storage::putFileAs(path: $path, file: $image, name: $imageName, options: ['visibility' => 'public', 'directory_visibility' => 'public']);
 
                 try {
                     unlink($newFilePath);
                 } catch (Exception $exception) {
                 }
 
-                return asset(Storage::url($fullPath));
+                return "/storage/" . $fullPath;
             }
 
             return null;
