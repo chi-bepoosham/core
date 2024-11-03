@@ -6,8 +6,10 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "intervention/image": "2.7",
         "laravel/framework": "^11.9",
         "laravel/octane": "^2.5",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "vladimir-yuldashev/laravel-queue-rabbitmq": "^14.1"
     },
@@ -26,7 +28,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/Helpers/helpers.php",
+            "app/Helpers/Exceptions/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Support\Facades\Log;
+
+if (!function_exists('random_string')) {
+    function random_string($length = 10, $start_with = '', $end_with = ''): string
+    {
+        $start_with = filled($start_with) ? $start_with . "_" : $start_with;
+        $end_with = filled($end_with) ? "_" . $end_with : $end_with;
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[random_int(0, $charactersLength - 1)];
+        }
+        return $start_with . $randomString . $end_with;
+    }
+}
+
+if (!function_exists('sendSms')) {
+    function sendSms(string|int $mobile, string $message = null, string $hash = '-'): bool
+    {
+        try {
+            $app_env = env('APP_ENV');
+            Log::debug($mobile." : ".$message);
+            if ($app_env == 'production') {
+//                return \Modules\Sms\Services\Sms::sendSMSAsTemp($mobile, $message, $hash, 'NewOTP');
+                return true;
+            } else {
+                return true;
+            }
+        } catch (\Exception $exception) {
+            return false;
+        }
+    }
+}
