@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Helpers\Response\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ValidateUpdateBodyImage;
 use App\Http\Requests\ValidateUpdateUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,6 +26,20 @@ class UserController extends Controller
             return ResponseHelper::responseSuccess([],$message);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
+            return ResponseHelper::responseCustomError($message);
+        }
+    }
+
+
+    public function updateBodyImage(ValidateUpdateBodyImage $request): JsonResponse
+    {
+        $inputs = $request->validated();
+        try {
+            $this->service->updateBodyImage($inputs);
+            $message = __("custom.defaults.upload_success");
+            return ResponseHelper::responseSuccess([],$message);
+        } catch (\Exception $exception) {
+            $message = __("custom.defaults.upload_failed");
             return ResponseHelper::responseCustomError($message);
         }
     }

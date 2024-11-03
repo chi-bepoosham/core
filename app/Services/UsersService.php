@@ -6,9 +6,11 @@ use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use App\Http\Repositories\UserRepository;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +48,7 @@ class UsersService
         $inputs["email"] = $inputs["email"] ?? null;
 
         if (isset($inputs["avatar"])) {
-            $inputs["avatar"] = $this->saveImage($inputs["avatar"]);
+            $inputs["avatar"] = $this->saveImage($inputs["avatar"], 'avatar');
         }
 
         DB::beginTransaction();
@@ -61,7 +63,33 @@ class UsersService
     }
 
 
-    public function saveImage($imageFile): ?string
+    /**
+     * @param $inputs
+     * @return bool
+     * @throws Exception
+     */
+    public function updateBodyImage($inputs): bool
+    {
+        $userItem = $this->repository->find(Auth::id());
+        if (!$userItem) {
+            throw new Exception(__("custom.user.not_exist"));
+        }
+
+        $inputs["body_image"] = $this->saveImage($inputs["body_image"], 'body_images');
+
+        DB::beginTransaction();
+        try {
+            $createdItem = $this->repository->update($userItem, $inputs);
+            DB::commit();
+            return $createdItem;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw new Exception(__("custom.user.register_exception"));
+        }
+    }
+
+
+    public function saveImage($imageFile, $folder): ?string
     {
         try {
             $extension = $imageFile->getClientOriginalExtension();
@@ -73,8 +101,8 @@ class UsersService
                 $image = new UploadedFile($imageEncoded->basePath(), $imageFile->getFilename());
 
 
-                $imageName = uniqid() . time() . random_string() . '.' . $extension;
-                $path = 'user/avatar';
+                $imageName = sha1(md5(Auth::id())) . '.' . $extension;
+                $path = 'user/' . $folder;
                 $fullPath = Storage::putFileAs(path: $path, file: $image, name: $imageName, options: ['visibility' => 'public', 'directory_visibility' => 'public']);
 
                 try {

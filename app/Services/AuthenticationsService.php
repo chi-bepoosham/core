@@ -83,7 +83,7 @@ class AuthenticationsService
 
             if (isset($inputs["avatar"])) {
                 $userService = new UsersService(new UserRepository());
-                $inputs["avatar"] = $userService->saveImage($inputs["avatar"]);
+                $inputs["avatar"] = $userService->saveImage($inputs["avatar"], 'avatar');
             }
 
             $createdItem = $this->create($inputs);

@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
             Route::post("/register", [AuthController::class, "register"])->middleware(checkApiKeyMiddleware::class);
         });
 
+        Route::post("/update/body/image", [UserController::class, "updateBodyImage"]);
         Route::post("/update/profile", [UserController::class, "updateUser"]);
 
     });

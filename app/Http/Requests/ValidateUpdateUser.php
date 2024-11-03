@@ -22,7 +22,7 @@ class ValidateUpdateUser extends FormRequest
             'birthday' => 'nullable|string',
             'email' => 'nullable|email|unique:users,email',
             'gender' => 'nullable|integer|min:1|max:3',
-            'avatar' => 'nullable|file',
+            'avatar' => 'nullable|file|mimes:jpg,jpeg,png,wep,webp',
             'delete_avatar' => 'nullable|boolean',
         ];
     }

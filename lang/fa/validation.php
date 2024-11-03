@@ -163,7 +163,7 @@ return [
         "publish_status" => "وضعیت انتشار",
         "status" => "وضعیت",
         "parent_category" => "دسته بندی والد",
-        "group_ids" => "آیدی گروه ها",
+        "body_image" => "تصویر بدن",
 
     ]
 ];
