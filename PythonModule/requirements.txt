@@ -1,2 +1,8 @@
 pika==1.3.2
 datetime==5.5
+tensorflow==2.13
+torch==2.4.1
+numpy
+ultralytics
+opencv-python
+pillow
