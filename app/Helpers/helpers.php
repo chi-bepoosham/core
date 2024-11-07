@@ -24,8 +24,7 @@ if (!function_exists('sendSms')) {
             $app_env = env('APP_ENV');
             Log::debug($mobile." : ".$message);
             if ($app_env == 'production') {
-//                return \Modules\Sms\Services\Sms::sendSMSAsTemp($mobile, $message, $hash, 'NewOTP');
-                return true;
+                return App\Services\SmsService::sendSms($mobile);
             } else {
                 return true;
             }
