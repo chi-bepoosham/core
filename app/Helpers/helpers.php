@@ -22,7 +22,7 @@ if (!function_exists('sendSms')) {
     {
         try {
             $app_env = env('APP_ENV');
-            Log::debug($mobile." : ".$code);
+            Log::info($mobile." : ".$code);
             if ($app_env == 'production') {
                 return App\Services\SmsService::sendSms($mobile,$code);
             } else {
