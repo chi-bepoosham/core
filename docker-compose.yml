@@ -85,7 +85,7 @@ services:
         working_dir: /var/www
         restart: always
         tty: true
-        user: "www"
+        user: "root"
         volumes:
             - './:/var/www:rw'
             - './docker/php/config/php.ini:/usr/local/etc/php/php.ini-development'
@@ -104,7 +104,7 @@ services:
         working_dir: /var/www
         restart: always
         tty: true
-        user: "www"
+        user: "root"
         command: sh -c  "php artisan octane:start --server=swoole --host=0.0.0.0 --rpc-port=6001 --port=1550"
         volumes:
             - './:/var/www:rw'
@@ -130,7 +130,7 @@ services:
         working_dir: /var/www
         command: sh -c "sleep 7 && php artisan start:rabbitmq && sleep 2 &&  php artisan rabbitmq:consume --timeout=0"
         restart: always
-        user: "www"
+        user: "root"
         depends_on:
             rabbitmq:
                 condition: service_healthy
