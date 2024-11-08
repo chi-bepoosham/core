@@ -18,13 +18,13 @@ if (!function_exists('random_string')) {
 }
 
 if (!function_exists('sendSms')) {
-    function sendSms(string|int $mobile, string $message = null, string $hash = '-'): bool
+    function sendSms(string|int $mobile, string $code = null, string $hash = '-'): bool
     {
         try {
             $app_env = env('APP_ENV');
-            Log::debug($mobile." : ".$message);
+            Log::debug($mobile." : ".$code);
             if ($app_env == 'production') {
-                return App\Services\SmsService::sendSms($mobile);
+                return App\Services\SmsService::sendSms($mobile,$code);
             } else {
                 return true;
             }

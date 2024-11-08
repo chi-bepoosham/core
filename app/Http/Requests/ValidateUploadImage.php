@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Validator;
 
-class ValidateUpdateBodyImage extends FormRequest
+class ValidateUploadImage extends FormRequest
 {
 
 
@@ -16,7 +16,7 @@ class ValidateUpdateBodyImage extends FormRequest
     public function rules(): array
     {
         return [
-            'body_image' => 'required|file|mimes:jpg,jpeg,png,wep,webp',
+            'image' => 'required|file|mimes:jpg,jpeg,png,wep,webp',
         ];
     }
 

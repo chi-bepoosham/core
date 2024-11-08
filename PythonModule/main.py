@@ -3,6 +3,7 @@ import os
 import json
 import re
 import time
+from deploy.man.body_type_M import get_man_body_type
 
 # Define RabbitMQ credentials and connection settings
 rabbitmq_user = "develop"
@@ -13,7 +14,9 @@ response_queue = 'ai_predict_process'
 
 
 def process_image():
+    man_body_type = get_man_body_type("/var/www/deploy/man/astinboland.jpg")
     return {
+        "man_body_type":man_body_type,
         "item_name":"image_processed",
         "item_content":"1d5w1dw4d6w4d6w46d"
     }

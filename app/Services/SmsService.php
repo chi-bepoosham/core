@@ -9,19 +9,19 @@ use Illuminate\Support\Facades\Log;
 class SmsService
 {
 
-    public static function sendSms($mobile)
+    public static function sendSms($mobile, $code)
     {
-        $templateId = 621415;
+        $templateId = env("SMSIR_LINE_NUMBER", 621415);
         $parameters = [
             [
                 "name" => "TOKEN",
-                "value" => "1234"
+                "value" => $code,
             ]
         ];
 
         try {
-            $send =  SmsIr::verifySend($mobile, $templateId, $parameters);
-            if ($send->status == 1){
+            $send = SmsIr::verifySend($mobile, $templateId, $parameters);
+            if ($send->status == 1) {
                 return true;
             }
             return false;

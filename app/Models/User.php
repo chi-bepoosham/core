@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
@@ -28,6 +29,8 @@ class User extends Authenticatable
         'avatar',
         'gender',
         'status',
+        'body_image',
+        'body_type_id',
     ];
 
     /**
@@ -46,10 +49,17 @@ class User extends Authenticatable
             'email_verified_at' => 'timestamp',
             'avatar' => 'string',
             'gender' => 'integer',
+            'body_image' => 'string',
             'status' => 'integer',
+            'body_type_id' => 'integer',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
         ];
+    }
+
+    public function bodyType(): BelongsTo
+    {
+        return $this->belongsTo(BodyType::class,"body_type_id");
     }
 
 }

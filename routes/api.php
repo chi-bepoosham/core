@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\api\v1\BodyTypeController;
 use App\Http\Middleware\checkApiKeyMiddleware;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,20 +20,22 @@ use App\Http\Controllers\api\v1\UserController;
 */
 
 
-Route::prefix('v1')->group(function () {
+Route::prefix('v1/user')->middleware('auth:sanctum')->group(function () {
 
-    Route::prefix('user')->middleware('auth:sanctum')->group(function () {
-
-        Route::prefix('auth')->withoutMiddleware('auth:sanctum')->group(function () {
-            Route::post("/otp/send", [AuthController::class, "sendOtp"]);
-            Route::post("/otp/confirm", [AuthController::class, "otpConfirm"]);
-            Route::post("/register", [AuthController::class, "register"])->middleware(checkApiKeyMiddleware::class);
-        });
-
-        Route::post("/update/body/image", [UserController::class, "updateBodyImage"]);
-        Route::post("/update/profile", [UserController::class, "updateUser"]);
-
+    Route::prefix('auth')->withoutMiddleware('auth:sanctum')->group(function () {
+        Route::post("/otp/send", [AuthController::class, "sendOtp"]);
+        Route::post("/otp/confirm", [AuthController::class, "otpConfirm"]);
+        Route::post("/register", [AuthController::class, "register"])->middleware(checkApiKeyMiddleware::class);
     });
+
+
+    Route::prefix('body_type')->group(callback: function () {
+        Route::get("/all", [BodyTypeController::class, "index"]);
+        Route::get("/details", [UserController::class, "getBodyTypeDetail"]);
+        Route::post("/upload/image", [UserController::class, "uploadBodyImage"]);
+    });
+
+    Route::post("/update/profile", [UserController::class, "updateUser"]);
 
 });
 

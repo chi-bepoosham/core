@@ -17,8 +17,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UsersService
 {
+    public $user;
+
+    /**
+     * @throws Exception
+     */
     public function __construct(public UserRepository $repository)
     {
+        $userItem = $this->repository->find(Auth::id());
+        if (!$userItem) {
+            throw new Exception(__("custom.user.not_exist"));
+        }
+        $this->user = $userItem;
     }
 
 
@@ -29,10 +39,7 @@ class UsersService
      */
     public function updateUser($inputs): bool
     {
-        $userItem = $this->repository->find(Auth::id());
-        if (!$userItem) {
-            throw new Exception(__("custom.user.not_exist"));
-        }
+
 
         $mobile = $inputs["mobile"];
         $existUserItem = User::query()->whereNot("id", Auth::id())->where("mobile", $mobile)->first();
@@ -53,7 +60,7 @@ class UsersService
 
         DB::beginTransaction();
         try {
-            $createdItem = $this->repository->update($userItem, $inputs);
+            $createdItem = $this->repository->update($this->user, $inputs);
             DB::commit();
             return $createdItem;
         } catch (Exception $exception) {
@@ -70,22 +77,34 @@ class UsersService
      */
     public function updateBodyImage($inputs): bool
     {
-        $userItem = $this->repository->find(Auth::id());
-        if (!$userItem) {
-            throw new Exception(__("custom.user.not_exist"));
-        }
 
-        $inputs["body_image"] = $this->saveImage($inputs["body_image"], 'body_images');
+        $inputs["body_image"] = $this->saveImage($inputs["image"], 'body_images');
 
         DB::beginTransaction();
         try {
-            $createdItem = $this->repository->update($userItem, $inputs);
+            $createdItem = $this->repository->update($this->user, $inputs);
             DB::commit();
             return $createdItem;
         } catch (Exception $exception) {
             DB::rollBack();
             throw new Exception(__("custom.user.register_exception"));
         }
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function getBodyTypeDetail(): mixed
+    {
+        $userBodyType = $this->user->bodyType()->with(["celebrities", "clothes"])->first();
+        if ($userBodyType != null) {
+            $result = new \stdClass();
+            $result->body_type = $userBodyType;
+            return $result;
+        }
+
+        throw new Exception(__("custom.user.body_type_not_detected"));
     }
 
 
