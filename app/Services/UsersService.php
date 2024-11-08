@@ -93,7 +93,6 @@ class UsersService
         try {
             $createdItem = $this->repository->update($this->user, $inputs);
 
-            Log::debug(asset($inputs["body_image"]));
             $data = [
                 "action" => "body_type",
                 "user_id" => $this->user->id,

@@ -144,7 +144,7 @@ services:
         image: chibepoosham-application_python:latest
         container_name: application_python
         working_dir: /var/www
-        restart: always
+        restart: on-failure
         volumes:
             - './PythonModule/:/var/www'
         expose:

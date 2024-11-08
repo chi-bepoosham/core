@@ -62,7 +62,7 @@ class UserClothesService
             $data = [
                 "action" => "process",
                 "user_id" => $this->user->id,
-                "image_link" => $inputs["image"],
+                "image_link" => asset($inputs["image"]),
                 "gender" => $this->user->gender,
                 "clothes_id" => $createdItem->id,
                 "time" => Carbon::now()->format("H:i:s"),
