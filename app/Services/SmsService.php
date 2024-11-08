@@ -27,7 +27,8 @@ class SmsService
             }
             return false;
         } catch (\Exception $e) {
-            return $e->getMessage();
+            Log::debug($e->getMessage());
+            return false;
         }
     }
 
