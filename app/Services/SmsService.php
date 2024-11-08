@@ -21,6 +21,7 @@ class SmsService
 
         try {
             $send = SmsIr::verifySend($mobile, $templateId, $parameters);
+            Log::info(json_encode($send));
             if ($send->status == 1) {
                 return true;
             }
