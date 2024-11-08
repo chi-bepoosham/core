@@ -39,7 +39,7 @@ class UserController extends Controller
             $message = __("custom.defaults.upload_success");
             return ResponseHelper::responseSuccess([], $message);
         } catch (\Exception $exception) {
-            $message = __("custom.defaults.upload_failed");
+            $message = $exception->getMessage();
             return ResponseHelper::responseCustomError($message);
         }
     }
