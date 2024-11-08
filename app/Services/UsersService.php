@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Repositories\UserRepository;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Symfony\Component\HttpFoundation\Response;
@@ -92,10 +93,11 @@ class UsersService
         try {
             $createdItem = $this->repository->update($this->user, $inputs);
 
+            Log::debug(asset($inputs["body_image"]));
             $data = [
                 "action" => "body_type",
                 "user_id" => $this->user->id,
-                "image_link" => $inputs["body_image"],
+                "image_link" => asset($inputs["body_image"]),
                 "gender" => $this->user->gender,
                 "clothes_id" => null,
                 "time" => Carbon::now()->format("H:i:s"),
