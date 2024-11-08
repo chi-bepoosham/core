@@ -28,6 +28,12 @@ class ProcessRabbitMQMessage implements ShouldQueue
         $time = $this->data['time'] ?? null;
         $processImageData = $this->data['process_image_data'] ?? null;
 
+        Log::info('process Image : ', $processImageData);
+        Log::info('action : ' . $action);
+        Log::info('user_id : ' . $userId);
+        Log::info('image Link : ' . $imageLink);
+        Log::info('time : ' . $time);
+
         $userRepository = new UserRepository();
         $userItem = $userRepository->find($userId);
         if ($userItem != null) {
@@ -43,11 +49,7 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
 
-        Log::info('process Image : ', $processImageData);
-        Log::info('action : ' . $action);
-        Log::info('user_id : ' . $userId);
-        Log::info('image Link : ' . $imageLink);
-        Log::info('time : ' . $time);
+
 
     }
 }

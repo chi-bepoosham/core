@@ -83,10 +83,25 @@ def process_message(ch, method, properties, body):
                     match = re.search(r's:7:"\x00\*\x00data";a:\d+:{(.*)}', php_serialized_data)
                     if match:
                         data_content = match.group(1)
-                        # Regex pattern to extract individual key-value pairs
-                        key_value_pairs = re.findall(r's:\d+:"(.*?)";(s|i):\d+:"?([^";]*)"?(?:;|$)', data_content)
-                        # Convert key-value pairs to a dictionary
-                        messageData = {key: int(value) if type_ == 'i' else value for key, type_, value in key_value_pairs}
+
+                        # Updated regex pattern to handle integer, string, and null values accurately
+                        key_value_pairs = re.findall(r's:\d+:"(.*?)";(s|i|N):(?:\d+:"(.*?)"|([^;]*));?', data_content)
+
+                        messageData = {}
+                        for key, type_, str_value, int_or_null in key_value_pairs:
+                            if type_ == 'i':
+                                # If it's an integer type, try converting the captured int_or_null to an integer
+                                try:
+                                    messageData[key] = int(int_or_null)
+                                except ValueError:
+                                    # Handle cases where int_or_null is empty or not a valid integer
+                                    messageData[key] = None
+                            elif type_ == 's':
+                                # Use str_value for string type
+                                messageData[key] = str_value
+                            elif type_ == 'N':
+                                # Null type
+                                messageData[key] = None
                     else:
                         messageData = None
 
@@ -95,7 +110,6 @@ def process_message(ch, method, properties, body):
 
             except (json.JSONDecodeError, KeyError) as e:
                 messageData = None
-
 
 
             if messageData is not None:
