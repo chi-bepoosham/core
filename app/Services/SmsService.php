@@ -21,14 +21,12 @@ class SmsService
 
         try {
             $send = SmsIr::verifySend($mobile, $templateId, $parameters);
-            Log::debug(json_encode($send));
             if ($send->status == 1) {
                 return true;
             }
             return false;
-        } catch (\Exception $e) {
-            Log::debug($e->getMessage());
-            return false;
+        } catch (\Exception $exception) {
+            throw $exception;
         }
     }
 
