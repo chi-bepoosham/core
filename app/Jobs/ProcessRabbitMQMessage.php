@@ -26,7 +26,7 @@ class ProcessRabbitMQMessage implements ShouldQueue
         $clothesId = $this->data['clothes_id'] ?? null;
         $imageLink = $this->data['image_link'] ?? null;
         $time = $this->data['time'] ?? null;
-        $processImageData = $this->data['process_data'] ?? null;
+        $processImageData = $this->data['process_image'] ?? null;
 
         Log::info('process Image : ', $processImageData);
         Log::info('action : ' . $action);
