@@ -1,1 +1,0 @@
-{"id": "8450dc38-88a8-4d62-80b2-5bf3144490a6", "uuid": "6c8f9aae-4ad1-4e91-88ee-3153a7fb1f4b", "job": "App\\Jobs\\SendRabbitMQMessage", "data": {"process_image": {"man_body_type": "0", "item_name": "image_processed", "item_content": "1d5w1dw4d6w4d6w46d"}, "action": "process", "uuid": null, "user_id": "16161616", "image_link": "https://test.com", "time": "17:53:37"}}

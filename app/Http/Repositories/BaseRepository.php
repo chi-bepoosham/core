@@ -178,24 +178,13 @@ abstract class BaseRepository
         return $query->orderBy($orderByColumn, $directionOrderBy);
     }
 
-    public function paginate($query, $perPage = null): Collection
+    public function paginate($perPage = null, $inputs = [], $relations = [], $selects = [], $orderByColumn = 'id', $directionOrderBy = 'desc'): LengthAwarePaginator
     {
-        $perPage = $perPage ?? request('per_page') ?? request(key: 'perPage', default: $this->default_per_page);
-        $paginated = $query->paginate(perPage: $perPage);
-        $tableName = $this->getTable();
-        return collect([
-            $tableName => $paginated->items(),
-            "pagination" => [
-                "current_page" => $paginated->currentPage(),
-                "per_page" => $paginated->perPage(),
-                "last_page" => $paginated->lastPage(),
-                "has_more_pages" => $paginated->hasMorePages(),
-                "total_count" => $paginated->total()
-            ]
-        ]);
+        $perPage = $perPage ?? request('per_page') ?? request('perPage') ?? $this->default_per_page;
+        return $this->queryFull(inputs: $inputs, relations: $relations, selects: $selects, orderByColumn: $orderByColumn, directionOrderBy: $directionOrderBy)->paginate($perPage);
     }
 
-    public function resolve_paginate($perPage = null, $inputs = [], $relations = [], $selects = [], $orderByColumn = 'id', $directionOrderBy = 'desc', $paginate = null, Builder|Collection $query = null): Collection
+    public function resolve_paginate($perPage = null, $inputs = [], $relations = [], $selects = [], $orderByColumn = 'id', $directionOrderBy = 'desc', $paginate = null, Builder|Collection $query = null): LengthAwarePaginator|Collection
     {
         $paginate = isset($paginate) && !is_bool($paginate) ? $paginate : request(key: 'paginate', default: $this->default_paginate);
         $perPage = $perPage ?? request('per_page') ?? request(key: 'perPage', default: $this->default_per_page);
@@ -205,7 +194,7 @@ abstract class BaseRepository
         return
             $paginate
                 ?
-                $this->paginate($query, perPage: $perPage)
+                $query->paginate(perPage: $perPage)
                 :
                 $query->get();
     }

@@ -3,20 +3,52 @@ import os
 import json
 import re
 import time
+import requests
+import random
 from deploy.man.body_type_M import get_man_body_type
+from deploy.man.load_and_predict_man import process_clothing_image
+from deploy.woman.body_typeF import get_body_type_female
+from deploy.woman.load_and_predict_woman import process_woman_clothing_image
+from deploy.woman.load_and_predict_woman_6model import process_six_model_predictions
 
 # Define RabbitMQ credentials and connection settings
 rabbitmq_user = "develop"
 rabbitmq_password = "Z!^P>C78)g5"
 rabbitmq_host = "rabbitmq"
 rabbitmq_vhost = "rabbitmq"
-response_queue = 'ai_predict_process'
+response_queue = "ai_predict_process"
 
 
-def process_image():
-    man_body_type = get_man_body_type("/var/www/deploy/man/astinboland.jpg")
+def process_image(gender,action,image_link):
+
+    # Create directory if it doesn't exist
+    temp_images_dir = '/var/www/temp_images/'
+    if not os.path.exists(temp_images_dir):
+        os.makedirs(temp_images_dir, exist_ok=True)
+
+    filename = image_link.split('/')[-1]
+    img_data = requests.get(image_link).content
+    img_name = temp_images_dir + str(int(time.time())) + str(random.randrange(100, 999)) + '-temp-' + filename
+
+    with open(img_name, 'wb') as handler:
+        handler.write(img_data)
+
+    if gender == 1 or gender == '1':
+        if action == 'body_type':
+            process_data = get_man_body_type(img_name)
+        else:
+            process_data = process_clothing_image(img_name)
+    else:
+        if action == 'body_type':
+            process_data = get_body_type_female(img_name)
+        else:
+            process_data = process_woman_clothing_image(img_name)
+            if process_data.get('paintane') is None:
+                process_data = process_six_model_predictions(img_name)
+
+
     return {
-        "man_body_type":man_body_type,
+        "process_data":process_data,
         "item_name":"image_processed",
         "item_content":"1d5w1dw4d6w4d6w46d"
     }
@@ -68,12 +100,13 @@ def process_message(ch, method, properties, body):
 
             if messageData is not None:
 
-                process_image_data = process_image()
                 action = messageData.get("action")
-                uuid = messageData.get("uuid")
                 user_id = messageData.get("user_id")
+                gender = messageData.get("gender")
+                clothes_id = messageData.get("clothes_id")
                 image_link = messageData.get("image_link")
                 time = messageData.get("time")
+                process_image_data = process_image(gender,action,image_link)
 
 
                 completion_data =  {
@@ -83,8 +116,9 @@ def process_message(ch, method, properties, body):
                     "data": {
                         "process_image": process_image_data,
                         "action": action,
-                        "uuid": uuid,
                         "user_id": user_id,
+                        "gender": gender,
+                        "clothes_id": clothes_id,
                         "image_link": image_link,
                         "time": time,
                     },
@@ -105,10 +139,6 @@ def send_message_to_rabbitmq(data):
         properties=pika.BasicProperties(delivery_mode=2,headers={'index': 1})
     )
 
-    # Save extracted data to file
-    file_name = "send.txt"
-    with open(file_name, "w") as file:
-        file.write(str(message))
 
 
     connection.close()

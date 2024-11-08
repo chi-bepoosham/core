@@ -23,7 +23,7 @@ class UserController extends Controller
         try {
             $this->service->updateUser($inputs);
             $message = __("custom.defaults.update_success");
-            return ResponseHelper::responseSuccess([],$message);
+            return ResponseHelper::responseSuccess([], $message);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
             return ResponseHelper::responseCustomError($message);
@@ -37,7 +37,7 @@ class UserController extends Controller
         try {
             $this->service->updateBodyImage($inputs);
             $message = __("custom.defaults.upload_success");
-            return ResponseHelper::responseSuccess([],$message);
+            return ResponseHelper::responseSuccess([], $message);
         } catch (\Exception $exception) {
             $message = __("custom.defaults.upload_failed");
             return ResponseHelper::responseCustomError($message);
@@ -51,10 +51,10 @@ class UserController extends Controller
             return ResponseHelper::responseSuccess($result);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
-            return ResponseHelper::responseCustomError($message);
+            $code = $exception->getCode();
+            return ResponseHelper::responseCustomError($message, $code);
         }
     }
-
 
 
 }

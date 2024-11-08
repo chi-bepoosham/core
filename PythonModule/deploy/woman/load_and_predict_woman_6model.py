@@ -1,36 +1,29 @@
-import tensorflow as tf
-from keras.models import Model
 import cv2
-from keras.layers import Dense, GlobalAveragePooling2D
-from keras.applications.resnet import ResNet101, preprocess_input
-from keras.optimizers import SGD
-from tensorflow.keras.utils import load_img, img_to_array  # تغییر این قسمت
-import numpy as np
-from main import load_modelll ,predict_class
-image  = cv2.imread( "F://chibeposham_team_git//astin//astinman//longsleeve//0ad79b50af0d9d398010f134fa5b91b8_crop_0_5.jpg")
+from .core import load_modelll, predict_class
 
+def process_six_model_predictions(image_path):
+    image = cv2.imread(image_path)
+    
+    # Load models
+    model_balted = load_modelll('/var/www/deploy/models/6model/belted.h5', class_num=2, base_model="resnet101")
+    model_cowl = load_modelll('/var/www/deploy/models/6model/cowl.h5', class_num=2, base_model="resnet101")
+    model_empire = load_modelll('/var/www/deploy/models/6model/empire.h5', class_num=2, base_model="resnet101")
+    model_loose = load_modelll('/var/www/deploy/models/6model/loose.h5', class_num=2, base_model="resnet101")
+    model_peplum = load_modelll('/var/www/deploy/models/6model/peplum.h5', class_num=2, base_model="resnet101")
+    model_wrap = load_modelll('/var/www/deploy/models/6model/wrap.h5', class_num=2, base_model="resnet101")
 
-model_empire = load_modelll('F://chibeposham_team_git//6model//empire.h5',class_num=2, base_model="resnet101")
-model_loose = load_modelll('F://chibeposham_team_git//6model//loose.h5',class_num=2, base_model="resnet101")
-model_peplumm = load_modelll('F://chibeposham_team_git//6model//peplumm.h5',class_num=2, base_model="resnet101")
-model_wrap = load_modelll('F://chibeposham_team_git//6model//wrap.h5',class_num=2, base_model="resnet101")
+    # Perform predictions
+    results = {
+        "balted": predict_class(image, model=model_balted, class_names=["balted", "notbalted"], reso=300, model_name="balted"),
+        "cowl": predict_class(image, model=model_cowl, class_names=["cowl", "notcowl"], reso=300, model_name="cowl"),
+        "empire": predict_class(image, model=model_empire, class_names=["empire", "notempire"], reso=300, model_name="empire"),
+        "loose": predict_class(image, model=model_loose, class_names=["losse", "snatched"], reso=300, model_name="loose"),
+        "wrap": predict_class(image, model=model_wrap, class_names=["notwrap", "wrap"], reso=300, model_name="wrap"),
+        "peplum": predict_class(image, model=model_peplum, class_names=["notpeplum", "peplum"], reso=300, model_name="peplum")
+    }
+    
+    return results
 
-
-
-
-
-predict_class(image,model=model_empire,
-              class_names=["empire","_"],reso=300)
-
-predict_class(image,model=model_loose,
-              class_names=["losse","snatched"],reso=300)
-
-predict_class(image,model=model_wrap,
-              class_names=["_","wrap"],reso=300)
-
-predict_class(image,model=model_peplumm,
-              class_names=["_","peplum"],reso=300)
-
-
-
-
+# Test
+# result = process_six_model_predictions("chibeposham-Docker/deploy/man/astinboland.jpg")
+# print(result)

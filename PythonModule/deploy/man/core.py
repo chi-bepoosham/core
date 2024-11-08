@@ -3,29 +3,34 @@ from keras.models import Model
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras.applications.resnet import ResNet101, preprocess_input
 from keras.optimizers import SGD
-from tensorflow.keras.utils import load_img, img_to_array  # تغییر این قسمت
+from tensorflow.keras.utils import load_img, img_to_array
 import numpy as np
 from keras.applications import ResNet152
-import cv2 
+import cv2
+import keras
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D, BatchNormalization
+
+
 
 
 def load_modelll(model_path,class_num,base_model):
+
         if base_model=="resnet101":
 
-
-        # مشخصات ورودی‌ها
             reso = 300
             input_shape = (reso, reso, 3)
 
-            # 1. بازسازی معماری مدل ResNet101
+
             input_tensor = tf.keras.layers.Input(shape=input_shape)
             base_model = ResNet101(weights=None, include_top=False, input_shape=input_shape, input_tensor=input_tensor)
 
-            # افزودن لایه‌های بالا به مدل
+
             x = base_model.output
             x = GlobalAveragePooling2D()(x)
             x = Dense(300, activation='relu')(x)  # لایه Dense
-            predictions = Dense(class_num, activation='softmax')(x)  # لایه خروجی برای 11 کلاس
+            predictions = Dense(class_num, activation='softmax')(x)
 
             # ساخت مدل کامل
             model = Model(inputs=base_model.input, outputs=predictions)
@@ -33,34 +38,7 @@ def load_modelll(model_path,class_num,base_model):
             # 2. لود وزن‌های ذخیره‌شده
             model.load_weights("{0}".format(model_path))
             return model
-        
 
-        if base_model=="resnet101_30_unit":
-
-
-        # مشخصات ورودی‌ها
-            reso = 300
-            input_shape = (reso, reso, 3)
-
-            # 1. بازسازی معماری مدل ResNet101
-            input_tensor = tf.keras.layers.Input(shape=input_shape)
-            base_model = ResNet101(weights=None, include_top=False, input_shape=input_shape, input_tensor=input_tensor)
-
-            # افزودن لایه‌های بالا به مدل
-            x = base_model.output
-            x = GlobalAveragePooling2D()(x)
-            x = Dense(300, activation='relu')(x)  # لایه Dense
-            x = Dense(30, activation='relu')(x)  # لایه Dense
-
-            predictions = Dense(class_num, activation='softmax')(x)  # لایه خروجی برای 11 کلاس
-
-            # ساخت مدل کامل
-            model = Model(inputs=base_model.input, outputs=predictions)
-
-            # 2. لود وزن‌های ذخیره‌شده
-            model.load_weights("{0}".format(model_path))
-            return model
-        
         if base_model=="mobilenet":
 
 
@@ -81,7 +59,7 @@ def load_modelll(model_path,class_num,base_model):
             model = tf.keras.Model(inputs=base_model.input, outputs=predictions)
             model.load_weights("{0}".format(model_path))
             return model
-        
+
 
         if base_model=="resnet152":
 
@@ -107,14 +85,21 @@ def load_modelll(model_path,class_num,base_model):
             # 2. لود وزن‌های ذخیره‌شده
             model.load_weights("{0}".format(model_path))
             return model
-        
-        
+        if base_model=="mnist":
+
+            model = mnist_sequential((28,28,1))
+            model.load_weights("{0}".format(model_path))
+            return model
 
 
 
 
 
-def predict_class(img, model,class_names,reso):
+
+
+
+def predict_class(img, model,class_names,reso,model_name=None):
+
     reso = reso
     # آماده‌سازی تصویر
     img_array = prepare_image(img, target_size=(reso, reso))
@@ -126,14 +111,46 @@ def predict_class(img, model,class_names,reso):
     predicted_class = np.argmax(predictions, axis=-1)
 
     # لیست کلاس‌ها (این لیست باید با کلاس‌های دیتاست شما همخوانی داشته باشد)
-    
+
 
     # نمایش نام کلاس پیش‌بینی‌شده
     predicted_label = class_names[predicted_class[0]]
-    print(f"class prediction_name: {predicted_label}")
+
+    if model_name==None:
+
+        print(f"{model.name}:class prediction_name: {predicted_label}")
+    else:
+        print(f"{model_name}:class prediction_name: {predicted_label}")
+
+    return predicted_label
 
 
 
+def mnist_prepar(image):
+    image_fasion_mnist = image
+    image_fasion_mnist = cv2.cvtColor(image_fasion_mnist,code=cv2.COLOR_BGR2GRAY)
+    image_fasion_mnist = cv2.resize(image_fasion_mnist,(28,28))
+    normalaze = image_fasion_mnist/255.0
+    normalaze = np.expand_dims(normalaze, axis=0)
+    return normalaze
+
+
+
+def predict_mnist(prepare_output,model,class_names):
+
+
+    predictions = model.predict(prepare_output)
+
+    # دریافت کلاس پیش‌بینی‌شده
+    predicted_class = np.argmax(predictions, axis=-1)
+
+    # لیست کلاس‌ها (این لیست باید با کلاس‌های دیتاست شما همخوانی داشته باشد)
+
+
+    # نمایش نام کلاس پیش‌بینی‌شده
+    predicted_label = class_names[predicted_class[0]]
+    print(f"mnist :class prediction_name: {predicted_label}")
+    return predicted_label
 
 
 
@@ -150,7 +167,7 @@ def prepare_image(img, target_size):
 
 
 def get_color_tone(image):
-    
+
 
     # تغییر اندازه تصویر به 255x255
     image = cv2.resize(image, (255, 255))
@@ -199,9 +216,40 @@ def get_color_tone(image):
             tone = 'dark_bright'
         else:  # اشباع پایین
             tone = 'dark_muted'
-    print(tone)
+    return tone
 
 
 
+def mnist_sequential(input_shape):
+    cnn4 = Sequential()
+    cnn4.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=input_shape))
+    cnn4.add(BatchNormalization())
+
+    cnn4.add(Conv2D(32, kernel_size=(3, 3), activation='relu'))
+    cnn4.add(BatchNormalization())
+    cnn4.add(MaxPooling2D(pool_size=(2, 2)))
+    cnn4.add(Dropout(0.25))
+
+    cnn4.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+    cnn4.add(BatchNormalization())
+    cnn4.add(Dropout(0.25))
+
+    cnn4.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+    cnn4.add(BatchNormalization())
+    cnn4.add(MaxPooling2D(pool_size=(2, 2)))
+    cnn4.add(Dropout(0.25))
+
+    cnn4.add(Flatten())
+
+    cnn4.add(Dense(512, activation='relu'))
+    cnn4.add(BatchNormalization())
+    cnn4.add(Dropout(0.5))
+
+    cnn4.add(Dense(128, activation='relu'))
+    cnn4.add(BatchNormalization())
+    cnn4.add(Dropout(0.5))
+
+    cnn4.add(Dense(10, activation='softmax'))
+    return cnn4
 
 

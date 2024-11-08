@@ -164,6 +164,8 @@ return [
         "status" => "وضعیت",
         "parent_category" => "دسته بندی والد",
         "body_image" => "تصویر بدن",
+        "clothes_type" => "نوع لباس",
+        "process_status" => "وضعیت پردازش",
 
     ]
 ];

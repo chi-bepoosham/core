@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\v1\BodyTypeController;
+use App\Http\Controllers\api\v1\UserClothingController;
 use App\Http\Middleware\checkApiKeyMiddleware;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -33,6 +34,11 @@ Route::prefix('v1/user')->middleware('auth:sanctum')->group(function () {
         Route::get("/all", [BodyTypeController::class, "index"]);
         Route::get("/details", [UserController::class, "getBodyTypeDetail"]);
         Route::post("/upload/image", [UserController::class, "uploadBodyImage"]);
+    });
+
+    Route::prefix('clothes')->group(callback: function () {
+        Route::get("/", [UserClothingController::class, "index"]);
+        Route::post("/upload/image", [UserClothingController::class, "uploadClothingImage"]);
     });
 
     Route::post("/update/profile", [UserController::class, "updateUser"]);

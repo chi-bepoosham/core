@@ -2,29 +2,31 @@
 
 namespace App\Services;
 
+use App\Http\Repositories\UserClothingRepository;
+use App\Http\Repositories\UserRepository;
 use App\Jobs\SendRabbitMQMessage;
+use App\Models\UserClothesPivot;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use App\Http\Repositories\UserRepository;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
-use Symfony\Component\HttpFoundation\Response;
 
-class UsersService
+class UserClothesService
 {
     public $user;
 
     /**
      * @throws Exception
      */
-    public function __construct(public UserRepository $repository)
+    public function __construct(public UserClothingRepository $repository)
     {
         $userItem = Auth::user();
         if (!$userItem) {
@@ -33,40 +35,13 @@ class UsersService
         $this->user = $userItem;
     }
 
-
     /**
      * @param $inputs
-     * @return bool
-     * @throws Exception
+     * @return Collection|LengthAwarePaginator
      */
-    public function updateUser($inputs): bool
+    public function index($inputs): Collection|LengthAwarePaginator
     {
-        $mobile = $inputs["mobile"];
-        $existUserItem = User::query()->whereNot("id", Auth::id())->where("mobile", $mobile)->first();
-        if ($existUserItem != null) {
-            throw new Exception(__("custom.user.mobile_exist"));
-        }
-
-        $deleteAvatar = $inputs["delete_avatar"] ?? null;
-        if ((bool)$deleteAvatar === true) {
-            $inputs["avatar"] = null;
-        }
-        $inputs["birthday"] = $inputs["birthday"] ?? null;
-        $inputs["email"] = $inputs["email"] ?? null;
-
-        if (isset($inputs["avatar"])) {
-            $inputs["avatar"] = $this->saveImage($inputs["avatar"], 'avatar');
-        }
-
-        DB::beginTransaction();
-        try {
-            $createdItem = $this->repository->update($this->user, $inputs);
-            DB::commit();
-            return $createdItem;
-        } catch (Exception $exception) {
-            DB::rollBack();
-            throw new Exception(__("custom.user.register_exception"));
-        }
+        return $this->repository->resolve_paginate(inputs: $inputs, relations: $this->repository->relations());
     }
 
 
@@ -75,55 +50,37 @@ class UsersService
      * @return bool
      * @throws Exception
      */
-    public function updateBodyImage($inputs): bool
+    public function uploadClothingImage($inputs): mixed
     {
-        if ($this->user->process_body_image_status == 1){
-            throw new Exception(__("custom.user.body_type_not_detected"));
-        }
-
-        if ($this->user->process_body_image_status == 2){
-            throw new Exception(__("custom.user.body_type_not_detected"));
-        }
-
-        $inputs["body_image"] = $this->saveImage($inputs["image"], 'body_images');
-        $inputs["process_body_image_status"] = 1;
+        $inputs["image"] = $this->saveImage($inputs["image"], 'clothes_images');
+        $inputs["process_status"] = 1;
 
         DB::beginTransaction();
         try {
-            $createdItem = $this->repository->update($this->user, $inputs);
+            $createdItem = $this->repository->create($inputs);
 
             $data = [
-                "action" => "body_type",
+                "action" => "process",
                 "user_id" => $this->user->id,
-                "image_link" => $inputs["body_image"],
+                "image_link" => $inputs["image"],
                 "gender" => $this->user->gender,
-                "clothes_id" => null,
+                "clothes_id" => $createdItem->id,
                 "time" => Carbon::now()->format("H:i:s"),
             ];
             SendRabbitMQMessage::dispatch($data);
 
+//            UserClothesPivot::query()->create([
+//                "first_user_clothes_id" => $createdItem->id,
+//                "second_user_clothes_id" => $createdItem->id,
+//                "matched" => true,
+//            ]);
+
             DB::commit();
             return $createdItem;
         } catch (Exception $exception) {
             DB::rollBack();
             throw new Exception(__("custom.user.register_exception"));
         }
-    }
-
-    /**
-     * @return bool
-     * @throws Exception
-     */
-    public function getBodyTypeDetail(): mixed
-    {
-        $userBodyType = $this->user->bodyType()->with(["celebrities", "clothes"])->first();
-        if ($userBodyType != null) {
-            $result = new \stdClass();
-            $result->body_type = $userBodyType;
-            return $result;
-        }
-
-        throw new Exception(__("custom.user.body_type_not_detected"),409);
     }
 
 
