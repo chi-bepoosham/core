@@ -29,11 +29,15 @@ class UsersService
     }
 
     /**
-     * @return mixed
+     * @return \stdClass
      */
-    public function splash(): mixed
+    public function splash(): \stdClass
     {
-        return Auth::user();
+        $user = Auth::user();
+
+        $data = new \stdClass();
+        $data->user = $user;
+        return $data;
     }
 
 
