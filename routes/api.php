@@ -41,6 +41,7 @@ Route::prefix('v1/user')->middleware('auth:sanctum')->group(function () {
         Route::post("/upload/image", [UserClothingController::class, "uploadClothingImage"]);
     });
 
+    Route::get("/splash", [UserController::class, "splash"]);
     Route::post("/update/profile", [UserController::class, "updateUser"]);
 
 });

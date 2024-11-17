@@ -137,7 +137,7 @@ class AuthenticationsService
             $cacheData = cache()->get($apiKeyCache);
             $apiKeyValue = $cacheData['api_key'] ?? null;
             $expiredTime = $cacheData['expired_time'] ?? null;
-            cache()->forget($apiKeyCache);
+//            cache()->forget($apiKeyCache);
             return $apiKey == $apiKeyValue && (bool)Carbon::make($expiredTime) >= now();
         }
         return false;

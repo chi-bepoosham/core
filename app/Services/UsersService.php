@@ -20,18 +20,20 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UsersService
 {
-    public $user;
 
     /**
      * @throws Exception
      */
     public function __construct(public UserRepository $repository)
     {
-        $userItem = Auth::user();
-        if (!$userItem) {
-            throw new Exception(__("custom.user.not_exist"));
-        }
-        $this->user = $userItem;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function splash(): mixed
+    {
+        return Auth::user();
     }
 
 
@@ -42,6 +44,11 @@ class UsersService
      */
     public function updateUser($inputs): bool
     {
+        $userItem = Auth::user();
+        if (!$userItem) {
+            throw new Exception(__("custom.user.not_exist"));
+        }
+
         $mobile = $inputs["mobile"];
         $existUserItem = User::query()->whereNot("id", Auth::id())->where("mobile", $mobile)->first();
         if ($existUserItem != null) {
@@ -61,7 +68,7 @@ class UsersService
 
         DB::beginTransaction();
         try {
-            $createdItem = $this->repository->update($this->user, $inputs);
+            $createdItem = $this->repository->update($userItem, $inputs);
             DB::commit();
             return $createdItem;
         } catch (Exception $exception) {
@@ -78,11 +85,16 @@ class UsersService
      */
     public function updateBodyImage($inputs): bool
     {
-        if ($this->user->process_body_image_status == 1){
+        $userItem = Auth::user();
+        if (!$userItem) {
+            throw new Exception(__("custom.user.not_exist"));
+        }
+
+        if ($userItem->process_body_image_status == 1){
             throw new Exception(__("custom.user.body_type_not_detected"));
         }
 
-        if ($this->user->process_body_image_status == 2){
+        if ($userItem->process_body_image_status == 2){
             throw new Exception(__("custom.user.body_type_not_detected"));
         }
 
@@ -91,13 +103,13 @@ class UsersService
 
         DB::beginTransaction();
         try {
-            $createdItem = $this->repository->update($this->user, $inputs);
+            $createdItem = $this->repository->update($userItem, $inputs);
 
             $data = [
                 "action" => "body_type",
-                "user_id" => $this->user->id,
+                "user_id" => $userItem->id,
                 "image_link" => asset($inputs["body_image"]),
-                "gender" => $this->user->gender,
+                "gender" => $userItem->gender,
                 "clothes_id" => null,
                 "time" => Carbon::now()->format("H:i:s"),
             ];
@@ -117,7 +129,12 @@ class UsersService
      */
     public function getBodyTypeDetail(): mixed
     {
-        $userBodyType = $this->user->bodyType()->with(["celebrities", "clothes"])->first();
+        $userItem = Auth::user();
+        if (!$userItem) {
+            throw new Exception(__("custom.user.not_exist"));
+        }
+
+        $userBodyType = $userItem->bodyType()->with(["celebrities", "clothes"])->first();
         if ($userBodyType != null) {
             $result = new \stdClass();
             $result->body_type = $userBodyType;

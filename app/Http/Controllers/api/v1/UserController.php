@@ -17,6 +17,18 @@ class UserController extends Controller
     }
 
 
+    public function splash(): JsonResponse
+    {
+        try {
+            $result = $this->service->splash();
+            return ResponseHelper::responseSuccess($result);
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            $code = $exception->getCode();
+            return ResponseHelper::responseCustomError($message, $code);
+        }
+    }
+
     public function updateUser(ValidateUpdateUser $request): JsonResponse
     {
         $inputs = $request->validated();
