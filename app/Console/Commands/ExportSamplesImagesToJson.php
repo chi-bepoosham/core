@@ -36,11 +36,24 @@ class ExportSamplesImagesToJson extends Command
                     $images = File::files($subDir);
 
                     foreach ($images as $image) {
-                        $relativePath =  $dir . '/' . $subDirName . '/' . $image->getFilename();
+
+                        $originalName = $image->getFilename();
+                        $newName = str_replace(' ', '_', $originalName);
+
+                        // Rename the file if needed
+                        if ($originalName !== $newName) {
+                            $originalPath = $image->getPathname();
+                            $newPath = $image->getPath() . '/' . $newName;
+                            File::move($originalPath, $newPath);
+                            File::delete($originalPath);
+                        }
+
+                        $relativePath =  $dir . '/' . $subDirName . '/' . $newName;
+                        $title = str_replace("_"," ",pathinfo($image->getFilename(), PATHINFO_FILENAME));
 
                         if ($dir === 'celebrity') {
                             $celebrityData[] = [
-                                'title' => pathinfo($image->getFilename(), PATHINFO_FILENAME), // Use filename as title
+                                'title' => $title,
                                 'body_type_id' => trim($bodyTypeId),
                                 'image' => asset($relativePath),
                             ];
