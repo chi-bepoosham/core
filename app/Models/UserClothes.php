@@ -16,6 +16,7 @@ class UserClothes extends Model
         'match_percentage',
         'clothes_type',
         'process_status',
+        'processed_image_data',
     ];
 
     /**
@@ -34,6 +35,8 @@ class UserClothes extends Model
             'updated_at' => 'timestamp',
         ];
     }
+
+    protected $hidden = ["processed_image_data"];
 
     public function matchedClothing():BelongsToMany
     {

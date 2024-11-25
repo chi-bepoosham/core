@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Http\Repositories\UserRepository;
 use App\Models\BodyType;
+use App\Models\UserClothes;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -49,7 +50,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
         $matchScore = $this->calculateScore($processImageData);
-
+        $clothes = UserClothes::query()->find($clothesId);
+        $clothes?->update(["processed_image_data" => json_encode($processImageData), "match_percentage" => $matchScore]);
 
     }
 
@@ -57,114 +59,241 @@ class ProcessRabbitMQMessage implements ShouldQueue
     {
         $score = 0;
 
-        // Women balatane
-        if (in_array($imageData['paintane'] ?? null, ['fbalatane', 'ftamamtane'])) {
-            if (!empty($imageData['astin'])) {
-                $score += $imageData['astin'] === 'flongsleeve' ? 20 : 10;
+        if ($imageData['gender'] === 'male') {
+            if (isset($imageData['category']) && $imageData['category'] === 'balatane') {
+                $score += $this->menBalatane($imageData);
+            } elseif (isset($imageData['category']) && $imageData['category'] === 'payintane') {
+                $score += $this->menPayintane($imageData);
             }
-            if (!empty($imageData['pattern'])) {
-                $score += $imageData['pattern'] !== 'sade' ? 10 : 5;
-            }
-            if (!empty($imageData['yaghe'])) {
-                $score += in_array($imageData['yaghe'], ['round', 'v_neck']) ? 20 : 10;
-            }
-
-            // Silhouette features
-            $silhouetteFeatures = ['balted', 'cowl', 'empire', 'loose', 'snatched', 'wrap', 'peplum'];
-            foreach ($silhouetteFeatures as $feature) {
-                if (!empty($imageData[$feature])) {
-                    if ($imageData[$feature] == $feature){
-                        if ($feature == 'loose' || $feature == 'snatched') {
-                            $score += 5;
-                        } else {
-                            $score += 3;
-                        }
-                    }
-                }
-            }
-
-
-            // Color tone
-            if (!empty($imageData['color_tone'])) {
-                $tones = explode('_', $imageData['color_tone']);
-                $score += (in_array('light', $tones) || in_array('dark', $tones)) ? 5 : 3;
-                $score += (in_array('bright', $tones) || in_array('muted', $tones)) ? 5 : 3;
+        } elseif ($imageData['gender'] === 'female') {
+            if (isset($imageData['category']) && $imageData['category'] === 'balatane') {
+                $score += $this->womenBalatane($imageData);
+            } elseif (isset($imageData['category']) && $imageData['category'] === 'payintane') {
+                $score += $this->womenPayintane($imageData);
             }
         }
 
-        // Women paintane skirt/pants
-        if (in_array($imageData['paintane'] ?? null, ['fpaintane', 'ftamamtane'])) {
-            if (!empty($imageData['rise'])) {
-                $score += $imageData['rise'] === 'highrise' ? 30 : 10;
-            }
-            if (!empty($imageData['shalvar'])) {
-                $score += $imageData['shalvar'] === 'wskinny' ? 30 : 10;
-            }
-            if (!empty($imageData['tarh_shalvar'])) {
-                $score += $imageData['tarh_shalvar'] !== 'wpsade' ? 20 : 10;
-            }
-            if (!empty($imageData['skirt_and_pants']) && $imageData['skirt_and_pants'] === 'skirt') {
-                if (!empty($imageData['skirt_print'])) {
-                    $score += $imageData['skirt_print'] !== 'skirtsade' ? 40 : 20;
-                }
-                if (!empty($imageData['skirt_type'])) {
-                    $score += $imageData['skirt_type'] === 'wrapskirt' ? 40 : 20;
-                }
-            }
-
-            // Color tone
-            if (!empty($imageData['color_tone'])) {
-                $tones = explode('_', $imageData['color_tone']);
-                $score += (in_array('light', $tones) || in_array('dark', $tones)) ? 10 : 5;
-                $score += (in_array('bright', $tones) || in_array('muted', $tones)) ? 10 : 5;
-            }
-        }
-
-
-        // Men balatane
-        if ($imageData['paintane'] ?? null === 'mbalatane') {
-            if (!empty($imageData['astin'])) {
-                $score += $imageData['astin'] === 'flongsleeve' ? 15 : 10;
-            }
-            if (!empty($imageData['pattern'])) {
-                $score += $imageData['pattern'] === 'riz' ? 10 : 5;
-            }
-            if (!empty($imageData['yaghe'])) {
-                $score += $imageData['yaghe'] === 'one_shoulder' ? 20 : 10;
-            }
-
-            // Color tone
-            if (!empty($imageData['color_tone'])) {
-                $tones = explode('_', $imageData['color_tone']);
-                $score += (in_array('light', $tones) || in_array('dark', $tones)) ? 10 : 5;
-                $score += (in_array('bright', $tones) || in_array('muted', $tones)) ? 10 : 5;
-            }
-        }
-
-        // Men paintane pants
-        if ($imageData['paintane'] ?? null === 'mpayintane') {
-            if (!empty($imageData['rise'])) {
-                $score += $imageData['rise'] === 'lowrise' ? 10 : 5;
-            }
-            if (!empty($imageData['shalvar'])) {
-                $score += $imageData['shalvar'] === 'mbaggy' ? 20 : 10;
-            }
-            if (!empty($imageData['tarh_shalvar'])) {
-                $score += $imageData['tarh_shalvar'] === 'mpamudi' ? 20 : 10;
-            }
-            if (!empty($imageData['skirt_and_pants']) && $imageData['skirt_and_pants'] === 'pants') {
-                $score += 10;
-            }
-
-            // Color tone
-            if (!empty($imageData['color_tone'])) {
-                $tones = explode('_', $imageData['color_tone']);
-                $score += (in_array('light', $tones) || in_array('dark', $tones)) ? 10 : 5;
-                $score += (in_array('bright', $tones) || in_array('muted', $tones)) ? 10 : 5;
-            }
-        }
-
-
-        return $score > 100 ? 100 : $score;
+        // Ensure score does not exceed 100
+        return min($score, 100);
     }
+
+    private function menBalatane(array $data): int
+    {
+        $score = 0;
+
+        // Collar
+        switch ($data['collar'] ?? '') {
+            case 'round':
+            case 'classic':
+            case 'turtleneck':
+            case 'hoodie':
+                $score += 30;
+                break;
+            case 'V_neck':
+                $score += 10;
+                break;
+        }
+
+        // Sleeve
+        switch ($data['sleeve'] ?? '') {
+            case 'shortsleeve':
+                $score += 30;
+                break;
+            case 'sleeveless':
+            case 'halfsleeve':
+                $score += 10;
+                break;
+        }
+
+        // Pattern
+        switch ($data['pattern'] ?? '') {
+            case 'dorosht':
+            case 'rahrahofoghi':
+                $score += 20;
+                break;
+            case 'sade':
+                $score += 10;
+                break;
+            case 'riz':
+            case 'rahrahamudi':
+                $score += 0;
+                break;
+        }
+
+        // Color
+        switch ($data['color'] ?? '') {
+            case 'light':
+            case 'bright':
+                $score += 10;
+                break;
+            case 'dark':
+            case 'muted':
+                $score += 0;
+                break;
+        }
+
+        return $score;
+    }
+
+    private function menPayintane(array $data): int
+    {
+        $score = 0;
+
+        // Type
+        switch ($data['type'] ?? '') {
+            case 'mstraight':
+            case 'mslimfit':
+                $score += 40;
+                break;
+            case 'mshorts':
+            case 'mmom':
+                $score += 20;
+                break;
+            case 'mbaggy':
+            case 'mcargo':
+            case 'mcargoshorts':
+                $score += 0;
+                break;
+        }
+
+        // Pattern
+        switch ($data['pattern'] ?? '') {
+            case 'mpamudi':
+            case 'mpriz':
+            case 'mpsade':
+                $score += 40;
+                break;
+            case 'mpofoghi':
+            case 'mpdorosht':
+                $score += 0;
+                break;
+        }
+
+        // Color
+        switch ($data['color'] ?? '') {
+            case 'dark':
+            case 'muted':
+                $score += 10;
+                break;
+            case 'light':
+            case 'bright':
+                $score += 0;
+                break;
+        }
+
+        return $score;
+    }
+
+    private function womenBalatane(array $data): int
+    {
+        $score = 0;
+
+        // Collar
+        switch ($data['collar'] ?? '') {
+            case 'off_the_shoulder':
+            case 'V_neck':
+            case 'squer':
+            case 'sweatheart':
+                $score += 20;
+                break;
+            case 'turtleneck':
+            case 'round':
+            case 'one_shoulder':
+            case 'halter':
+            case 'boatneck':
+            case 'hoodie':
+            case 'classic':
+                $score += 10;
+                break;
+        }
+
+        // Sleeve
+        switch ($data['sleeve'] ?? '') {
+            case 'fsleeveless':
+            case 'fhalfsleeve':
+            case 'bottompuffy':
+                $score += 20;
+                break;
+            case 'fshortsleeve':
+            case 'flongsleeve':
+                $score += 10;
+                break;
+            case 'toppuffy':
+                $score += 0;
+                break;
+        }
+
+        // Silhouette
+        switch ($data['silhouette'] ?? '') {
+            case 'snatched':
+            case 'wrap':
+            case 'peplum':
+            case 'belted':
+                $score += 5;
+                break;
+            case 'cowl':
+            case 'empire':
+                $score += 3;
+                break;
+            case 'loose':
+                $score += 0;
+                break;
+        }
+
+        // Pattern
+        $score += 10; // Default score for pattern
+
+        // Color
+        $score += 10; // Default score for color
+
+        return $score;
+    }
+
+    private function womenPayintane(array $data): int
+    {
+        $score = 0;
+
+        if ($data['kind'] === 'skirt') {
+            switch ($data['type'] ?? '') {
+                case 'wrapskirt':
+                case 'balloonskirt':
+                case 'mermaidskirt':
+                case 'alineskirt':
+                case 'pencilskirt':
+                case 'miniskirt':
+                case 'shortaskirt':
+                    $score += 20;
+                    break;
+            }
+        } elseif ($data['kind'] === 'pants') {
+            switch ($data['rise'] ?? '') {
+                case 'highrise':
+                case 'lowrise':
+                    $score += 10;
+                    break;
+            }
+
+            switch ($data['type'] ?? '') {
+                case 'wbaggy':
+                case 'wstraight':
+                case 'wskinny':
+                case 'wbootcut':
+                case 'wcargo':
+                case 'wshorts':
+                case 'wcargoshorts':
+                case 'wmom':
+                    $score += 10;
+                    break;
+            }
+        }
+
+        // Pattern
+        $score += 10; // Default for skirt/pants pattern
+
+        // Color
+        $score += 10; // Default for color
+
+        return $score;
+    }
+
 }
