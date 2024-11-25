@@ -42,12 +42,12 @@ class ExportSamplesImagesToJson extends Command
                             $celebrityData[] = [
                                 'title' => pathinfo($image->getFilename(), PATHINFO_FILENAME), // Use filename as title
                                 'body_type_id' => trim($bodyTypeId),
-                                'image' => str_replace("/:8080", ":8080", asset($relativePath)),
+                                'image' => asset($relativePath),
                             ];
                         } elseif ($dir === 'clothes') {
                             $clothesData[] = [
                                 'body_type_id' => trim($bodyTypeId),
-                                'image' => str_replace("/:8080", ":8080", asset($relativePath)),
+                                'image' => asset($relativePath),
                             ];
                         }
                     }
