@@ -36,7 +36,7 @@ class ExportSamplesImagesToJson extends Command
                     $images = File::files($subDir);
 
                     foreach ($images as $image) {
-                        $relativePath = ':8080/' . $dir . '/' . $subDirName . '/' . $image->getFilename();
+                        $relativePath =  $dir . '/' . $subDirName . '/' . $image->getFilename();
 
                         if ($dir === 'celebrity') {
                             $celebrityData[] = [
