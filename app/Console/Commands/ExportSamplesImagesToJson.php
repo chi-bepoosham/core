@@ -48,19 +48,19 @@ class ExportSamplesImagesToJson extends Command
                             File::delete($originalPath);
                         }
 
-                        $relativePath =  $dir . '/' . $subDirName . '/' . $newName;
-                        $title = str_replace("_"," ",pathinfo($image->getFilename(), PATHINFO_FILENAME));
+                        $relativePath = '/' . $dir . '/' . $subDirName . '/' . $newName;
+                        $title = str_replace("_", " ", pathinfo($image->getFilename(), PATHINFO_FILENAME));
 
                         if ($dir === 'celebrity') {
                             $celebrityData[] = [
                                 'title' => $title,
                                 'body_type_id' => trim($bodyTypeId),
-                                'image' => asset($relativePath),
+                                'image' => $relativePath,
                             ];
                         } elseif ($dir === 'clothes') {
                             $clothesData[] = [
                                 'body_type_id' => trim($bodyTypeId),
-                                'image' => asset($relativePath),
+                                'image' => $relativePath,
                             ];
                         }
                     }
