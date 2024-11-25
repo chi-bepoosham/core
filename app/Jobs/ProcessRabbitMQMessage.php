@@ -46,12 +46,13 @@ class ProcessRabbitMQMessage implements ShouldQueue
                         "process_body_image_status" => 2,
                     ]);
                 }
+            }else{
+                $matchScore = $this->calculateScore($processImageData["process_data"]);
+                $clothes = UserClothes::query()->find($clothesId);
+                $clothes?->update(["processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore]);
+
             }
         }
-
-        $matchScore = $this->calculateScore($processImageData);
-        $clothes = UserClothes::query()->find($clothesId);
-        $clothes?->update(["processed_image_data" => json_encode($processImageData), "match_percentage" => $matchScore]);
 
     }
 
@@ -59,16 +60,16 @@ class ProcessRabbitMQMessage implements ShouldQueue
     {
         $score = 0;
 
-        if ($imageData['gender'] === 'male') {
-            if (isset($imageData['category']) && $imageData['category'] === 'balatane') {
+        if ($imageData['paintane'] === 'mpayintane' || $imageData['paintane'] === 'mbalatane') {
+            if ($imageData['paintane'] === 'mbalatane') {
                 $score += $this->menBalatane($imageData);
-            } elseif (isset($imageData['category']) && $imageData['category'] === 'payintane') {
+            } elseif ($imageData['paintane'] === 'mpayintane') {
                 $score += $this->menPayintane($imageData);
             }
-        } elseif ($imageData['gender'] === 'female') {
-            if (isset($imageData['category']) && $imageData['category'] === 'balatane') {
+        } elseif ($imageData['paintane'] === 'fbalatane' || $imageData['paintane'] === 'fpayintane' || $imageData['paintane'] === 'ftamamtane') {
+            if ($imageData['paintane'] === 'fbalatane') {
                 $score += $this->womenBalatane($imageData);
-            } elseif (isset($imageData['category']) && $imageData['category'] === 'payintane') {
+            } elseif ($imageData['paintane'] === 'fpayintane' ||  $imageData['category'] === 'ftamamtane') {
                 $score += $this->womenPayintane($imageData);
             }
         }
@@ -82,7 +83,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         $score = 0;
 
         // Collar
-        switch ($data['collar'] ?? '') {
+        $collar = $data['collar'] ?? $data['yaghe'] ?? '';
+        switch ($collar) {
             case 'round':
             case 'classic':
             case 'turtleneck':
@@ -95,7 +97,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
         // Sleeve
-        switch ($data['sleeve'] ?? '') {
+        $sleeve = $data['sleeve'] ?? $data['astin'] ?? '';
+        switch ($sleeve) {
             case 'shortsleeve':
                 $score += 30;
                 break;
@@ -106,7 +109,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
         // Pattern
-        switch ($data['pattern'] ?? '') {
+        $pattern = $data['pattern'] ?? '';
+        switch ($pattern) {
             case 'dorosht':
             case 'rahrahofoghi':
                 $score += 20;
@@ -121,16 +125,10 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
         // Color
-        switch ($data['color'] ?? '') {
-            case 'light':
-            case 'bright':
-                $score += 10;
-                break;
-            case 'dark':
-            case 'muted':
-                $score += 0;
-                break;
-        }
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
+        $tones = explode('_', $color);
+        $score += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
+        $score += (in_array('bright', $tones) || in_array('light', $tones)) ? 0 : 0;
 
         return $score;
     }
@@ -140,7 +138,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         $score = 0;
 
         // Type
-        switch ($data['type'] ?? '') {
+        $type = $data['type'] ?? $data['shalvar'] ?? '';
+        switch ($type) {
             case 'mstraight':
             case 'mslimfit':
                 $score += 40;
@@ -157,7 +156,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
         // Pattern
-        switch ($data['pattern'] ?? '') {
+        $pattern = $data['pattern'] ?? $data['tarh_shalvar'] ?? '';
+        switch ($pattern) {
             case 'mpamudi':
             case 'mpriz':
             case 'mpsade':
@@ -170,16 +170,10 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
         // Color
-        switch ($data['color'] ?? '') {
-            case 'dark':
-            case 'muted':
-                $score += 10;
-                break;
-            case 'light':
-            case 'bright':
-                $score += 0;
-                break;
-        }
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
+        $tones = explode('_', $color);
+        $score += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
+        $score += (in_array('bright', $tones) || in_array('light', $tones)) ? 0 : 0;
 
         return $score;
     }
@@ -189,7 +183,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         $score = 0;
 
         // Collar
-        switch ($data['collar'] ?? '') {
+        $collar = $data['collar'] ?? $data['yaghe'] ?? '';
+        switch ($collar) {
             case 'off_the_shoulder':
             case 'V_neck':
             case 'squer':
@@ -208,7 +203,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
         // Sleeve
-        switch ($data['sleeve'] ?? '') {
+        $sleeve = $data['sleeve'] ?? $data['astin'] ?? '';
+        switch ($sleeve) {
             case 'fsleeveless':
             case 'fhalfsleeve':
             case 'bottompuffy':
@@ -224,7 +220,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
         // Silhouette
-        switch ($data['silhouette'] ?? '') {
+        $silhouette = $data['silhouette'] ?? $data['skirt_type'] ?? '';
+        switch ($silhouette) {
             case 'snatched':
             case 'wrap':
             case 'peplum':
@@ -253,8 +250,9 @@ class ProcessRabbitMQMessage implements ShouldQueue
     {
         $score = 0;
 
-        if ($data['kind'] === 'skirt') {
-            switch ($data['type'] ?? '') {
+        if ($data['skirt_and_pants'] === 'skirt') {
+            $type = $data['silhouette'] ?? $data['skirt_type'] ?? '';
+            switch ($type) {
                 case 'wrapskirt':
                 case 'balloonskirt':
                 case 'mermaidskirt':
@@ -265,7 +263,7 @@ class ProcessRabbitMQMessage implements ShouldQueue
                     $score += 20;
                     break;
             }
-        } elseif ($data['kind'] === 'pants') {
+        } elseif ($data['skirt_and_pants'] === 'pants') {
             switch ($data['rise'] ?? '') {
                 case 'highrise':
                 case 'lowrise':
@@ -273,7 +271,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
                     break;
             }
 
-            switch ($data['type'] ?? '') {
+            $type = $data['type'] ?? $data['shalvar'] ?? '';
+            switch ($type) {
                 case 'wbaggy':
                 case 'wstraight':
                 case 'wskinny':
