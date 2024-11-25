@@ -46,10 +46,10 @@ class ProcessRabbitMQMessage implements ShouldQueue
                         "process_body_image_status" => 2,
                     ]);
                 }
-            }else{
+            } else {
                 $matchScore = $this->calculateScore($processImageData["process_data"]);
                 $clothes = UserClothes::query()->find($clothesId);
-                $clothes?->update(["processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore]);
+                $clothes?->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore]);
 
             }
         }
@@ -69,7 +69,7 @@ class ProcessRabbitMQMessage implements ShouldQueue
         } elseif ($imageData['paintane'] === 'fbalatane' || $imageData['paintane'] === 'fpayintane' || $imageData['paintane'] === 'ftamamtane') {
             if ($imageData['paintane'] === 'fbalatane') {
                 $score += $this->womenBalatane($imageData);
-            } elseif ($imageData['paintane'] === 'fpayintane' ||  $imageData['category'] === 'ftamamtane') {
+            } elseif ($imageData['paintane'] === 'fpayintane' || $imageData['category'] === 'ftamamtane') {
                 $score += $this->womenPayintane($imageData);
             }
         }
