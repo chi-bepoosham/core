@@ -41,6 +41,7 @@ class UserClothesService
      */
     public function index($inputs): Collection|LengthAwarePaginator
     {
+        $inputs["user_id"] = Auth::id();
         return $this->repository->resolve_paginate(inputs: $inputs, relations: $this->repository->relations());
     }
 

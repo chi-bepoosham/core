@@ -51,6 +51,8 @@ class ProcessRabbitMQMessage implements ShouldQueue
                 $clothes = UserClothes::query()->find($clothesId);
                 $clothes?->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore]);
 
+                sleep(1);
+                $clothes?->matchWithOtherClothes();
             }
         }
 

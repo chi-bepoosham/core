@@ -43,10 +43,10 @@ class UsersService
 
     /**
      * @param $inputs
-     * @return bool
+     * @return mixed
      * @throws Exception
      */
-    public function updateUser($inputs): bool
+    public function updateUser($inputs): mixed
     {
         $userItem = Auth::user();
         if (!$userItem) {
@@ -74,7 +74,7 @@ class UsersService
         try {
             $createdItem = $this->repository->update($userItem, $inputs);
             DB::commit();
-            return $createdItem;
+            return $this->repository->findWithRelations(Auth::id());
         } catch (Exception $exception) {
             DB::rollBack();
             throw new Exception(__("custom.user.register_exception"));

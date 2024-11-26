@@ -33,9 +33,9 @@ class UserController extends Controller
     {
         $inputs = $request->validated();
         try {
-            $this->service->updateUser($inputs);
+            $result = $this->service->updateUser($inputs);
             $message = __("custom.defaults.update_success");
-            return ResponseHelper::responseSuccess([], $message);
+            return ResponseHelper::responseSuccess($result, $message);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
             return ResponseHelper::responseCustomError($message);
