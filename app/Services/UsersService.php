@@ -66,6 +66,15 @@ class UsersService
         $inputs["birthday"] = $inputs["birthday"] ?? null;
         $inputs["email"] = $inputs["email"] ?? null;
 
+
+        if ($inputs["email"] != null){
+            $existUserItem = User::query()->whereNot("id", Auth::id())->where("email", $inputs["email"])->first();
+            if ($existUserItem != null) {
+                throw new Exception(__("custom.user.email_exist"));
+            }
+        }
+
+
         if (isset($inputs["avatar"])) {
             $inputs["avatar"] = $this->saveImage($inputs["avatar"], 'avatar');
         }

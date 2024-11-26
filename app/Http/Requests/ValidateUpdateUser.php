@@ -20,7 +20,7 @@ class ValidateUpdateUser extends FormRequest
             'last_name' => 'required|string',
             'mobile' => 'required|bail|regex:/^(09){1}[0-9]{9}+$/',
             'birthday' => 'nullable|string',
-            'email' => 'nullable|email|unique:users,email',
+            'email' => 'nullable|email',
             'gender' => 'nullable|integer|min:1|max:3',
             'avatar' => 'nullable|file|mimes:jpg,jpeg,png,wep,webp',
             'delete_avatar' => 'nullable|boolean',
