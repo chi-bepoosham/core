@@ -55,6 +55,7 @@ class UserClothesService
     {
         $inputs["image"] = $this->saveImage($inputs["image"], 'clothes_images');
         $inputs["process_status"] = 1;
+        $inputs["user_id"] = $this->user->id;
 
         DB::beginTransaction();
         try {
