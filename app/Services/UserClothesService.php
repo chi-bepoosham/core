@@ -93,7 +93,7 @@ class UserClothesService
      */
     public function delete($clothesId): bool
     {
-        $item = $this->repository->find($clothesId);
+        $item = $this->repository->findWithInputs(["id" => $clothesId, "user_id" => Auth::id()]);
         if (!$item) {
             throw new Exception(__("custom.defaults.not_found"));
         }
