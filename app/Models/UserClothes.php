@@ -58,7 +58,7 @@ class UserClothes extends Model
             $clotheProcessedImageData = $clothe->processed_image_data;
             $matched = false;
 
-            if ($clotheProcessedImageData->match_percentage != null && $clotheProcessedImageData->match_percentage >= 50) {
+            if ($clothe->match_percentage != null && $clothe->match_percentage >= 50) {
 
                 $mnistPrediction = $clotheProcessedImageData?->mnist_prediction ?? '';
                 $mnistPrediction = strtolower($mnistPrediction);
