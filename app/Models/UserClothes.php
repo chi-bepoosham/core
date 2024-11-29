@@ -3,10 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-
 class UserClothes extends Model
 {
     protected $table = 'user_clothes';
@@ -45,7 +43,7 @@ class UserClothes extends Model
         return $this->belongsToMany(UserClothes::class, "user_clothes_pivot", "first_user_clothes_id", "second_user_clothes_id")->withPivot('matched');
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, "user_id");
     }
@@ -60,116 +58,835 @@ class UserClothes extends Model
             $clotheProcessedImageData = $clothe->processed_image_data;
             $matched = false;
 
-            if ($clotheProcessedImageData->match_percentage >= 50) {
+            if ($clotheProcessedImageData->match_percentage != null && $clotheProcessedImageData->match_percentage >= 50) {
+
+                $mnistPrediction = $clotheProcessedImageData?->mnist_prediction ?? '';
+                $mnistPrediction = strtolower($mnistPrediction);
+
+                $color = $currentProcessedImageData?->color_tone ?? '';
+                $clotheColor = $clotheProcessedImageData?->color_tone ?? '';
 
                 if ($currentProcessedImageData->paintane == 'fpayintane' && $clotheProcessedImageData->paintane != 'fpayintane') {
 
-                    $mnistPrediction = $clotheProcessedImageData?->mnist_prediction ?? '';
-                    $mnistPrediction = strtolower($mnistPrediction);
-                    if ($mnistPrediction == 'jacket' || $mnistPrediction = 't-shirt' ||
-                            $mnistPrediction == 'shirt' || $mnistPrediction == 'pullover') {
+//                    if ($mnistPrediction == 'jacket' || $mnistPrediction = 't-shirt' ||
+//                            $mnistPrediction == 'shirt' || $mnistPrediction == 'pullover') {
 
 
-                        $currentColor = $currentProcessedImageData?->color_tone ?? '';
-                        $clotheColor = $clotheProcessedImageData?->color_tone ?? '';
+                    $shalvar = $currentProcessedImageData?->shalvar ?? '';
+                    $shalvar = strtolower($shalvar);
 
-                        $shalvar = $currentProcessedImageData?->shalvar ?? '';
-                        $shalvar = strtolower($shalvar);
+                    $skirtType = $currentProcessedImageData?->skirt_type ?? '';
+                    $skirtType = strtolower($skirtType);
 
-                        $skirtType = $currentProcessedImageData?->skirt_type ?? '';
-                        $skirtType = strtolower($skirtType);
+                    $tarh = $currentProcessedImageData?->tarh_shalvar ?? $currentProcessedImageData?->skirt_print ?? '';
+                    $tarh = strtolower($tarh);
 
-                        $tarh = $currentProcessedImageData?->tarh_shalvar ?? $currentProcessedImageData?->skirt_print ?? '';
-                        $tarh = strtolower($tarh);
+                    $clothePattren = $clotheProcessedImageData?->pattren ?? '';
+                    $clothePattren = strtolower($clothePattren);
 
-                        $clotheTarh = $clotheProcessedImageData?->tarh_shalvar ?? $clotheProcessedImageData?->skirt_print ?? '';
-                        $clotheTarh = strtolower($clotheTarh);
+                    $clotheAstin = $clotheProcessedImageData?->astin ?? '';
+                    $clotheAstin = strtolower($clotheAstin);
 
-                        $clotheAstin = $clotheProcessedImageData?->astin ?? '';
-                        $clotheAstin = strtolower($clotheAstin);
+                    switch ($userBodyType) {
+                        case 11:
 
-                        switch ($userBodyType){
-                            case 11:
-
-                                if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
-
-                                    if ($clotheAstin == 'toppuffy') {
-                                        $matched = true;
-                                    }
-                                } elseif ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
-                                    $skirtType == 'mermaidskirt' || $skirtType == 'alineskirt' ||
-                                    $skirtType == 'shortaskirt' || $skirtType == 'pencilskirt' ||
-                                    $skirtType == 'wrapskirt' || $skirtType == 'miniskirt') {
-
-                                    if ($clotheAstin == 'fsleeveless' || $clotheAstin == 'fshortsleeve' || $clotheAstin == 'flongsleeve' ||
-                                        $clotheAstin == 'fhalfsleeve' || $clotheAstin == 'bottompuffy') {
-
-                                        $matched = true;
-                                    }
-
+                            if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
+                                if ($clotheAstin == 'toppuffy') {
+                                    $matched = true;
                                 }
+                            } elseif ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
+                                $skirtType == 'mermaidskirt' || $skirtType == 'alineskirt' ||
+                                $skirtType == 'shortaskirt' || $skirtType == 'pencilskirt' ||
+                                $skirtType == 'wrapskirt' || $skirtType == 'miniskirt') {
 
-                                if ($tarh != 'sade') {
-                                    if ($clotheTarh == 'sade') {
-                                        $matched = true;
-                                    }
-                                } else {
+                                if ($clotheAstin == 'fsleeveless' || $clotheAstin == 'fshortsleeve' || $clotheAstin == 'flongsleeve' ||
+                                    $clotheAstin == 'fhalfsleeve' || $clotheAstin == 'bottompuffy') {
+
                                     $matched = true;
                                 }
 
-                                if ($currentColor == 'dark_bright' || $currentColor == 'dark_muted') {
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+
+                        case 21:
+
+                            if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
+                                if ($clotheAstin == 'toppuffy') {
+                                    $matched = true;
+                                }
+                            } elseif ($shalvar == 'wstraight' || $skirtType == 'alineskirt' || $skirtType == 'shortaskirt' || $skirtType == 'wrapskirt') {
+
+                                if ($clotheAstin == 'fsleeveless' || $clotheAstin == 'fshortsleeve' || $clotheAstin == 'flongsleeve' ||
+                                    $clotheAstin == 'fhalfsleeve' || $clotheAstin == 'bottompuffy') {
+
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+
+                        case 31:
+
+                            if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
+                                $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
+                                $skirtType == 'shortaskirt') {
+                                if ($clotheAstin == 'flongsleeve' || $clotheAstin == 'bottompuffy' ||
+                                    $clotheAstin == 'fsleeveless' || $clotheAstin == 'fhalfsleeve') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($color == 'light_bright') {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted' || $clotheColor = 'light_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                } else {
                                     if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
                                         $matched = true;
                                     } else {
                                         $matched = false;
                                     }
-                                } elseif ($currentColor == 'light_bright' || $currentColor == 'light_muted') {
-                                    if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                }
+
+
+                            }
+
+                            break;
+                        case 41:
+                            if ($shalvar == 'wbaggy' || $shalvar == 'wcargo' ||
+                                $shalvar == 'wcargoshorts' || $shalvar == 'wbootcut' ||
+                                $shalvar == 'wmom' || $skirtType == 'balloonskirt' || $skirtType == 'mermaidskirt') {
+
+                                if ($clotheAstin == 'fshortsleeve' || $clotheAstin == 'toppuffy') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'dark_bright') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+                        case 51:
+                            if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
+                                $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
+                                $skirtType == 'shortaskirt') {
+                                if ($clotheAstin == 'flongsleeve' || $clotheAstin == 'bottompuffy' ||
+                                    $clotheAstin == 'fsleeveless' || $clotheAstin == 'fhalfsleeve') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($color == 'light_bright') {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted'
+                                        || $clotheColor = 'light_muted' || $clotheColor == 'light_bright') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                } else {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted' || $clotheColor == 'light_muted') {
                                         $matched = true;
                                     } else {
                                         $matched = false;
                                     }
                                 }
 
-                                break;
 
-                            case 21:
+                            }
 
-                                break;
-                            case 31:
-
-                                break;
-                            case 41:
-
-                                break;
-                            case 51:
-
-                                break;
-                        }
-
-
+                            break;
                     }
+
+                } elseif ($currentProcessedImageData->paintane == 'fbalatane' && $clotheProcessedImageData->paintane != 'fbalatane') {
+//
+//                    if ($currentMnistPrediction == 'T-shirt/top' || $currentMnistPrediction == 'Pullover'
+//                        || $currentMnistPrediction == 'Shirt' || $currentMnistPrediction == 'Dress') {
+//                        if ($mnistPrediction == 'T-shirt/top' || $mnistPrediction == 'Pullover' ||
+//                            $mnistPrediction == 'Shirt' || $mnistPrediction == 'Dress') {
+//                            continue;
+//                        }
+//                    }
+//
+//                    if ($currentMnistPrediction == 'jacket' && $mnistPrediction == 'jacket') {
+//                        continue;
+//                    }
+
+
+                    $clotheShalvar = $clotheProcessedImageData?->shalvar ?? '';
+                    $clotheShalvar = strtolower($clotheShalvar);
+
+                    $clotheSkirtType = $clotheProcessedImageData?->skirt_type ?? '';
+                    $clotheSkirtType = strtolower($clotheSkirtType);
+
+                    $clotheTarh = $clotheProcessedImageData?->tarh_shalvar ?? $clotheProcessedImageData?->skirt_print ?? '';
+                    $clotheTarh = strtolower($clotheTarh);
+
+                    $pattren = $currentProcessedImageData?->pattren ?? '';
+                    $pattren = strtolower($pattren);
+
+                    $astin = $currentProcessedImageData?->astin ?? '';
+                    $astin = strtolower($astin);
+
+                    switch ($userBodyType) {
+                        case 11:
+                            if ($astin == 'toppuffy') {
+                                if ($clotheShalvar == 'wbootcut' || $clotheShalvar == 'wbaggy' || $clotheSkirtType == 'balloonskirt') {
+                                    $matched = true;
+                                }
+                            } elseif ($astin == 'fsleeveless' || $astin == 'fshortsleeve' || $astin == 'flongsleeve' ||
+                                $astin == 'fhalfsleeve' || $astin == 'bottompuffy') {
+
+                                if ($clotheShalvar == 'wskinny' || $clotheShalvar == 'wstraight' ||
+                                    $clotheSkirtType == 'mermaidskirt' || $clotheSkirtType == 'alineskirt' ||
+                                    $clotheSkirtType == 'shortaskirt' || $clotheSkirtType == 'pencilskirt' ||
+                                    $clotheSkirtType == 'wrapskirt' || $clotheSkirtType == 'miniskirt') {
+
+                                    $matched = true;
+                                }
+
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($pattren == 'sade') {
+                                $matched = true;
+                            } else {
+                                if ($clotheTarh == 'sade' || $clotheTarh == 'skirtsade') {
+                                    $matched = true;
+                                }
+                            }
+
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+
+                        case 21:
+
+                            if ($astin == 'toppuffy') {
+                                if ($clotheShalvar == 'wbootcut' || $clotheShalvar == 'wbaggy' || $clotheSkirtType == 'balloonskirt') {
+                                    $matched = true;
+                                }
+                            } elseif ($astin == 'fsleeveless' || $astin == 'fshortsleeve' || $astin == 'flongsleeve' ||
+                                $astin == 'fhalfsleeve' || $astin == 'bottompuffy') {
+
+                                if ($clotheShalvar == 'wstraight' || $clotheShalvar == 'wbaggy' ||
+                                    $clotheSkirtType == 'alineskirt' || $clotheSkirtType == 'shortaskirt' ||
+                                    $clotheSkirtType == 'wrapskirt') {
+
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($pattren == 'sade') {
+                                $matched = true;
+                            } else {
+                                if ($clotheTarh == 'sade' || $clotheTarh == 'skirtsade') {
+                                    $matched = true;
+                                }
+                            }
+
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+
+                        case 31:
+
+                            if ($astin == 'fshortsleeve' || $astin == 'toppuffy') {
+                                if ($clotheShalvar == 'wbaggy' || $clotheShalvar == 'wcargo' ||
+                                    $clotheShalvar == 'wcargoshorts' || $clotheShalvar == 'wbootcut' ||
+                                    $clotheShalvar == 'wmom' || $clotheSkirtType == 'balloonskirt' ||
+                                    $clotheSkirtType == 'mermaidskirt') {
+
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($pattren == 'sade') {
+                                $matched = true;
+                            } else {
+                                if ($clotheTarh == 'sade' || $clotheTarh == 'skirtsade') {
+                                    $matched = true;
+                                }
+                            }
+
+                            if ($color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'dark_bright') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+                        case 41:
+
+                            if ($astin == 'flongsleeve' || $astin == 'bottompuffy' ||
+                                $astin == 'fsleeveless' || $astin == 'fhalfsleeve') {
+                                if ($clotheShalvar == 'wskinny' || $clotheShalvar == 'wstraight' ||
+                                    $clotheShalvar == 'wshorts' || $clotheSkirtType == 'alineskirt' || $clotheSkirtType == 'pencilskirt' ||
+                                    $clotheSkirtType == 'shortaskirt') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($pattren == 'sade') {
+                                $matched = true;
+                            } else {
+                                if ($clotheTarh == 'sade' || $clotheTarh == 'skirtsade') {
+                                    $matched = true;
+                                }
+                            }
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($color == 'light_bright') {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted' || $clotheColor = 'light_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                } else {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                }
+
+
+                            }
+
+                            break;
+                        case 51:
+
+                            if ($astin == 'fshortsleeve' || $astin == 'toppuffy') {
+                                if ($clotheShalvar == 'wbaggy' || $clotheShalvar == 'wcargo' ||
+                                    $clotheShalvar == 'wcargoshorts' || $clotheShalvar == 'wmom' || $clotheShalvar == 'wshorts' ||
+                                    $clotheSkirtType == 'balloonskirt' || $clotheSkirtType == 'shortaskirt') {
+
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($pattren == 'sade') {
+                                $matched = true;
+                            } else {
+                                if ($clotheTarh == 'sade' || $clotheTarh == 'skirtsade') {
+                                    $matched = true;
+                                }
+                            }
+
+                            if ($color == 'dark_bright') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }elseif ($color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted'
+                                    || $clotheColor = 'light_muted' || $clotheColor == 'light_bright') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+                    }
+
+
+                } elseif ($currentProcessedImageData->paintane == 'mpayintane' && $clotheProcessedImageData->paintane != 'mpayintane') {
+
+                    $shalvar = $currentProcessedImageData?->shalvar ?? '';
+                    $shalvar = strtolower($shalvar);
+
+                    $tarh = $currentProcessedImageData?->tarh_shalvar ?? '';
+                    $tarh = strtolower($tarh);
+
+                    $clothePattren = $clotheProcessedImageData?->pattren ?? '';
+                    $clothePattren = strtolower($clothePattren);
+
+                    $clotheAstin = $clotheProcessedImageData?->astin ?? '';
+                    $clotheAstin = strtolower($clotheAstin);
+
+                    switch ($userBodyType) {
+                        case 0:
+
+                            if ($shalvar == 'mcargo' || $shalvar == 'mcargoshorts' || $shalvar == 'mmom') {
+                                if ($clotheAstin == 'shortsleeve') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($tarh != 'mpsade') {
+                                if ($clothePattren == 'mpsade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'dark_bright') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+
+                        case 2:
+
+                            if ($shalvar == 'mslimfit' || $shalvar == 'mshorts') {
+                                if ($clotheAstin == 'longsleeve') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($tarh != 'mpsade') {
+                                if ($clothePattren == 'mpsade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($color == 'light_bright') {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted' || $clotheColor = 'light_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                } else {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                }
+
+
+                            }
+
+                            break;
+
+                        case 5:
+
+                            if ($shalvar == 'mslimfit' || $shalvar == 'mstraight') {
+                                if ($clotheAstin == 'longsleeve') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($tarh != 'mpsade') {
+                                if ($clothePattren == 'mpsade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($color == 'light_bright') {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted'
+                                        || $clotheColor = 'light_muted' || $clotheColor == 'light_bright') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                } else {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted' || $clotheColor == 'light_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                }
+
+
+                            }
+
+                            break;
+                    }
+
+                } elseif ($currentProcessedImageData->paintane == 'mbalatane' && $clotheProcessedImageData->paintane != 'mbalatane') {
+
+
+                    $clotheShalvar = $clotheProcessedImageData?->shalvar ?? '';
+                    $clotheShalvar = strtolower($clotheShalvar);
+
+                    $clotheTarh = $clotheProcessedImageData?->tarh_shalvar ?? '';
+                    $clotheTarh = strtolower($clotheTarh);
+
+                    $pattren = $currentProcessedImageData?->pattren ?? '';
+                    $pattren = strtolower($pattren);
+
+                    $astin = $currentProcessedImageData?->astin ?? '';
+                    $astin = strtolower($astin);
+
+
+                    switch ($userBodyType) {
+                        case 0:
+
+                            if ($astin == 'longsleeve') {
+                                if ($clotheShalvar == 'mshorts' || $clotheShalvar == 'mslimfit' || $clotheShalvar == 'mstraight') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($pattren == 'mpsade') {
+                                $matched = true;
+                            } else {
+                                if ($clotheTarh == 'mpsade') {
+                                    $matched = true;
+                                }
+                            }
+
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($color == 'light_bright') {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted' || $clotheColor = 'light_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                } else {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                }
+                            }
+
+                            break;
+
+                        case 2:
+
+                            if ($astin == 'shortsleeve') {
+                                if ($clotheShalvar == 'mcargo' || $clotheShalvar == 'mcargoshorts' || $clotheShalvar == 'mmom') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($pattren == 'mpsade') {
+                                $matched = true;
+                            } else {
+                                if ($clotheTarh == 'mpsade') {
+                                    $matched = true;
+                                }
+                            }
+
+
+                            if ($color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'dark_bright') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+
+                        case 5:
+
+                            if ($astin == 'longsleeve') {
+                                if ($clotheShalvar == 'mshorts' || $clotheShalvar == 'mslimfit' || $clotheShalvar == 'mstraight') {
+                                    $matched = true;
+                                }
+                            }elseif ($astin == 'shortsleeve') {
+                                if ($clotheShalvar == 'mcargo' || $clotheShalvar == 'mcargoshorts' || $clotheShalvar == 'mmom' ||
+                                    $clotheShalvar == 'mstraight' || $clotheShalvar == 'mshorts') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($pattren == 'mpsade') {
+                                $matched = true;
+                            } else {
+                                if ($clotheTarh == 'mpsade') {
+                                    $matched = true;
+                                }
+                            }
+
+                            if ($color == 'dark_bright') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }elseif ($color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted'
+                                    || $clotheColor = 'light_muted' || $clotheColor == 'light_bright') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+                    }
+
                 }
 
 
-            }
-
-
-            if ($matched) {
-                UserClothesPivot::query()->insert(
-                    [
-                        "first_user_clothes_id" => $currentProcessedImageData->id,
-                        "second_user_clothes_id" => $clotheProcessedImageData->id,
-                        "matched" => true
-                    ]
-                );
-                UserClothesPivot::query()->insert(
-                    [
-                        "first_user_clothes_id" => $clotheProcessedImageData->id,
-                        "second_user_clothes_id" => $currentProcessedImageData->id,
-                        "matched" => true
-                    ]
-                );
+                if ($matched) {
+                    UserClothesPivot::query()->insert(
+                        [
+                            "first_user_clothes_id" => $currentProcessedImageData->id,
+                            "second_user_clothes_id" => $clotheProcessedImageData->id,
+                            "matched" => true
+                        ]
+                    );
+                    UserClothesPivot::query()->insert(
+                        [
+                            "first_user_clothes_id" => $clotheProcessedImageData->id,
+                            "second_user_clothes_id" => $currentProcessedImageData->id,
+                            "matched" => true
+                        ]
+                    );
+                }
             }
         }
     }

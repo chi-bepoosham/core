@@ -51,11 +51,16 @@ class ProcessRabbitMQMessage implements ShouldQueue
 
                 if ($userItemBodyType != null) {
                     $matchScore = $this->calculateScore($processImageData["process_data"], (int)trim($userItemBodyType));
-                    $clothes = UserClothes::query()->find($clothesId);
-                    $clothes?->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore]);
+                    try {
+                        $clothes = UserClothes::query()->find($clothesId);
+                        $clothes?->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore]);
 
-                    sleep(1);
-                    $clothes?->matchWithOtherClothes();
+                        sleep(1);
+                        $clothes?->matchWithOtherClothes();
+                    }catch (\Exception $exception){
+                        Log::debug("Error On Update : --------------------------------");
+                        Log::debug($exception->getMessage());
+                    }
                 }
 
             }
@@ -115,7 +120,7 @@ class ProcessRabbitMQMessage implements ShouldQueue
                         break;
                 }
 
-            } elseif ($imageData['paintane'] === 'fpayintane' || $imageData['category'] === 'ftamamtane') {
+            } else {
                 switch ($userBodyType) {
                     case 11:
                         $score += $this->womenPayintaneOneOne($imageData);
@@ -524,12 +529,12 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
 
-        $point += $data["snatched"] == "snatched" ? 5 : 0;
-        $point += $data["wrap"] == "wrap" ? 5 : 0;
-        $point += $data["peplum"] == "peplum" ? 5 : 0;
-        $point += $data["belted"] == "belted" ? 5 : 0;
-        $point += $data["cowl"] == "cowl" ? 3 : 0;
-        $point += $data["empire"] == "empire" ? 3 : 0;
+        $point += isset($data["snatched"]) ? $data["snatched"] == "snatched" ? 5 : 0 : 0;
+        $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
+        $point += isset($data["peplum"]) ? $data["peplum"] == "peplum" ? 5 : 0 : 0;
+        $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
+        $point += isset($data["cowl"]) ? $data["cowl"] == "cowl" ? 3 : 0 : 0;
+        $point += isset($data["empire"]) ? $data["empire"] == "empire" ? 3 : 0 : 0;
 
 
         switch ($data['pattern'] ?? null) {
@@ -697,12 +702,12 @@ class ProcessRabbitMQMessage implements ShouldQueue
                 break;
         }
 
-        $point += $data["snatched"] == "snatched" ? 5 : 0;
-        $point += $data["wrap"] == "wrap" ? 5 : 0;
-        $point += $data["peplum"] == "peplum" ? 5 : 0;
-        $point += $data["belted"] == "belted" ? 5 : 0;
-        $point += $data["cowl"] == "cowl" ? 5 : 0;
-        $point += $data["empire"] == "empire" ? 3 : 0;
+        $point += isset($data["snatched"]) ? $data["snatched"] == "snatched" ? 5 : 0 : 0;
+        $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
+        $point += isset($data["peplum"]) ? $data["peplum"] == "peplum" ? 5 : 0 : 0;
+        $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
+        $point += isset($data["cowl"]) ? $data["cowl"] == "cowl" ? 5 : 0 : 0;
+        $point += isset($data["empire"]) ? $data["empire"] == "empire" ? 3 : 0 : 0;
 
 
         switch ($data['pattern'] ?? null) {
@@ -885,12 +890,12 @@ class ProcessRabbitMQMessage implements ShouldQueue
         }
 
 
-        $point += $data["snatched"] == "snatched" ? 5 : 0;
-        $point += $data["wrap"] == "wrap" ? 5 : 0;
-        $point += $data["peplum"] == "peplum" ? 5 : 0;
-        $point += $data["belted"] == "belted" ? 5 : 0;
-        $point += $data["loose"] == "loose" || $data["loose"] == "losse" ? 3 : 0;
-        $point += $data["empire"] == "empire" ? 3 : 0;
+        $point += isset($data["snatched"]) ? $data["snatched"] == "snatched" ? 5 : 0 : 0;
+        $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
+        $point += isset($data["peplum"]) ? $data["peplum"] == "peplum" ? 5 : 0 : 0;
+        $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
+        $point += isset($data["loose"]) ? $data["loose"] == "loose" || $data["loose"] == "losse" ? 3 : 0 : 0;
+        $point += isset($data["empire"]) ? $data["empire"] == "empire" ? 3 : 0 : 0;
 
 
         switch ($data['pattern'] ?? null) {
@@ -1001,12 +1006,12 @@ class ProcessRabbitMQMessage implements ShouldQueue
             $point += 0;
         }
 
-        $point += $data["snatched"] == "snatched" ? 5 : 0;
-        $point += $data["wrap"] == "wrap" ? 5 : 0;
-        $point += $data["cowl"] == "cowl" ? 5 : 0;
-        $point += $data["belted"] == "belted" ? 5 : 0;
-        $point += $data["peplum"] == "peplum" ? 3 : 0;
-        $point += $data["empire"] == "empire" ? 3 : 0;
+        $point += isset($data["snatched"]) ? $data["snatched"] == "snatched" ? 5 : 0 : 0;
+        $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
+        $point += isset($data["cowl"]) ? $data["cowl"] == "cowl" ? 5 : 0 : 0;
+        $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
+        $point += isset($data["peplum"]) ? $data["peplum"] == "peplum" ? 3 : 0 : 0;
+        $point += isset($data["empire"]) ? $data["empire"] == "empire" ? 3 : 0 : 0;
 
 
         if (in_array($data['pattern'] ?? null, ['ofoghi', 'dorosht'])) {
@@ -1139,12 +1144,12 @@ class ProcessRabbitMQMessage implements ShouldQueue
             $point += 0;
         }
 
-        $point += $data["wrap"] == "wrap" ? 5 : 0;
-        $point += $data["belted"] == "belted" ? 5 : 0;
-        $point += $data["peplum"] == "peplum" ? 5 : 0;
-        $point += $data["empire"] == "empire" ? 5 : 0;
-        $point += $data["loose"] == "loose" || $data["loose"] == "losse" ? 5 : 0;
-        $point += $data["cowl"] == "cowl" ? 3 : 0;
+        $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
+        $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
+        $point += isset($data["peplum"]) ? $data["peplum"] == "peplum" ? 5 : 0 : 0;
+        $point += isset($data["empire"]) ? $data["empire"] == "empire" ? 5 : 0 : 0;
+        $point += isset($data["loose"]) ? $data["loose"] == "loose" || $data["loose"] == "losse" ? 5 : 0 : 0;
+        $point += isset($data["cowl"]) ? $data["cowl"] == "cowl" ? 3 : 0 : 0;
 
 
         if (in_array($data['pattern'] ?? null, ['amudi', 'riz', 'sade'])) {
