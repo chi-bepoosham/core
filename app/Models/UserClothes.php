@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Log;
 
 class UserClothes extends Model
 {
@@ -49,15 +50,14 @@ class UserClothes extends Model
         return $this->belongsTo(User::class, "user_id");
     }
 
-    public function matchWithOtherClothes($clothesId)
+    public function matchWithOtherClothes()
     {
-        $clothes = UserClothes::query()->find($clothesId);
-        $currentProcessedImageData = $clothes->processed_image_data;
-        $userBodyType = (int)$clothes->user->bodyType->predict_value;
-        $otherClothes = UserClothes::query()->where("user_id", $clothes->user_id)->get();
+        $currentProcessedImageData = json_decode($this->processed_image_data);
+        $userBodyType = (int)$this->user->bodyType->predict_value;
+        $otherClothes = UserClothes::query()->where("user_id", $this->user_id)->get();
 
         foreach ($otherClothes as $clothe) {
-            $clotheProcessedImageData = $clothe->processed_image_data;
+            $clotheProcessedImageData = json_decode($clothe->processed_image_data);
             $matched = false;
 
             if ($clothe->match_percentage != null && $clothe->match_percentage >= 50) {
