@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
 class UserClothes extends Model
 {
     protected $table = 'user_clothes';
@@ -48,11 +49,12 @@ class UserClothes extends Model
         return $this->belongsTo(User::class, "user_id");
     }
 
-    public function matchWithOtherClothes()
+    public function matchWithOtherClothes($clothesId)
     {
-        $currentProcessedImageData = $this->processed_image_data;
-        $userBodyType = (int)$this->user->bodyType->predict_value;
-        $otherClothes = UserClothes::query()->where("user_id", $this->user_id)->get();
+        $clothes = UserClothes::query()->find($clothesId);
+        $currentProcessedImageData = $clothes->processed_image_data;
+        $userBodyType = (int)$clothes->user->bodyType->predict_value;
+        $otherClothes = UserClothes::query()->where("user_id", $clothes->user_id)->get();
 
         foreach ($otherClothes as $clothe) {
             $clotheProcessedImageData = $clothe->processed_image_data;
@@ -551,7 +553,7 @@ class UserClothes extends Model
                                 } else {
                                     $matched = false;
                                 }
-                            }elseif ($color == 'dark_muted') {
+                            } elseif ($color == 'dark_muted') {
                                 if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted'
                                     || $clotheColor = 'light_muted' || $clotheColor == 'light_bright') {
                                     $matched = true;
@@ -826,7 +828,7 @@ class UserClothes extends Model
                                 if ($clotheShalvar == 'mshorts' || $clotheShalvar == 'mslimfit' || $clotheShalvar == 'mstraight') {
                                     $matched = true;
                                 }
-                            }elseif ($astin == 'shortsleeve') {
+                            } elseif ($astin == 'shortsleeve') {
                                 if ($clotheShalvar == 'mcargo' || $clotheShalvar == 'mcargoshorts' || $clotheShalvar == 'mmom' ||
                                     $clotheShalvar == 'mstraight' || $clotheShalvar == 'mshorts') {
                                     $matched = true;
@@ -850,7 +852,7 @@ class UserClothes extends Model
                                 } else {
                                     $matched = false;
                                 }
-                            }elseif ($color == 'dark_muted') {
+                            } elseif ($color == 'dark_muted') {
                                 if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted'
                                     || $clotheColor = 'light_muted' || $clotheColor == 'light_bright') {
                                     $matched = true;
