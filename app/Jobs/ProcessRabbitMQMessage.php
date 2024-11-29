@@ -50,14 +50,17 @@ class ProcessRabbitMQMessage implements ShouldQueue
                 $userItemBodyType = $userItem?->bodyType?->predict_value ?? null;
 
                 if ($userItemBodyType != null) {
-                    $matchScore = $this->calculateScore($processImageData["process_data"], (int)trim($userItemBodyType));
                     try {
+                        $clothesType = $this->getClothesType($processImageData["process_data"]);
+                        $matchScore = $this->calculateScore($processImageData["process_data"], (int)trim($userItemBodyType));
                         $clothes = UserClothes::query()->find($clothesId);
-                        $clothes?->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore]);
+                        if ($clothes != null) {
+                            $clothes->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore, "clothes_type" => $clothesType]);
+                            sleep(5);
+                            $clothes->matchWithOtherClothes();
+                        }
 
-                        sleep(1);
-                        $clothes?->matchWithOtherClothes();
-                    }catch (\Exception $exception){
+                    } catch (\Exception $exception) {
                         Log::debug("Error On Update : --------------------------------");
                         Log::debug($exception->getMessage());
                     }
@@ -66,6 +69,15 @@ class ProcessRabbitMQMessage implements ShouldQueue
             }
         }
 
+    }
+
+    public function getClothesType(array $imageData): int
+    {
+        if ($imageData['paintane'] === 'mpayintane' || $imageData['paintane'] === 'fpayintane' || $imageData['paintane'] === 'ftamamtane') {
+            return 2;
+        } else {
+            return 1;
+        }
     }
 
     public function calculateScore(array $imageData, $userBodyType): int
