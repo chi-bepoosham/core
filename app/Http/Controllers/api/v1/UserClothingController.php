@@ -39,4 +39,20 @@ class UserClothingController extends Controller
         }
     }
 
+    /**
+     * @param $clothesId
+     * @return JsonResponse
+     */
+    public function delete($clothesId): JsonResponse
+    {
+        try {
+            $this->service->delete($clothesId);
+            $message = __("custom.defaults.delete_success");
+            return ResponseHelper::responseSuccess([],$message);
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            return ResponseHelper::responseCustomError($message);
+        }
+    }
+
 }

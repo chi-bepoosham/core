@@ -39,6 +39,7 @@ Route::prefix('v1/user')->middleware('auth:sanctum')->group(function () {
     Route::prefix('clothes')->group(callback: function () {
         Route::get("/", [UserClothingController::class, "index"]);
         Route::post("/upload/image", [UserClothingController::class, "uploadClothingImage"]);
+        Route::delete("/{clothesId}", [UserClothingController::class, "delete"]);
     });
 
     Route::get("/splash", [UserController::class, "splash"]);

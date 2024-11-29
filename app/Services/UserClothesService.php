@@ -86,6 +86,30 @@ class UserClothesService
     }
 
 
+    /**
+     * @param $clothesId
+     * @return bool
+     * @throws Exception
+     */
+    public function delete($clothesId): bool
+    {
+        $item = $this->repository->find($clothesId);
+        if (!$item) {
+            throw new Exception(__("custom.defaults.not_found"));
+        }
+
+        DB::beginTransaction();
+        try {
+            $this->repository->delete($item);
+            DB::commit();
+            return true;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw new Exception(__("custom.defaults.delete_failed"));
+        }
+    }
+
+
     public function saveImage($imageFile, $folder): ?string
     {
         try {
@@ -116,5 +140,6 @@ class UserClothesService
             return null;
         }
     }
+
 
 }
