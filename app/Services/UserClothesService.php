@@ -122,7 +122,7 @@ class UserClothesService
                 $image = new UploadedFile($imageEncoded->basePath(), $imageFile->getFilename());
 
 
-                $imageName = sha1(md5(Auth::id())) . '.' . $extension;
+                $imageName = sha1(md5(Auth::id())) . time() . rand(100, 999) . '.' . $extension;
                 $path = 'user/' . $folder;
                 $fullPath = Storage::putFileAs(path: $path, file: $image, name: $imageName, options: ['visibility' => 'public', 'directory_visibility' => 'public']);
 
