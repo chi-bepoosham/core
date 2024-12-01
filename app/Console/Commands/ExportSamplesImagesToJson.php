@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\BodyType;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -54,12 +55,12 @@ class ExportSamplesImagesToJson extends Command
                         if ($dir === 'celebrity') {
                             $celebrityData[] = [
                                 'title' => $title,
-                                'body_type_id' => trim($bodyTypeId),
+                                'body_type_id' => BodyType::query()->where("predict_value", trim($bodyTypeId))->first()?->id,
                                 'image' => $relativePath,
                             ];
                         } elseif ($dir === 'clothes') {
                             $clothesData[] = [
-                                'body_type_id' => trim($bodyTypeId),
+                                'body_type_id' => BodyType::query()->where("predict_value", trim($bodyTypeId))->first()?->id,
                                 'image' => $relativePath,
                             ];
                         }
