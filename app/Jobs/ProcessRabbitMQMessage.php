@@ -39,11 +39,17 @@ class ProcessRabbitMQMessage implements ShouldQueue
         $userItem = $userRepository->find($userId);
         if ($userItem != null) {
             if ($action == 'body_type') {
-                $bodyType = BodyType::query()->where("predict_value", trim($processImageData["process_data"]))->first();
-                if ($bodyType != null) {
+                if ($processImageData["process_data"] != "No human detected") {
+                    $bodyType = BodyType::query()->where("predict_value", trim($processImageData["process_data"]))->first();
+                    if ($bodyType != null) {
+                        $userRepository->update($userItem, [
+                            "body_type_id" => $bodyType->id,
+                            "process_body_image_status" => 2,
+                        ]);
+                    }
+                }else{
                     $userRepository->update($userItem, [
-                        "body_type_id" => $bodyType->id,
-                        "process_body_image_status" => 2,
+                        "process_body_image_status" => 3,
                     ]);
                 }
             } else {

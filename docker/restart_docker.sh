@@ -6,4 +6,4 @@
 cd /home/amir/Projects/ChiBepoosham
 
 # Restart Docker Compose services
-docker compose down && docker compose up -d
+docker compose down && docker compose --profile gpus up -d

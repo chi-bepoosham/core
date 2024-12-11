@@ -876,15 +876,15 @@ class UserClothes extends Model
                 if ($matched) {
                     UserClothesPivot::query()->insert(
                         [
-                            "first_user_clothes_id" => $currentProcessedImageData->id,
-                            "second_user_clothes_id" => $clotheProcessedImageData->id,
+                            "first_user_clothes_id" => $this->id,
+                            "second_user_clothes_id" => $clothe->id,
                             "matched" => true
                         ]
                     );
                     UserClothesPivot::query()->insert(
                         [
-                            "first_user_clothes_id" => $clotheProcessedImageData->id,
-                            "second_user_clothes_id" => $currentProcessedImageData->id,
+                            "first_user_clothes_id" => $clothe->id,
+                            "second_user_clothes_id" => $this->id,
                             "matched" => true
                         ]
                     );
