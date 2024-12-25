@@ -13,6 +13,9 @@ def process_woman_clothing_image(image_path):
     crop_image_astin = yolo(image_path=image_path, model="astin")
     crop_image_yaghe = yolo(image_path=image_path, model='yaghe')
 
+    if isinstance(crop_image_astin, str) or isinstance(crop_image_yaghe, str):
+        return "No Cloth detected"
+
     # Load models
     model_astin = load_modelll('/var/www/deploy/models/astin/models/astinwoman.h5', class_num=6, base_model="resnet101")
     model_patern = load_modelll('/var/www/deploy/models/patern/models/petternwoman.h5', class_num=5, base_model="resnet101")

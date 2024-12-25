@@ -54,6 +54,11 @@ def yolo(model,image_path):
 
         # برای هر باکس تشخیص داده شده
         for result in results[0].boxes:
+
+            confidence = result.conf.item()
+            if confidence < 90 :
+                return "No Cloth detected"
+
             # گرفتن مختصات باکس (x1, y1, x2, y2)
             x1, y1, x2, y2 = map(int, result.xyxy[0].tolist())
 

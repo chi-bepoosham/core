@@ -47,31 +47,37 @@ class ProcessRabbitMQMessage implements ShouldQueue
                             "process_body_image_status" => 2,
                         ]);
                     }
-                }else{
+                } else {
                     $userRepository->update($userItem, [
                         "process_body_image_status" => 3,
                     ]);
                 }
             } else {
-                $userItemBodyType = $userItem?->bodyType?->predict_value ?? null;
+                if ($processImageData["process_data"] != "No Cloth detected") {
+                    $userItemBodyType = $userItem?->bodyType?->predict_value ?? null;
 
-                if ($userItemBodyType != null) {
-                    try {
-                        $clothesType = $this->getClothesType($processImageData["process_data"]);
-                        $matchScore = $this->calculateScore($processImageData["process_data"], (int)trim($userItemBodyType));
-                        $clothes = UserClothes::query()->find($clothesId);
-                        if ($clothes != null) {
-                            $clothes->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore, "clothes_type" => $clothesType]);
-                            sleep(2);
-                            $clothes->matchWithOtherClothes();
+                    if ($userItemBodyType != null) {
+                        try {
+                            $clothesType = $this->getClothesType($processImageData["process_data"]);
+                            $matchScore = $this->calculateScore($processImageData["process_data"], (int)trim($userItemBodyType));
+                            $clothes = UserClothes::query()->find($clothesId);
+                            if ($clothes != null) {
+                                $clothes->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore, "clothes_type" => $clothesType]);
+                                sleep(2);
+                                $clothes->matchWithOtherClothes();
+                            }
+
+                        } catch (\Exception $exception) {
+                            Log::debug("Error On Update : --------------------------------");
+                            Log::debug($exception->getMessage());
                         }
-
-                    } catch (\Exception $exception) {
-                        Log::debug("Error On Update : --------------------------------");
-                        Log::debug($exception->getMessage());
+                    }
+                } else {
+                    $clothes = UserClothes::query()->find($clothesId);
+                    if ($clothes != null) {
+                        $clothes->update(["process_status" => 3]);
                     }
                 }
-
             }
         }
 
