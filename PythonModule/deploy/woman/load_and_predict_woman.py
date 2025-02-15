@@ -23,13 +23,13 @@ base_path = os.path.dirname(__file__)
 model_astin_path = os.path.join(base_path, '../../models/astin/astinwoman.h5')
 model_patern_path = os.path.join(base_path, '../../models/pattern/petternwoman.h5')
 model_paintane_path = os.path.join(base_path, '../../models/paintane/zan.h5')  # FIXME: not available
-model_rise_path = os.path.join(base_path, '../../models/rise/models/riseeeeef.h5')  # FIXME: not available
+model_rise_path = os.path.join(base_path, '../../models/rise/riseeeeef.h5')  # FIXME: low accuracy
 model_shalvar_path = os.path.join(base_path, '../../models/shalvar/womenpants.h5')
 model_tarh_shalvar_path = os.path.join(base_path, '../../models/tarh_shalvar/wwpantsprint.h5')
-model_skirt_pants_path = os.path.join(base_path, '../../models/skirt_pants/skirt_pants.h5')  # FIXME: not available
+model_skirt_pants_path = os.path.join(base_path, '../../models/skirt_pants/skirt_pants.h5')  
 model_yaghe_path = os.path.join(base_path, '../../models/yaghe/yaghewoman101A.h5')
-model_skirt_print_path = os.path.join(base_path, '../../models/skirt_print/skirt_print.h5')  # FIXME: not available
-model_skirt_type_path = os.path.join(base_path, '../../models/skirt_type/skirttt_types.h5')  # FIXME: not available
+model_skirt_print_path = os.path.join(base_path, '../../models/skirt_print/skirt_print.h5')
+model_skirt_type_path = os.path.join(base_path, '../../models/skirt_type/skirttt_types.h5') 
 model_mnist_path = os.path.join(base_path, '../../models/fasionmnist/mnist.h5')  # FIXME: not available
 
 
@@ -166,3 +166,19 @@ def test_model_yaghe(image_path="../../image/sample_yaghe.jpg"):
                            class_names=["boatneck", "classic", "halter", "hoodie", "of_the_shoulder", "one_shoulder", "round", "squer", "sweatheart", 'turtleneck', "v_neck"], reso=300,
                            model_name="yaghe")
     print(f"Yaghe Prediction: {result}")
+
+def test_model_skirt_print(image_path="../../image/sample_skirt_print.jpg"):
+    model_skirt_print = load_modelll(model_skirt_print_path, class_num=5, base_model="resnet101_30_unit")
+    sample_image = cv2.imread(image_path)
+    result = predict_class(sample_image, model=model_skirt_print, 
+                           class_names=["skirtamudi", "skirtdorosht", "skirtofoghi", "skirtriz", "skirtsade"], 
+                           reso=300, model_name="skirt and pants")
+    print(f"Skirt Print Prediction: {result}")
+
+def test_model_skirt_type(image_path="../../image/sample_skirt_print.jpg"):
+    model_skirt_type = load_modelll(model_skirt_type_path, class_num=7, base_model="resnet101_30_unit")
+    sample_image = cv2.imread(image_path)
+    result = predict_class(sample_image, model=model_skirt_type, 
+                           class_names=["alineskirt", "balloonskirt", "mermaidskirt", "miniskirt", "pencilskirt", "shortaskirt", "wrapskirt"], 
+                           reso=300, model_name="model_skirt_type")
+    print(f"Skirt Print Prediction: {result}")
