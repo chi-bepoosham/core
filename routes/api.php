@@ -27,6 +27,10 @@ Route::prefix('v1/user')->middleware('auth:sanctum')->group(function () {
         Route::post("/otp/send", [AuthController::class, "sendOtp"]);
         Route::post("/otp/confirm", [AuthController::class, "otpConfirm"]);
         Route::post("/register", [AuthController::class, "register"])->middleware(checkApiKeyMiddleware::class);
+
+//        Google Authentication
+        Route::get("/google/redirect", [AuthController::class, "redirectToGoogleOAuth"])->middleware('web');
+        Route::get("/google/callback", [AuthController::class, "callbackGoogleOAuth"])->middleware('web');
     });
 
 

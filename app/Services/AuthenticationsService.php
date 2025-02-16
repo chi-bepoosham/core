@@ -4,13 +4,16 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use JetBrains\PhpStorm\ArrayShape;
 use App\Http\Repositories\UserRepository;
 use App\Models\User;
-use Symfony\Component\HttpFoundation\Response;
+use Laravel\Socialite\Facades\Socialite;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\SimpleCache\InvalidArgumentException;
+use Throwable;
 
 class AuthenticationsService
 {
@@ -20,11 +23,10 @@ class AuthenticationsService
 
     /**
      * @param $inputs
-     * @param bool $onRegister
      * @return bool
-     * @throws Exception
+     * @throws Exception|InvalidArgumentException
      */
-    public function sendOtp($inputs, bool $onRegister = false): bool
+    public function sendOtp($inputs): bool
     {
         $mobile = $inputs["mobile"];
         $code = $this->generateOtpRandom();
@@ -36,7 +38,7 @@ class AuthenticationsService
             sendSms($mobile, $code, $hash);
             cache()->set($mobile, ['code' => $code, 'expired_time' => $expiredTime], $ttlCache);
             return true;
-        } catch (Exception $exception) {
+        } catch (Exception) {
             throw new Exception(__("custom.user.send_otp_failed"));
         }
 
@@ -46,7 +48,7 @@ class AuthenticationsService
     /**
      * @param $inputs
      * @return array
-     * @throws Exception
+     * @throws Exception|InvalidArgumentException
      */
     #[ArrayShape(['token' => "mixed", 'user' => "mixed", 'api_key' => "mixed"])]
     public function otpConfirm($inputs): array
@@ -94,7 +96,7 @@ class AuthenticationsService
 
             return ['token' => $token, 'user' => $user];
 
-        } catch (Exception $exception) {
+        } catch (Exception) {
             DB::rollBack();
             throw new Exception(__("custom.user.register_exception"));
         }
@@ -112,9 +114,55 @@ class AuthenticationsService
             $createdItem = $this->repository->create($inputs);
             DB::commit();
             return $createdItem;
-        } catch (Exception $exception) {
+        } catch (Exception) {
             DB::rollBack();
             throw new Exception(__("custom.user.create_user_exception"));
+        }
+    }
+
+
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function callbackGoogleOAuth(): string
+    {
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (Throwable) {
+            throw new Exception(__("custom.user.oauth_google_exception"));
+        }
+
+        $user = User::query()->where("email", $googleUser->getEmail())->first();
+
+        if ($user) {
+            $userId = $user->id;
+            return $user->createToken("ChiBepoosham-usr-$userId")->plainTextToken;
+        } else {
+
+            $inputs = [
+                'first_name' => $googleUser->user['given_name'],
+                'last_name' => $googleUser->user['family_name'],
+                'email' => $googleUser->getEmail(),
+                'email_verified_at' => now()
+            ];
+
+
+            DB::beginTransaction();
+            try {
+
+                $createdItem = $this->create($inputs);
+                $user = User::query()->find($createdItem->id);
+                $userId = $user->id;
+                $token = $user->createToken("ChiBepoosham-usr-$userId")->plainTextToken;
+                DB::commit();
+
+                return $token;
+
+            } catch (Exception) {
+                DB::rollBack();
+                throw new Exception(__("custom.user.register_exception"));
+            }
         }
     }
 
@@ -130,6 +178,10 @@ class AuthenticationsService
         }
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public static function checkApiKey($apiKey, $mobile): bool
     {
         $apiKeyCache = $mobile . "-api-key";
@@ -137,7 +189,6 @@ class AuthenticationsService
             $cacheData = cache()->get($apiKeyCache);
             $apiKeyValue = $cacheData['api_key'] ?? null;
             $expiredTime = $cacheData['expired_time'] ?? null;
-//            cache()->forget($apiKeyCache);
             return $apiKey == $apiKeyValue && (bool)Carbon::make($expiredTime) >= now();
         }
         return false;

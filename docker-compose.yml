@@ -140,32 +140,35 @@ services:
             - './:/var/www:rw'
         networks:
             - main
-    application_python:
-        image: chibepoosham-application_python:latest
-        container_name: application_python
-        working_dir: /var/www
-        restart: on-failure
-        volumes:
-            - './PythonModule/:/var/www'
-        expose:
-            - "8000"
-        depends_on:
-            rabbitmq:
-                condition: service_healthy
-            application_queue:
-                condition: service_started
-        networks:
-            - main
-        deploy:
-            resources:
-                reservations:
-                    devices:
-                        - driver: nvidia
-                          device_ids: ['all']
-                          capabilities: [ gpu ]
-        environment:
-            - NVIDIA_VISIBLE_DEVICES='all'  # Use 'all' to expose all GPUs
-            - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+#    application_python:
+#        build:
+#            context: PythonModule
+#            dockerfile: Dockerfile
+#        image: chibepoosham_application_python:latest
+#        container_name: application_python
+#        working_dir: /var/www
+#        restart: on-failure
+#        volumes:
+#            - './PythonModule/:/var/www'
+#        expose:
+#            - "8000"
+#        depends_on:
+#            rabbitmq:
+#                condition: service_healthy
+#            application_queue:
+#                condition: service_started
+#        networks:
+#            - main
+#        deploy:
+#            resources:
+#                reservations:
+#                    devices:
+#                        - driver: nvidia
+#                          device_ids: ['all']
+#                          capabilities: [ gpu ]
+#        environment:
+#            - NVIDIA_VISIBLE_DEVICES='all'  # Use 'all' to expose all GPUs
+#            - NVIDIA_DRIVER_CAPABILITIES=compute,utility
 networks:
     main:
         driver: bridge
