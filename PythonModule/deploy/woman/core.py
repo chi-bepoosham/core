@@ -235,56 +235,41 @@ def prepare_image(img, target_size):
 
 
 def get_color_tone(image):
+    """
+    Analyzes the lightness and saturation of the dominant color in an image.
 
+    Parameters:
+    - image: image object
 
-    # تغییر اندازه تصویر به 255x255
-    image = cv2.resize(image, (255, 255))
+    Returns:
+    - tone
+    """
 
-    # تبدیل تصویر به مدل رنگی HSV
+    # Step 1: Convert the image from BGR to HSV color space
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    # جدا کردن کانال‌های Hue, Saturation, Value
-    hue_channel = hsv_image[:, :, 0]
-    saturation_channel = hsv_image[:, :, 1]
-    value_channel = hsv_image[:, :, 2]
+    # Step 2: Calculate the dominant color
+    pixels = hsv_image.reshape(-1, hsv_image.shape[-1])
+    unique, counts = np.unique(pixels, axis=0, return_counts=True)
+    dominant_index = np.argmax(counts)
+    central_pixel_hsv = unique[dominant_index]
 
-    # محاسبه میانگین برای هر کانال
-    avg_hue = np.mean(hue_channel)
-    avg_saturation = np.mean(saturation_channel)
-    avg_value = np.mean(value_channel)
+    # Step 3: Use the dominant color's saturation and value
+    target_saturation = central_pixel_hsv[1]
+    target_value = central_pixel_hsv[2]
 
-    # تشخیص طیف رنگ بر اساس Hue (رنگ اصلی)
-    if 0 <= avg_hue <= 15 or 160 <= avg_hue <= 180:
-        color = 'Red'
-        color_bgr = (0, 0, 255)  # قرمز
-    elif 15 < avg_hue <= 35:
-        color = 'Yellow'
-        color_bgr = (0, 255, 255)  # زرد
-    elif 35 < avg_hue <= 85:
-        color = 'Green'
-        color_bgr = (0, 255, 0)  # سبز
-    elif 85 < avg_hue <= 125:
-        color = 'Blue'
-        color_bgr = (255, 0, 0)  # آبی
-    elif 125 < avg_hue <= 160:
-        color = 'Purple'
-        color_bgr = (255, 0, 255)  # بنفش
-    else:
-        color = 'Unknown'
-        color_bgr = (255, 255, 255)  # سفید برای ناشناخته
+    # Step 4: Define thresholds for lightness and saturation
+    lightness_threshold = 127  # Adjust as needed
+    saturation_threshold = 127  # Adjust as needed
 
-    # تعیین نوع رنگ بر اساس Saturation (اشباع) و Value (روشنایی)
-    if avg_value > 128:  # روشنایی بالا
-        if avg_saturation > 128:  # اشباع بالا
-            tone = 'light_bright'
-        else:  # اشباع پایین
-            tone = 'light_muted'
+    # Step 5: Determine lightness
+    lightness = 'light' if target_value > lightness_threshold else 'dark'
 
-    else:  # روشنایی پایین
-        if avg_saturation > 128:  # اشباع بالا
-            tone = 'dark_bright'
-        else:  # اشباع پایین
-            tone = 'dark_muted'
+    # Step 6: Determine saturation
+    saturation = 'bright' if target_saturation > saturation_threshold else 'muted'
+
+    tone = f"{lightness}_{saturation}"
+
     return tone
 
 
