@@ -36,8 +36,7 @@ def process_clothing_image(img_path):
     tone = get_color_tone(img)
 
     # Use YOLO to detect and crop specific parts of the image
-    crop_image_astin = yolo(model="astin", image_path=img_path)
-    crop_image_yaghe = yolo(model="astin", image_path=img_path)
+    crop_image_astin, crop_image_yaghe = yolo(img_path)
 
     # Load various models for prediction
     model_astin = load_modelll(model_astin_path, class_num=3, base_model="resnet101")

@@ -40,9 +40,7 @@ def process_woman_clothing_image(image_path):
     # Color tone
     tone = get_color_tone(image)
 
-    # YOLO detections
-    crop_image_astin = yolo(image_path=image_path, model="astin")
-    crop_image_yaghe = yolo(image_path=image_path, model='yaghe')
+    crop_image_astin, crop_image_yaghe = yolo(image_path=image_path)
 
     # Load models
     model_astin = load_modelll(model_astin_path, class_num=6, base_model="resnet101")
