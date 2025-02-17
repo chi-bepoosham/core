@@ -6,6 +6,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "ext-pdo": "*",
         "intervention/image": "2.7",
         "ipe/smsir-php": "^1.0",
         "laravel/framework": "^11.9",
