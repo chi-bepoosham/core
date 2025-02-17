@@ -33,8 +33,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install extensions
 
-RUN pecl install -D 'enable-openssl="yes"' swoole
-RUN docker-php-ext-enable swoole
+RUN pecl install -D 'enable-openssl="yes"' swoole && pecl install redis
+RUN docker-php-ext-enable swoole && docker-php-ext-enable redis
 RUN docker-php-ext-configure gd --with-webp --with-jpeg
 RUN docker-php-ext-install gd pgsql pdo_pgsql mbstring zip exif pcntl bcmath soap curl sockets
 
@@ -47,10 +47,10 @@ RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www
 
 # Copy existing application directory contents
-COPY . /var/www
+#COPY . /var/www
 
-# Copy existing application directory permissions
-COPY --chown=www:www . /var/www
+# set application directory permissions
+RUN chown www:www  /var/www
 
 
 # Expose port 9000 and start php-fpm server

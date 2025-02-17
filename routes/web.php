@@ -1,8 +1,6 @@
 <?php
 
-use App\Jobs\ProcessRabbitMQMessage;
-use App\Jobs\SendRabbitMQMessage;
-use Illuminate\Support\Facades\Queue;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -16,7 +14,7 @@ Route::get('/ok', function () {
         "image_link" => "https://test.com",
         "time" => \Carbon\Carbon::now()->format("H:i:s"),
     ];
-    SendRabbitMQMessage::dispatch($data);
+    \Illuminate\Support\Facades\Redis::publish(env('REDIS_PUBLISHER_QUEUE'), json_encode($data));
 
     return view('welcome');
 });

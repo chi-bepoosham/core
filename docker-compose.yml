@@ -9,31 +9,54 @@ services:
         depends_on:
             application_2:
                 condition: service_healthy
-            rabbitmq:
+            redis:
                 condition: service_healthy
         ports:
-            - "8080:8080"
+            - "${APPLICATION_PUBLISH_PORT}:8080"
         volumes:
             - './docker/haproxy/config/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro'
         restart: always
         networks:
             - main
-    rabbitmq:
-        image: rabbitmq:3.11-management-alpine
-        container_name: rabbitmq
+#    rabbitmq:
+#        image: rabbitmq:3.11-management-alpine
+#        container_name: rabbitmq
+#        restart: always
+#        ports:
+#            - "5672:5672"        # Port for RabbitMQ messaging
+#            - "15672:15672"      # Port for RabbitMQ management UI
+#        environment:
+#            RABBITMQ_DEFAULT_USER: "develop"
+#            RABBITMQ_DEFAULT_PASS: "Z!^P>C78)g5"
+#            RABBITMQ_DEFAULT_VHOST: "rabbitmq"
+#        healthcheck:
+#            test: rabbitmq-diagnostics -q ping
+#            interval: 7s
+#            timeout: 2s
+#            retries: 15
+#        networks:
+#            - main
+    redis:
+        image: redis:alpine3.21
+        container_name: redis_main
         restart: always
-        ports:
-            - "5672:5672"        # Port for RabbitMQ messaging
-            - "15672:15672"      # Port for RabbitMQ management UI
         environment:
-            RABBITMQ_DEFAULT_USER: "develop"
-            RABBITMQ_DEFAULT_PASS: "Z!^P>C78)g5"
-            RABBITMQ_DEFAULT_VHOST: "rabbitmq"
+            REDIS_ARGS: "--requirepass ${REDIS_PASSWORD}"
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
+                max-file: "5"
         healthcheck:
-            test: rabbitmq-diagnostics -q ping
-            interval: 7s
-            timeout: 2s
-            retries: 15
+            test: [ "CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping | grep PONG" ]
+            interval: 5s
+            timeout: 5s
+            retries: 3
+        expose:
+            - "6379"
+        command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+        volumes:
+            - redis_data:/data
         networks:
             - main
     postgres:
@@ -80,7 +103,10 @@ services:
         depends_on:
             - application_1
     application_1:
-        image: chibepoosham-application_1:latest
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: chibepoosham_application_1:latest
         container_name: application_1
         working_dir: /var/www
         restart: always
@@ -94,12 +120,12 @@ services:
         networks:
             - main
         depends_on:
-            rabbitmq:
+            redis:
                 condition: service_healthy
             postgres:
                 condition: service_started
     application_2:
-        image: chibepoosham-application_1:latest
+        image: chibepoosham_application_1:latest
         container_name: application_2
         working_dir: /var/www
         restart: always
@@ -115,7 +141,7 @@ services:
         expose:
             - "1550"
         depends_on:
-            rabbitmq:
+            redis:
                 condition: service_healthy
             postgres:
                 condition: service_started
@@ -125,14 +151,14 @@ services:
             timeout: 2s
             retries: 1
     application_queue:
-        image: chibepoosham-application_1:latest
+        image: chibepoosham_application_1:latest
         container_name: application_queue
         working_dir: /var/www
-        command: sh -c "sleep 7 && php artisan start:rabbitmq && sleep 2 &&  php artisan rabbitmq:consume --timeout=0"
+        command: sh -c "php artisan queue:work"
         restart: always
         user: "root"
         depends_on:
-            rabbitmq:
+            redis:
                 condition: service_healthy
             postgres:
                 condition: service_started
@@ -140,25 +166,25 @@ services:
             - './:/var/www:rw'
         networks:
             - main
-#    application_python:
-#        build:
-#            context: PythonModule
-#            dockerfile: Dockerfile
-#        image: chibepoosham_application_python:latest
-#        container_name: application_python
-#        working_dir: /var/www
-#        restart: on-failure
-#        volumes:
-#            - './PythonModule/:/var/www'
-#        expose:
-#            - "8000"
-#        depends_on:
-#            rabbitmq:
-#                condition: service_healthy
-#            application_queue:
-#                condition: service_started
-#        networks:
-#            - main
+    application_python:
+        build:
+            context: .
+            dockerfile: PythonModule/Dockerfile
+        image: chibepoosham_application_python:latest
+        container_name: application_python
+        working_dir: /var/www
+        restart: on-failure
+        volumes:
+            - './PythonModule/:/var/www'
+        expose:
+            - "8000"
+        depends_on:
+            redis:
+                condition: service_healthy
+            application_queue:
+                condition: service_started
+        networks:
+            - main
 #        deploy:
 #            resources:
 #                reservations:
@@ -166,13 +192,15 @@ services:
 #                        - driver: nvidia
 #                          device_ids: ['all']
 #                          capabilities: [ gpu ]
-#        environment:
-#            - NVIDIA_VISIBLE_DEVICES='all'  # Use 'all' to expose all GPUs
-#            - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+        environment:
+            - NVIDIA_VISIBLE_DEVICES='all'  # Use 'all' to expose all GPUs
+            - NVIDIA_DRIVER_CAPABILITIES=compute,utility
 networks:
     main:
         driver: bridge
 volumes:
+    redis_data:
+        driver: local
     postgres_data:
         driver: local
     pgadmin_data:
