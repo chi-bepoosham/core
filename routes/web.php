@@ -14,7 +14,7 @@ Route::get('/ok', function () {
         "image_link" => "https://test.com",
         "time" => \Carbon\Carbon::now()->format("H:i:s"),
     ];
-    \Illuminate\Support\Facades\Redis::publish(env('REDIS_PUBLISHER_QUEUE'), json_encode($data));
+    \App\Jobs\SendRedisMessage::dispatch($data);
 
     return view('welcome');
 });

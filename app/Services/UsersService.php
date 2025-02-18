@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Jobs\SendRabbitMQMessage;
+use App\Jobs\SendRedisMessage;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -126,7 +126,7 @@ class UsersService
                 "clothes_id" => null,
                 "time" => Carbon::now()->format("H:i:s"),
             ];
-            SendRabbitMQMessage::dispatch($data);
+            SendRedisMessage::dispatch($data);
 
             DB::commit();
             return $createdItem;

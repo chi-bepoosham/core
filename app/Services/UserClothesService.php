@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Http\Repositories\UserClothingRepository;
 use App\Http\Repositories\UserRepository;
-use App\Jobs\SendRabbitMQMessage;
+use App\Jobs\SendRedisMessage;
 use App\Models\UserClothesPivot;
 use Carbon\Carbon;
 use Exception;
@@ -69,7 +69,7 @@ class UserClothesService
                 "clothes_id" => $createdItem->id,
                 "time" => Carbon::now()->format("H:i:s"),
             ];
-            SendRabbitMQMessage::dispatch($data);
+            SendRedisMessage::dispatch($data);
 
 //            UserClothesPivot::query()->create([
 //                "first_user_clothes_id" => $createdItem->id,

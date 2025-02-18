@@ -18,24 +18,6 @@ services:
         restart: always
         networks:
             - main
-#    rabbitmq:
-#        image: rabbitmq:3.11-management-alpine
-#        container_name: rabbitmq
-#        restart: always
-#        ports:
-#            - "5672:5672"        # Port for RabbitMQ messaging
-#            - "15672:15672"      # Port for RabbitMQ management UI
-#        environment:
-#            RABBITMQ_DEFAULT_USER: "develop"
-#            RABBITMQ_DEFAULT_PASS: "Z!^P>C78)g5"
-#            RABBITMQ_DEFAULT_VHOST: "rabbitmq"
-#        healthcheck:
-#            test: rabbitmq-diagnostics -q ping
-#            interval: 7s
-#            timeout: 2s
-#            retries: 15
-#        networks:
-#            - main
     redis:
         image: redis:alpine3.21
         container_name: redis_main
@@ -154,14 +136,28 @@ services:
         image: chibepoosham_application_1:latest
         container_name: application_queue
         working_dir: /var/www
-        command: sh -c "php artisan queue:work"
+        command: sh -c "php artisan queue:work redis --daemon --timeout=0 --queue=laravel,${REDIS_QUEUE}"
         restart: always
         user: "root"
         depends_on:
             redis:
                 condition: service_healthy
-            postgres:
-                condition: service_started
+        volumes:
+            - './:/var/www:rw'
+        networks:
+            - main
+    application_redis_subscribe:
+        image: chibepoosham_application_1:latest
+        container_name: application_redis_subscribe
+        working_dir: /var/www
+        command: sh -c "php artisan redis:subscribe"
+        restart: always
+        user: "root"
+        depends_on:
+            redis:
+                condition: service_healthy
+            application_queue:
+                    condition: service_started
         volumes:
             - './:/var/www:rw'
         networks:
