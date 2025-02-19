@@ -20,7 +20,7 @@ base_path = os.path.dirname(__file__)
 model_astin_path = os.path.join(base_path, '../../models/astin/astinman.h5')
 model_patern_path = os.path.join(base_path, '../../models/pattern/petternman.h5')
 model_paintane_path = os.path.join(base_path, '../../models/paintane/mard.h5')
-model_rise_path = os.path.join(base_path, '../../models/rise/riseeeeef.h5')  # FIXME: low accuracy
+model_rise_path = os.path.join(base_path, '../../models/rise/riseeeeef.h5')  
 model_shalvar_path = os.path.join(base_path, '../../models/shalvar/menpants.h5')
 model_mnist_path = os.path.join(base_path, '../../models/fasionmnist/mnist.h5')  # FIXME: not available
 model_tarh_shalvar_path = os.path.join(base_path, '../../models/tarh_shalvar/mmpantsprint.h5')
@@ -42,7 +42,7 @@ def process_clothing_image(img_path):
     model_astin = load_modelll(model_astin_path, class_num=3, base_model="resnet101")
     model_patern = load_modelll(model_patern_path, class_num=5, base_model="resnet101")
     model_paintane = load_modelll(model_paintane_path, class_num=2, base_model="mobilenet")
-    model_rise = load_modelll(model_rise_path, class_num=2, base_model="resnet152")
+    model_rise = load_modelll(model_rise_path, class_num=2, base_model="resnet152_600")
     model_shalvar = load_modelll(model_shalvar_path, class_num=7, base_model="resnet101")
     model_mnist = load_modelll(model_mnist_path, class_num=10, base_model="mnist")
     model_tarh_shalvar = load_modelll(model_tarh_shalvar_path, class_num=5, base_model="resnet101")
@@ -118,7 +118,7 @@ def test_model_paintane(image_path="../../image/sample_paintane.jpg"):
 
 
 def test_model_rise(image_path="../../image/sample_rise.jpg"):
-    model_rise = load_modelll(model_rise_path, class_num=2, base_model="resnet152")
+    model_rise = load_modelll(model_rise_path, class_num=2, base_model="resnet152_600")
     sample_image = cv2.imread(image_path)
     result = predict_class(sample_image, model=model_rise,
                            class_names=["highrise", "lowrise"], reso=300,

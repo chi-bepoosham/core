@@ -181,6 +181,31 @@ def load_modelll(model_path,class_num,base_model):
             return model
 
 
+        if base_model=="resnet152_600":
+
+
+        # مشخصات ورودی‌ها
+            reso = 300
+            input_shape = (reso, reso, 3)
+
+            # 1. بازسازی معماری مدل ResNet101
+            input_tensor = tf.keras.layers.Input(shape=input_shape)
+            base_model = ResNet152(weights=None, include_top=False, input_shape=input_shape, input_tensor=input_tensor)
+
+            # افزودن لایه‌های بالا به مدل
+            x = base_model.output
+            x = GlobalAveragePooling2D()(x)
+            x = Dense(600, activation='relu')(x)  # لایه Dense
+            x = Dense(30,activation="relu")(x)
+            predictions = Dense(class_num, activation='softmax')(x)  # لایه خروجی برای 11 کلاس
+
+            # ساخت مدل کامل
+            model = Model(inputs=base_model.input, outputs=predictions)
+
+            # 2. لود وزن‌های ذخیره‌شده
+            model.load_weights("{0}".format(model_path))
+            return model 
+
 
         if base_model=="mnist":
             model = mnist_sequential((28,28,1))
