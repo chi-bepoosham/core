@@ -22,7 +22,7 @@ model_patern_path = os.path.join(base_path, '../../models/pattern/petternman.h5'
 model_paintane_path = os.path.join(base_path, '../../models/paintane/mard.h5')
 model_rise_path = os.path.join(base_path, '../../models/rise/riseeeeef.h5')  
 model_shalvar_path = os.path.join(base_path, '../../models/shalvar/menpants.h5')
-model_mnist_path = os.path.join(base_path, '../../models/fasionmnist/mnist.h5')  # FIXME: not available
+model_mnist_path = os.path.join(base_path, '../../models/under_over/under_over_mobilenet_final.h5')
 model_tarh_shalvar_path = os.path.join(base_path, '../../models/tarh_shalvar/mmpantsprint.h5')
 model_skirt_pants_path = os.path.join(base_path, '../../models/skirt_pants/skirt_pants.h5')
 model_yaghe_path = os.path.join(base_path, '../../models/yaghe/man_yaghe.h5')  # FIXME: not available
@@ -44,14 +44,14 @@ def process_clothing_image(img_path):
     model_paintane = load_modelll(model_paintane_path, class_num=2, base_model="mobilenet")
     model_rise = load_modelll(model_rise_path, class_num=2, base_model="resnet152_600")
     model_shalvar = load_modelll(model_shalvar_path, class_num=7, base_model="resnet101")
-    model_mnist = load_modelll(model_mnist_path, class_num=10, base_model="mnist")
+    model_mnist = load_modelll(model_mnist_path, class_num=2, base_model="mobilenet-v2")
     model_tarh_shalvar = load_modelll(model_tarh_shalvar_path, class_num=5, base_model="resnet101")
     model_skirt_pants = load_modelll(model_skirt_pants_path, class_num=2, base_model="resnet101")
     model_yaghe = load_modelll(model_yaghe_path, class_num=5, base_model="resnet101")
 
     # Perform predictions using the loaded models
     mnist_prediction = predict_mnist(mnist_image, model=model_mnist, class_names=[
-        'T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot'
+        "Under", "Over"
     ])
 
     paintane = predict_class(img, model=model_paintane, class_names=["mbalatane", 'mpayintane'], reso=224,
@@ -136,12 +136,14 @@ def test_model_shalvar(image_path="../../image/sample_shalvar.jpg"):
 
 
 def test_model_mnist(image_path="../../image/sample_mnist.jpg"):
-    model_mnist = load_modelll(model_mnist_path, class_num=10, base_model="mnist")
+    model_mnist = load_modelll(model_mnist_path, class_num=2, base_model="mobilenet-v2")
     sample_image = cv2.imread(image_path)
     prepared_image = mnist_prepar(sample_image)
-    result = predict_mnist(prepared_image, model=model_mnist, class_names=[
-        'T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot'
-    ])
+    result = predict_mnist(
+        prepared_image, model=model_mnist, class_names=[
+            "Under", "Over"
+        ]
+    )
     print(f"MNIST Prediction: {result}")
 
 

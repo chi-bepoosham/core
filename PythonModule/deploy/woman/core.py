@@ -5,7 +5,7 @@ from keras.applications.resnet import ResNet101, preprocess_input
 from keras.optimizers import SGD
 from tensorflow.keras.utils import load_img, img_to_array  # تغییر این قسمت
 import numpy as np
-from keras.applications import ResNet152
+from keras.applications import ResNet152, MobileNetV2
 import cv2
 
 import keras
@@ -50,29 +50,25 @@ def mnist_sequential(input_shape):
 
 
 def mnist_prepar(image):
-    image_fasion_mnist = image
-    image_fasion_mnist = cv2.cvtColor(image_fasion_mnist,code=cv2.COLOR_BGR2GRAY)
-    image_fasion_mnist = cv2.resize(image_fasion_mnist,(28,28))
-    normalaze = image_fasion_mnist/255.0
-    normalaze = np.expand_dims(normalaze, axis=0)
-    return normalaze
+    image = cv2.resize(image, (224, 224))  # تغییر اندازه به 224x224
+    if len(image.shape) == 2:  # اگر تصویر سیاه و سفید باشد
+        image = np.expand_dims(image, axis=-1)  # اضافه کردن بعد کانالی
+        image = np.repeat(image, 3, axis=-1)  # تبدیل به تصویر 3 کانالی
+    image = np.expand_dims(image, axis=0)  # افزودن بعد batch
+    return image.astype(np.float32) / 255.0  # نرمال‌سازی
+
 
 
 
 def predict_mnist(prepare_output,model,class_names):
-
-
     predictions = model.predict(prepare_output)
 
-    # دریافت کلاس پیش‌بینی‌شده
+    # Get predicted class
     predicted_class = np.argmax(predictions, axis=-1)
 
-    # لیست کلاس‌ها (این لیست باید با کلاس‌های دیتاست شما همخوانی داشته باشد)
-
-
-    # نمایش نام کلاس پیش‌بینی‌شده
+    # Display predicted class name
     predicted_label = class_names[predicted_class[0]]
-    print(f"mnist:class prediction_name: {predicted_label}")
+    print(f"mnist: class prediction_name: {predicted_label}")
     return predicted_label
 
 
@@ -153,6 +149,32 @@ def load_modelll(model_path,class_num,base_model):
             model = tf.keras.Model(inputs=base_model.input, outputs=predictions)
             model.load_weights("{0}".format(model_path))
             return model
+        
+        if base_model=="mobilenet-v2":
+        
+            base_model = MobileNetV2(
+            include_top=False,
+            weights=None,  # Using trained weights from model_path
+            input_shape=(224, 224, 3)
+            )
+            
+            # Freezing the first 50 layers as in training
+            for layer in base_model.layers[:50]:
+                layer.trainable = False
+            for layer in base_model.layers[50:]:
+                layer.trainable = True
+
+            # Adding custom layers
+            x = base_model.output
+            x = GlobalAveragePooling2D()(x)
+            x = Dense(128, activation="relu")(x)
+            x = Dropout(0.3)(x)
+            output_layer = Dense(1, activation="sigmoid")(x)  # Change to 'sigmoid' if binary classification
+
+            model = Model(inputs=base_model.input, outputs=output_layer)
+            model.load_weights(model_path)
+            
+            return model
 
 
         if base_model=="resnet152":
@@ -206,19 +228,10 @@ def load_modelll(model_path,class_num,base_model):
             model.load_weights("{0}".format(model_path))
             return model 
 
-
         if base_model=="mnist":
             model = mnist_sequential((28,28,1))
             model.load_weights("{0}".format(model_path))
             return model
-
-
-
-
-
-
-
-
 
 def predict_class(img, model,class_names,reso,model_name=None):
     reso = reso
@@ -239,25 +252,12 @@ def predict_class(img, model,class_names,reso,model_name=None):
     print(f"{model_name}:class prediction_name: {predicted_label}")
     return predicted_label
 
-
-
-
-
-
-
-
-
-
-
 def prepare_image(img, target_size):
     img = cv2.resize(img,target_size)
     img_array = img_to_array(img)  # تبدیل به آرایه
     img_array = np.expand_dims(img_array, axis=0)  # افزودن بعد اضافی برای Batch
     img_array = preprocess_input(img_array)  # پیش‌پردازش تصویر برای ResNet
     return img_array
-
-
-
 
 def get_color_tone(image):
     """
@@ -296,8 +296,3 @@ def get_color_tone(image):
     tone = f"{lightness}_{saturation}"
 
     return tone
-
-
-
-
-

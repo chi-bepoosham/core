@@ -30,7 +30,7 @@ model_skirt_pants_path = os.path.join(base_path, '../../models/skirt_pants/skirt
 model_yaghe_path = os.path.join(base_path, '../../models/yaghe/yaghewoman101A.h5')
 model_skirt_print_path = os.path.join(base_path, '../../models/skirt_print/skirt_print.h5')
 model_skirt_type_path = os.path.join(base_path, '../../models/skirt_type/skirttt_types.h5') 
-model_mnist_path = os.path.join(base_path, '../../models/fasionmnist/mnist.h5')  # FIXME: not available
+model_mnist_path = os.path.join(base_path, '../../models/under_over/under_over_mobilenet_final.h5')
 
 
 def process_woman_clothing_image(image_path):
@@ -53,17 +53,17 @@ def process_woman_clothing_image(image_path):
     model_yaghe = load_modelll(model_yaghe_path, class_num=11, base_model="resnet101")
     model_skirt_print = load_modelll(model_skirt_print_path, class_num=5, base_model="resnet101_30_unit")
     model_skirt_type = load_modelll(model_skirt_type_path, class_num=7, base_model="resnet101_30_unit")
-    model_mnist = load_modelll(model_mnist_path, class_num=10, base_model="mnist")
+    model_mnist = load_modelll(model_mnist_path, class_num=2, base_model="mobilenet-v2")
 
     # Perform predictions
     mnist_prediction = predict_mnist(
         mnist_image, model=model_mnist, class_names=[
-            'T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot'
+            "Under", "Over"
         ]
     )
 
     paintanezan = predict_class(image, model=model_paintane, class_names=["fbalatane", "fpaintane", "ftamamtane"], reso=224, model_name="paintane")
-
+ 
     results = {
         "color_tone": tone,
         "mnist_prediction": mnist_prediction,
@@ -131,12 +131,14 @@ def test_model_shalvar(image_path="../../image/sample_shalvar.jpg"):
 
 
 def test_model_mnist(image_path="../../image/sample_mnist.jpg"):
-    model_mnist = load_modelll(model_mnist_path, class_num=10, base_model="mnist")
+    model_mnist = load_modelll(model_mnist_path, class_num=2, base_model="mobilenet-v2")
     sample_image = cv2.imread(image_path)
     prepared_image = mnist_prepar(sample_image)
-    result = predict_mnist(prepared_image, model=model_mnist, class_names=[
-        'T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot'
-    ])
+    result = predict_mnist(
+        prepared_image, model=model_mnist, class_names=[
+            "Under", "Over"
+        ]
+    )
     print(f"MNIST Prediction: {result}")
 
 
