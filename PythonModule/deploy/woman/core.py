@@ -176,6 +176,27 @@ def load_modelll(model_path,class_num,base_model):
             
             return model
 
+        if base_model=="mobilenet-v2-pt":
+        
+            base_model = MobileNetV2(
+            include_top=False,
+            weights=None,  # Using trained weights from model_path
+            input_shape=(224, 224, 3)
+            )
+            
+            base_model.trainable = False
+
+            # Adding custom layers
+            x = base_model.output
+            x = GlobalAveragePooling2D()(x)
+            x = Dense(128, activation="relu", kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
+            x = Dropout(0.3)(x)
+            output_layer = Dense(3, activation="softmax")(x) 
+
+            model = Model(inputs=base_model.input, outputs=output_layer)
+            model.load_weights(model_path)
+            
+            return model
 
         if base_model=="resnet152":
 

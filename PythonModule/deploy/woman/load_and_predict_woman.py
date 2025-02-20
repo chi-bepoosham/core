@@ -6,23 +6,23 @@ from .yolo import yolo
 # Define model paths
 
 # For Docker
-# model_astin_path_docker = '/var/www/deploy/models/astin/models/astinwoman.h5'
-# model_patern_path_docker = '/var/www/deploy/models/patern/models/petternwoman.h5'
-# model_paintane_path_docker = '/var/www/deploy/models/paintane/models/zan.h5'
-# model_rise_path_docker = '/var/www/deploy/models/rise/models/riseeeeef.h5'
-# model_shalvar_path_docker = '/var/www/deploy/models/shalvar/models/womenpants.h5'
-# model_tarh_shalvar_path_docker = '/var/www/deploy/models/tarh_shalvar/models/wwpantsprint.h5'
-# model_skirt_pants_path_docker = '/var/www/deploy/models/skirt_pants/models/skirt_pants.h5'
-# model_yaghe_path_docker = '/var/www/deploy/models/yaghe/models/yaghewoman101A.h5'
-# model_skirt_print_path_docker = '/var/www/deploy/models/skirt_print/models/skirt_print.h5'
-# model_skirt_type_path_docker = '/var/www/deploy/models/skirt_type/models/skirttt_types.h5'
-# model_mnist_path_docker = '/var/www/deploy/models/fasionmnist/mnist.h5'
+# model_astin_path_docker = '/var/www/deploy/models/astin/astinwoman.h5'
+# model_patern_path_docker = '/var/www/deploy/models/pattern/petternwoman.h5'
+# model_paintane_path_docker = '/var/www/deploy/models/paintane/women_bodytype_model.h5'
+# model_rise_path_docker = '/var/www/deploy/models/rise/riseeeeef.h5'
+# model_shalvar_path_docker = '/var/www/deploy/models/shalvar/womenpants.h5'
+# model_tarh_shalvar_path_docker = '/var/www/deploy/models/tarh_shalvar/wwpantsprint.h5'
+# model_skirt_pants_path_docker = '/var/www/deploy/models/skirt_pants/skirt_pants.h5'
+# model_yaghe_path_docker = '/var/www/deploy/models/yaghe/yaghewoman101A.h5'
+# model_skirt_print_path_docker = '/var/www/deploy/models/skirt_print/skirt_print.h5'
+# model_skirt_type_path_docker = '/var/www/deploy/models/skirt_type/skirttt_types.h5'
+# model_mnist_path_docker = '/var/www/deploy/models/under_over/under_over_mobilenet_final.h5'
 
 # For Local
 base_path = os.path.dirname(__file__)
 model_astin_path = os.path.join(base_path, '../../models/astin/astinwoman.h5')
 model_patern_path = os.path.join(base_path, '../../models/pattern/petternwoman.h5')
-model_paintane_path = os.path.join(base_path, '../../models/paintane/zan.h5')  # FIXME: not available
+model_paintane_path = os.path.join(base_path, '../../models/paintane/women_bodytype_model.h5')  # FIXME: not available
 model_rise_path = os.path.join(base_path, '../../models/rise/riseeeeef.h5') 
 model_shalvar_path = os.path.join(base_path, '../../models/shalvar/womenpants.h5')
 model_tarh_shalvar_path = os.path.join(base_path, '../../models/tarh_shalvar/wwpantsprint.h5')
@@ -45,7 +45,7 @@ def process_woman_clothing_image(image_path):
     # Load models
     model_astin = load_modelll(model_astin_path, class_num=6, base_model="resnet101")
     model_patern = load_modelll(model_patern_path, class_num=5, base_model="resnet101")
-    model_paintane = load_modelll(model_paintane_path, class_num=3, base_model="mobilenet")
+    model_paintane = load_modelll(model_paintane_path, class_num=3, base_model="mobilenet-v2-pt")
     model_rise = load_modelll(model_rise_path, class_num=2, base_model="resnet152_600")
     model_shalvar = load_modelll(model_shalvar_path, class_num=8, base_model="resnet101")
     model_tarh_shalvar = load_modelll(model_tarh_shalvar_path, class_num=5, base_model="resnet101")
@@ -105,7 +105,7 @@ def test_model_patern(image_path="../../image/sample_patern.jpg"):
 
 
 def test_model_paintane(image_path="../../image/sample_paintane.jpg"):
-    model_paintane = load_modelll(model_paintane_path, class_num=3, base_model="mobilenet")
+    model_paintane = load_modelll(model_paintane_path, class_num=3, base_model="mobilenet-v2-pt")
     sample_image = cv2.imread(image_path)
     result = predict_class(sample_image, model=model_paintane,
                            class_names=["fbalatane", "fpaintane", "ftamamtane"], reso=224,
