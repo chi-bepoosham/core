@@ -13,7 +13,7 @@ from .yolo import yolo
 # model_mnist_path_docker = '/var/www/deploy/models/fasionmnist/mnist.h5'
 # model_tarh_shalvar_path_docker = '/var/www/deploy/models/tarh_shalvar/models/mmpantsprint.h5'
 # model_skirt_pants_path_docker = '/var/www/deploy/models/skirt_pants/models/skirt_pants.h5'
-# model_yaghe_path_docker = '/var/www/deploy/models/yaghe/models/man_yaghe.h5'
+# model_yaghe_path_docker = '/var/www/deploy/models/yaghe/models/neckline_classifier_mobilenet.h5'
 
 # For Local
 base_path = os.path.dirname(__file__)
@@ -25,7 +25,7 @@ model_shalvar_path = os.path.join(base_path, '../../models/shalvar/menpants.h5')
 model_mnist_path = os.path.join(base_path, '../../models/under_over/under_over_mobilenet_final.h5')
 model_tarh_shalvar_path = os.path.join(base_path, '../../models/tarh_shalvar/mmpantsprint.h5')
 model_skirt_pants_path = os.path.join(base_path, '../../models/skirt_pants/skirt_pants.h5')
-model_yaghe_path = os.path.join(base_path, '../../models/yaghe/man_yaghe.h5')  # FIXME: not available
+model_yaghe_path = os.path.join(base_path, '../../models/yaghe/neckline_classifier_mobilenet.h5') 
 
 
 def process_clothing_image(img_path):
@@ -47,7 +47,7 @@ def process_clothing_image(img_path):
     model_mnist = load_modelll(model_mnist_path, class_num=2, base_model="mobilenet-v2")
     model_tarh_shalvar = load_modelll(model_tarh_shalvar_path, class_num=5, base_model="resnet101")
     model_skirt_pants = load_modelll(model_skirt_pants_path, class_num=2, base_model="resnet101")
-    model_yaghe = load_modelll(model_yaghe_path, class_num=5, base_model="resnet101")
+    model_yaghe = load_modelll(model_yaghe_path, class_num=5, base_model="mobilenet-v2-softmax")
 
     # Perform predictions using the loaded models
     mnist_prediction = predict_mnist(mnist_image, model=model_mnist, class_names=[
@@ -72,7 +72,7 @@ def process_clothing_image(img_path):
                                            class_names=["amudi", "dorosht", "ofoghi", "riz", "sade"], reso=300,
                                            model_name="pattern")
         results["yaghe"] = predict_class(crop_image_yaghe, model=model_yaghe,
-                                         class_names=["classic", "hoodie", "round", "turtleneck", "v_neck"], reso=300,
+                                         class_names=["classic", "hoodie", "round", "turtleneck", "V_neck"], reso=300,
                                          model_name="yaghe")
 
     elif paintane == "mpayintane":
@@ -165,9 +165,9 @@ def test_model_skirt_pants(image_path="../../image/sample_skirt_pants.jpg"):
 
 
 def test_model_yaghe(image_path="../../image/sample_yaghe.jpg"):
-    model_yaghe = load_modelll(model_yaghe_path, class_num=5, base_model="resnet101")
+    model_yaghe = load_modelll(model_yaghe_path, class_num=5, base_model="mobilenet-v2-softmax")
     sample_image = cv2.imread(image_path)
     result = predict_class(sample_image, model=model_yaghe,
-                           class_names=["classic", "hoodie", "round", "turtleneck", "v_neck"], reso=300,
+                           class_names=["classic", "hoodie", "round", "turtleneck", "V_neck"], reso=300,
                            model_name="yaghe")
     print(f"Yaghe Prediction: {result}")

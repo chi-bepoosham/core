@@ -137,6 +137,28 @@ def load_modelll(model_path,class_num,base_model):
             model.load_weights(model_path)
             
             return model
+        
+        if base_model == "mobilenet-v2-softmax":
+
+            base_model = MobileNetV2(
+                include_top=False,
+                weights=None, 
+                input_shape=(300, 300, 3)
+            )
+            
+            base_model.trainable = False
+
+            # Adding custom layers
+            x = base_model.output
+            x = GlobalAveragePooling2D()(x)
+            x = Dense(128, activation="relu")(x)  
+            x = Dropout(0.4)(x)
+            output_layer = Dense(class_num, activation="softmax")(x)  
+
+            model = Model(inputs=base_model.input, outputs=output_layer)
+            model.load_weights(model_path)
+            
+            return model
 
 
         if base_model=="mnist":
