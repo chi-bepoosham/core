@@ -24,7 +24,7 @@ redis_conn = redis.StrictRedis(
     host=redis_host,
     port=redis_port,
     password=redis_password,
-    charset="utf-8",
+    charset='utf-8',
     decode_responses=True
 )
 
@@ -54,14 +54,23 @@ def process_image(gender,action,image_link):
 #             process_data = get_body_type_female(img_name)
 #         else:
 #             process_data = process_woman_clothing_image(img_name)
-#             if process_data.get('paintane') is None:
-#                 process_data = process_six_model_predictions(img_name)
+#             paintane = process_data.get('paintane');
+#             if paintane is None or paintane == 'fbalatane' or paintane == 'ftamamtane':
+#                 process_data_six_model = process_six_model_predictions(img_name)
+#                 process_data = process_data | process_data_six_model
 
 
     return {
-#         "process_data":process_data,
-        "item_name":"image_processed",
-        "item_content":"1d5w1dw4d6w4d6w46d"
+#         'process_data':process_data,
+        'process_data':{
+            'yaghe_women':'off_the_shoulder',
+            'womensleeve':'flongsleeve',
+            'silhouette':'snatched,cowl',
+            'color':'light_muted',
+            'pattern_women':'sade',
+        },
+        'item_name':'image_processed',
+        'item_content':'1d5w1dw4d6w4d6w46d',
     }
 
 
@@ -70,22 +79,22 @@ def process_message(job_data):
     messageData = json.loads(job_data)
     if messageData is not None:
 
-        action = messageData.get("action")
-        user_id = messageData.get("user_id")
-        gender = messageData.get("gender")
-        clothes_id = messageData.get("clothes_id")
-        image_link = messageData.get("image_link")
-        time = messageData.get("time")
+        action = messageData.get('action')
+        user_id = messageData.get('user_id')
+        gender = messageData.get('gender')
+        clothes_id = messageData.get('clothes_id')
+        image_link = messageData.get('image_link')
+        time = messageData.get('time')
         process_image_data = process_image(gender,action,image_link)
 
         completion_data =  {
-            "process_image": process_image_data,
-            "action": action,
-            "user_id": user_id,
-            "gender": gender,
-            "clothes_id": clothes_id,
-            "image_link": image_link,
-            "time": time,
+            'process_image': process_image_data,
+            'action': action,
+            'user_id': user_id,
+            'gender': gender,
+            'clothes_id': clothes_id,
+            'image_link': image_link,
+            'time': time,
         }
 
         publish_data_to_redis(completion_data)

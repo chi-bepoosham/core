@@ -50,10 +50,10 @@ class UserClothes extends Model
         return $this->belongsTo(User::class, "user_id");
     }
 
-    public function matchWithOtherClothes()
+    public function matchWithOtherClothes(): void
     {
         $currentProcessedImageData = json_decode($this->processed_image_data);
-        $userBodyType = (int)$this->user->bodyType->predict_value;
+        $userBodyType = $this->user->bodyType->predict_value;
         $otherClothes = UserClothes::query()->where("user_id", $this->user_id)->get();
 
         foreach ($otherClothes as $clothe) {
@@ -62,17 +62,15 @@ class UserClothes extends Model
 
             if ($clothe->match_percentage != null && $clothe->match_percentage >= 50) {
 
-                $mnistPrediction = $clotheProcessedImageData?->mnist_prediction ?? '';
+                $mnistPrediction = $currentProcessedImageData?->mnist_prediction ?? '';
                 $mnistPrediction = strtolower($mnistPrediction);
+                $clotheMnistPrediction = $clotheProcessedImageData?->mnist_prediction ?? '';
+                $clotheMnistPrediction = strtolower($clotheMnistPrediction);
 
                 $color = $currentProcessedImageData?->color_tone ?? '';
                 $clotheColor = $clotheProcessedImageData?->color_tone ?? '';
 
-                if ($currentProcessedImageData->paintane == 'fpayintane' && $clotheProcessedImageData->paintane != 'fpayintane') {
-
-//                    if ($mnistPrediction == 'jacket' || $mnistPrediction = 't-shirt' ||
-//                            $mnistPrediction == 'shirt' || $mnistPrediction == 'pullover') {
-
+                if ($currentProcessedImageData->paintane == 'ftamamtane' && $clotheMnistPrediction == 'over') {
 
                     $shalvar = $currentProcessedImageData?->shalvar ?? '';
                     $shalvar = strtolower($shalvar);
@@ -90,7 +88,7 @@ class UserClothes extends Model
                     $clotheAstin = strtolower($clotheAstin);
 
                     switch ($userBodyType) {
-                        case 11:
+                        case 'women_hourglass':
 
                             if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
                                 if ($clotheAstin == 'toppuffy') {
@@ -136,7 +134,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 21:
+                        case 'women_rectangle':
 
                             if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
                                 if ($clotheAstin == 'toppuffy') {
@@ -177,7 +175,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 31:
+                        case 'women_inverted_triangle':
 
                             if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
                                 $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
@@ -224,7 +222,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 41:
+                        case 'women_triangle':
                             if ($shalvar == 'wbaggy' || $shalvar == 'wcargo' ||
                                 $shalvar == 'wcargoshorts' || $shalvar == 'wbootcut' ||
                                 $shalvar == 'wmom' || $skirtType == 'balloonskirt' || $skirtType == 'mermaidskirt') {
@@ -266,7 +264,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 51:
+                        case 'women_round':
                             if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
                                 $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
                                 $skirtType == 'shortaskirt') {
@@ -315,19 +313,278 @@ class UserClothes extends Model
                             break;
                     }
 
-                } elseif ($currentProcessedImageData->paintane == 'fbalatane' && $clotheProcessedImageData->paintane != 'fbalatane') {
+
+                }elseif ($currentProcessedImageData->paintane == 'fpayintane' && $clotheProcessedImageData->paintane == 'fbalatane') {
+
+                    if ($clotheMnistPrediction == 'over') {
+                        // todo check multiple clothes
+                    }
+
+                    $shalvar = $currentProcessedImageData?->shalvar ?? '';
+                    $shalvar = strtolower($shalvar);
+
+                    $skirtType = $currentProcessedImageData?->skirt_type ?? '';
+                    $skirtType = strtolower($skirtType);
+
+                    $tarh = $currentProcessedImageData?->tarh_shalvar ?? $currentProcessedImageData?->skirt_print ?? '';
+                    $tarh = strtolower($tarh);
+
+                    $clothePattren = $clotheProcessedImageData?->pattren ?? '';
+                    $clothePattren = strtolower($clothePattren);
+
+                    $clotheAstin = $clotheProcessedImageData?->astin ?? '';
+                    $clotheAstin = strtolower($clotheAstin);
+
+                    switch ($userBodyType) {
+                        case 'women_hourglass':
+
+                            if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
+                                if ($clotheAstin == 'toppuffy') {
+                                    $matched = true;
+                                }
+                            } elseif ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
+                                $skirtType == 'mermaidskirt' || $skirtType == 'alineskirt' ||
+                                $skirtType == 'shortaskirt' || $skirtType == 'pencilskirt' ||
+                                $skirtType == 'wrapskirt' || $skirtType == 'miniskirt') {
+
+                                if ($clotheAstin == 'fsleeveless' || $clotheAstin == 'fshortsleeve' || $clotheAstin == 'flongsleeve' ||
+                                    $clotheAstin == 'fhalfsleeve' || $clotheAstin == 'bottompuffy') {
+
+                                    $matched = true;
+                                }
+
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+
+                        case 'women_rectangle':
+
+                            if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
+                                if ($clotheAstin == 'toppuffy') {
+                                    $matched = true;
+                                }
+                            } elseif ($shalvar == 'wstraight' || $skirtType == 'alineskirt' || $skirtType == 'shortaskirt' || $skirtType == 'wrapskirt') {
+
+                                if ($clotheAstin == 'fsleeveless' || $clotheAstin == 'fshortsleeve' || $clotheAstin == 'flongsleeve' ||
+                                    $clotheAstin == 'fhalfsleeve' || $clotheAstin == 'bottompuffy') {
+
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+
+                        case 'women_inverted_triangle':
+
+                            if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
+                                $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
+                                $skirtType == 'shortaskirt') {
+                                if ($clotheAstin == 'flongsleeve' || $clotheAstin == 'bottompuffy' ||
+                                    $clotheAstin == 'fsleeveless' || $clotheAstin == 'fhalfsleeve') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($color == 'light_bright') {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted' || $clotheColor = 'light_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                } else {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                }
+
+
+                            }
+
+                            break;
+                        case 'women_triangle':
+                            if ($shalvar == 'wbaggy' || $shalvar == 'wcargo' ||
+                                $shalvar == 'wcargoshorts' || $shalvar == 'wbootcut' ||
+                                $shalvar == 'wmom' || $skirtType == 'balloonskirt' || $skirtType == 'mermaidskirt') {
+
+                                if ($clotheAstin == 'fshortsleeve' || $clotheAstin == 'toppuffy') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'dark_bright') {
+                                if ($clotheColor == 'light_bright' || $clotheColor == 'light_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($clotheColor == 'light_bright') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            }
+
+                            break;
+                        case 'women_round':
+                            if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
+                                $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
+                                $skirtType == 'shortaskirt') {
+                                if ($clotheAstin == 'flongsleeve' || $clotheAstin == 'bottompuffy' ||
+                                    $clotheAstin == 'fsleeveless' || $clotheAstin == 'fhalfsleeve') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+
+                            if ($tarh != 'sade' && $tarh != 'skirtsade') {
+                                if ($clothePattren == 'sade') {
+                                    $matched = true;
+                                }
+                            } else {
+                                $matched = true;
+                            }
+
+                            if ($color == 'dark_bright' || $color == 'dark_muted') {
+                                if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted') {
+                                    $matched = true;
+                                } else {
+                                    $matched = false;
+                                }
+                            } elseif ($color == 'light_bright' || $color == 'light_muted') {
+                                if ($color == 'light_bright') {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted'
+                                        || $clotheColor = 'light_muted' || $clotheColor == 'light_bright') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                } else {
+                                    if ($clotheColor == 'dark_bright' || $clotheColor == 'dark_muted' || $clotheColor == 'light_muted') {
+                                        $matched = true;
+                                    } else {
+                                        $matched = false;
+                                    }
+                                }
+
+
+                            }
+
+                            break;
+                    }
+
+                } elseif ($currentProcessedImageData->paintane == 'fbalatane') {
 //
-//                    if ($currentMnistPrediction == 'T-shirt/top' || $currentMnistPrediction == 'Pullover'
-//                        || $currentMnistPrediction == 'Shirt' || $currentMnistPrediction == 'Dress') {
-//                        if ($mnistPrediction == 'T-shirt/top' || $mnistPrediction == 'Pullover' ||
-//                            $mnistPrediction == 'Shirt' || $mnistPrediction == 'Dress') {
-//                            continue;
-//                        }
-//                    }
-//
-//                    if ($currentMnistPrediction == 'jacket' && $mnistPrediction == 'jacket') {
-//                        continue;
-//                    }
+                    if ($mnistPrediction == 'under' && $clotheMnistPrediction == 'under') {
+                        continue;
+                    }
+                    if ($mnistPrediction == 'over' && $clotheMnistPrediction == 'over') {
+                        continue;
+                    }
+
+                    if ($mnistPrediction == 'under' && $clotheProcessedImageData->paintane == 'ftamamtane') {
+                        continue;
+                    }
+
+                    if ($mnistPrediction == 'under' && $clotheMnistPrediction == 'over') {
+                        // todo check multiple clothes
+                    }
+
+                    if ($mnistPrediction == 'over' && $clotheMnistPrediction == 'under') {
+                        // todo check multiple clothes
+                    }
+
+                    if ($mnistPrediction == 'over' && $clotheProcessedImageData->paintane == 'fpaintane') {
+                        // todo check multiple clothes
+                    }
 
 
                     $clotheShalvar = $clotheProcessedImageData?->shalvar ?? '';
@@ -346,7 +603,7 @@ class UserClothes extends Model
                     $astin = strtolower($astin);
 
                     switch ($userBodyType) {
-                        case 11:
+                        case 'women_hourglass':
                             if ($astin == 'toppuffy') {
                                 if ($clotheShalvar == 'wbootcut' || $clotheShalvar == 'wbaggy' || $clotheSkirtType == 'balloonskirt') {
                                     $matched = true;
@@ -391,7 +648,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 21:
+                        case 'women_rectangle':
 
                             if ($astin == 'toppuffy') {
                                 if ($clotheShalvar == 'wbootcut' || $clotheShalvar == 'wbaggy' || $clotheSkirtType == 'balloonskirt') {
@@ -435,7 +692,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 31:
+                        case 'women_inverted_triangle':
 
                             if ($astin == 'fshortsleeve' || $astin == 'toppuffy') {
                                 if ($clotheShalvar == 'wbaggy' || $clotheShalvar == 'wcargo' ||
@@ -479,7 +736,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 41:
+                        case 'women_triangle':
 
                             if ($astin == 'flongsleeve' || $astin == 'bottompuffy' ||
                                 $astin == 'fsleeveless' || $astin == 'fhalfsleeve') {
@@ -526,7 +783,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 51:
+                        case 'women_round':
 
                             if ($astin == 'fshortsleeve' || $astin == 'toppuffy') {
                                 if ($clotheShalvar == 'wbaggy' || $clotheShalvar == 'wcargo' ||
@@ -572,7 +829,11 @@ class UserClothes extends Model
                     }
 
 
-                } elseif ($currentProcessedImageData->paintane == 'mpayintane' && $clotheProcessedImageData->paintane != 'mpayintane') {
+                } elseif ($currentProcessedImageData->paintane == 'mpayintane' && $clotheProcessedImageData->paintane == 'mbalatane') {
+
+                    if ($clotheMnistPrediction == 'over') {
+                        // todo check multiple clothes
+                    }
 
                     $shalvar = $currentProcessedImageData?->shalvar ?? '';
                     $shalvar = strtolower($shalvar);
@@ -587,7 +848,7 @@ class UserClothes extends Model
                     $clotheAstin = strtolower($clotheAstin);
 
                     switch ($userBodyType) {
-                        case 0:
+                        case 'men_rectangle':
 
                             if ($shalvar == 'mcargo' || $shalvar == 'mcargoshorts' || $shalvar == 'mmom') {
                                 if ($clotheAstin == 'shortsleeve') {
@@ -628,7 +889,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 2:
+                        case 'men_inverted_triangle':
 
                             if ($shalvar == 'mslimfit' || $shalvar == 'mshorts') {
                                 if ($clotheAstin == 'longsleeve') {
@@ -672,7 +933,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 5:
+                        case 'men_oval':
 
                             if ($shalvar == 'mslimfit' || $shalvar == 'mstraight') {
                                 if ($clotheAstin == 'longsleeve') {
@@ -720,8 +981,26 @@ class UserClothes extends Model
                             break;
                     }
 
-                } elseif ($currentProcessedImageData->paintane == 'mbalatane' && $clotheProcessedImageData->paintane != 'mbalatane') {
+                } elseif ($currentProcessedImageData->paintane == 'mbalatane') {
 
+                    if ($mnistPrediction == 'under' && $clotheMnistPrediction == 'under') {
+                        continue;
+                    }
+                    if ($mnistPrediction == 'over' && $clotheMnistPrediction == 'over') {
+                        continue;
+                    }
+
+                    if ($mnistPrediction == 'under' && $clotheMnistPrediction == 'over') {
+                        // todo check multiple clothes
+                    }
+
+                    if ($mnistPrediction == 'over' && $clotheMnistPrediction == 'under') {
+                        // todo check multiple clothes
+                    }
+
+                    if ($mnistPrediction == 'over' && $clotheProcessedImageData->paintane == 'mpayintane') {
+                        // todo check multiple clothes
+                    }
 
                     $clotheShalvar = $clotheProcessedImageData?->shalvar ?? '';
                     $clotheShalvar = strtolower($clotheShalvar);
@@ -737,8 +1016,7 @@ class UserClothes extends Model
 
 
                     switch ($userBodyType) {
-                        case 0:
-
+                        case 'men_rectangle':
                             if ($astin == 'longsleeve') {
                                 if ($clotheShalvar == 'mshorts' || $clotheShalvar == 'mslimfit' || $clotheShalvar == 'mstraight') {
                                     $matched = true;
@@ -780,8 +1058,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 2:
-
+                        case 'men_inverted_triangle':
                             if ($astin == 'shortsleeve') {
                                 if ($clotheShalvar == 'mcargo' || $clotheShalvar == 'mcargoshorts' || $clotheShalvar == 'mmom') {
                                     $matched = true;
@@ -822,8 +1099,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 5:
-
+                        case 'men_oval':
                             if ($astin == 'longsleeve') {
                                 if ($clotheShalvar == 'mshorts' || $clotheShalvar == 'mslimfit' || $clotheShalvar == 'mstraight') {
                                     $matched = true;
@@ -891,5 +1167,12 @@ class UserClothes extends Model
                 }
             }
         }
+    }
+
+
+    public function matchClothes($matchedIds)
+    {
+
+
     }
 }

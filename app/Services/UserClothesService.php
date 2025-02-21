@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Http\Repositories\UserClothingRepository;
 use App\Http\Repositories\UserRepository;
 use App\Jobs\SendRedisMessage;
-use App\Models\UserClothesPivot;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -70,12 +69,6 @@ class UserClothesService
                 "time" => Carbon::now()->format("H:i:s"),
             ];
             SendRedisMessage::dispatch($data);
-
-//            UserClothesPivot::query()->create([
-//                "first_user_clothes_id" => $createdItem->id,
-//                "second_user_clothes_id" => $createdItem->id,
-//                "matched" => true,
-//            ]);
 
             DB::commit();
             return $createdItem;

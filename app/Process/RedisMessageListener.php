@@ -34,7 +34,7 @@ class RedisMessageListener
         $processImageData = $data['process_image'] ?? null;
 
 
-        Log::info('process Image : ' , $processImageData);
+        Log::info('process Image : ', $processImageData);
         Log::info('action : ' . $action);
         Log::info('user_id : ' . $userId);
         Log::info('image Link : ' . $imageLink);
@@ -66,7 +66,7 @@ class RedisMessageListener
                     if ($userItemBodyType != null) {
                         try {
                             $clothesType = $this->getClothesType($processImageData["process_data"]);
-                            $matchScore = $this->calculateScore($processImageData["process_data"], (int)trim($userItemBodyType));
+                            $matchScore = $this->calculateScore($processImageData["process_data"], trim($userItemBodyType));
                             $clothes = UserClothes::query()->find($clothesId);
                             if ($clothes != null) {
                                 $clothes->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore, "clothes_type" => $clothesType]);
@@ -106,26 +106,26 @@ class RedisMessageListener
         if ($imageData['paintane'] === 'mpayintane' || $imageData['paintane'] === 'mbalatane') {
             if ($imageData['paintane'] === 'mbalatane') {
                 switch ($userBodyType) {
-                    case 0:
+                    case 'men_rectangle':
                         $score += $this->menBalataneZero($imageData);
                         break;
-                    case 2:
+                    case 'men_inverted_triangle':
                         $score += $this->menBalataneTwo($imageData);
                         break;
-                    case 5:
+                    case 'men_oval':
                         $score += $this->menBalataneFive($imageData);
                         break;
                 }
 
             } elseif ($imageData['paintane'] === 'mpayintane') {
                 switch ($userBodyType) {
-                    case 0:
+                    case 'men_rectangle':
                         $score += $this->menPayintaneZero($imageData);
                         break;
-                    case 2:
+                    case 'men_inverted_triangle':
                         $score += $this->menPayintaneTwo($imageData);
                         break;
-                    case 5:
+                    case 'men_oval':
                         $score += $this->menPayintaneFive($imageData);
                         break;
                 }
@@ -134,38 +134,38 @@ class RedisMessageListener
         } elseif ($imageData['paintane'] === 'fbalatane' || $imageData['paintane'] === 'fpayintane' || $imageData['paintane'] === 'ftamamtane') {
             if ($imageData['paintane'] === 'fbalatane') {
                 switch ($userBodyType) {
-                    case 11:
+                    case 'women_hourglass':
                         $score += $this->womenBalataneOneOne($imageData);
                         break;
-                    case 21:
+                    case 'women_rectangle':
                         $score += $this->womenBalataneTwoOne($imageData);
                         break;
-                    case 31:
+                    case 'women_inverted_triangle':
                         $score += $this->womenBalataneThreeOne($imageData);
                         break;
-                    case 41:
+                    case 'women_triangle':
                         $score += $this->womenBalataneFourOne($imageData);
                         break;
-                    case 51:
+                    case 'women_round':
                         $score += $this->womenBalataneFiveOne($imageData);
                         break;
                 }
 
             } else {
                 switch ($userBodyType) {
-                    case 11:
+                    case 'women_hourglass':
                         $score += $this->womenPayintaneOneOne($imageData);
                         break;
-                    case 21:
+                    case 'women_rectangle':
                         $score += $this->womenPayintaneTwoOne($imageData);
                         break;
-                    case 31:
+                    case 'women_inverted_triangle':
                         $score += $this->womenPayintaneThreeOne($imageData);
                         break;
-                    case 41:
+                    case 'women_triangle':
                         $score += $this->womenPayintaneFourOne($imageData);
                         break;
-                    case 51:
+                    case 'women_round':
                         $score += $this->womenPayintaneFiveOne($imageData);
                         break;
                 }
@@ -560,7 +560,7 @@ class RedisMessageListener
         }
 
 
-        $point += isset($data["snatched"]) ? $data["snatched"] == "snatched" ? 5 : 0 : 0;
+        $point += isset($data["loose"]) ? $data["loose"] == "snatched" ? 10 : 0 : 0;
         $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
         $point += isset($data["peplum"]) ? $data["peplum"] == "peplum" ? 5 : 0 : 0;
         $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
@@ -596,7 +596,7 @@ class RedisMessageListener
         $point = 0;
 
         if (($data['skirt_and_pants'] ?? null) === 'skirt') {
-            $type = $data['silhouette'] ?? $data['skirt_type'] ?? '';
+            $type = $data['skirt_type'] ?? '';
             switch ($type) {
                 case 'pencilskirt':
                 case 'wrapskirt':
@@ -733,7 +733,7 @@ class RedisMessageListener
                 break;
         }
 
-        $point += isset($data["snatched"]) ? $data["snatched"] == "snatched" ? 5 : 0 : 0;
+        $point += isset($data["loose"]) ? $data["loose"] == "snatched" ? 10 : 0 : 0;
         $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
         $point += isset($data["peplum"]) ? $data["peplum"] == "peplum" ? 5 : 0 : 0;
         $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
@@ -773,7 +773,7 @@ class RedisMessageListener
         $point = 0;
 
         if (($data['skirt_and_pants'] ?? null) === 'skirt') {
-            $type = $data['silhouette'] ?? $data['skirt_type'] ?? '';
+            $type =  $data['skirt_type'] ?? '';
             switch ($type) {
                 case 'wrapskirt':
                 case 'balloonskirt':
@@ -921,11 +921,10 @@ class RedisMessageListener
         }
 
 
-        $point += isset($data["snatched"]) ? $data["snatched"] == "snatched" ? 5 : 0 : 0;
+        $point += isset($data["loose"]) ? $data["loose"] == "snatched" ? 10 : 0 : 0;
         $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
         $point += isset($data["peplum"]) ? $data["peplum"] == "peplum" ? 5 : 0 : 0;
         $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
-        $point += isset($data["loose"]) ? $data["loose"] == "loose" || $data["loose"] == "losse" ? 3 : 0 : 0;
         $point += isset($data["empire"]) ? $data["empire"] == "empire" ? 3 : 0 : 0;
 
 
@@ -959,7 +958,7 @@ class RedisMessageListener
         $point = 0;
 
         if (($data['skirt_and_pants'] ?? null) === 'skirt') {
-            $type = $data['silhouette'] ?? $data['skirt_type'] ?? null;
+            $type = $data['skirt_type'] ?? null;
 
             if (in_array($type, ['balloonskirt', 'alineskirt', 'shortaskirt', 'wrapskirt'])) {
                 $point += 40;
@@ -1037,7 +1036,7 @@ class RedisMessageListener
             $point += 0;
         }
 
-        $point += isset($data["snatched"]) ? $data["snatched"] == "snatched" ? 5 : 0 : 0;
+        $point += isset($data["loose"]) ? $data["loose"] == "snatched" ? 10 : 0 : 0;
         $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
         $point += isset($data["cowl"]) ? $data["cowl"] == "cowl" ? 5 : 0 : 0;
         $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
@@ -1068,7 +1067,7 @@ class RedisMessageListener
         $point = 0;
 
         if (($data['skirt_and_pants'] ?? null) === 'skirt') {
-            $type = $data['silhouette'] ?? $data['skirt_type'] ?? '';
+            $type = $data['skirt_type'] ?? '';
             switch ($type) {
                 case 'alineskirt':
                 case 'pencilskirt':
@@ -1167,13 +1166,6 @@ class RedisMessageListener
             $point += 0;
         }
 
-        if (in_array($data['silhouette'] ?? null, ['empire', 'wrap', 'peplum', 'belted', 'loose'])) {
-            $point += 5;
-        } elseif (in_array($data['silhouette'] ?? null, ['cowl'])) {
-            $point += 3;
-        } elseif (($data['silhouette'] ?? null) === 'snatched') {
-            $point += 0;
-        }
 
         $point += isset($data["wrap"]) ? $data["wrap"] == "wrap" ? 5 : 0 : 0;
         $point += isset($data["belted"]) ? $data["belted"] == "belted" ? 5 : 0 : 0;
@@ -1204,7 +1196,7 @@ class RedisMessageListener
         $point = 0;
 
         if (($data['skirt_and_pants'] ?? null) === 'skirt') {
-            $type = $data['silhouette'] ?? $data['skirt_type'] ?? '';
+            $type =  $data['skirt_type'] ?? '';
             switch ($type) {
                 case 'wrapskirt':
                 case 'pencilskirt':
