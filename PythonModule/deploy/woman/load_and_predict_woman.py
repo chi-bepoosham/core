@@ -8,7 +8,7 @@ from .yolo import yolo
 # For Docker
 # model_astin_path_docker = '/var/www/deploy/models/astin/astinwoman.h5'
 # model_patern_path_docker = '/var/www/deploy/models/pattern/petternwoman.h5'
-# model_paintane_path_docker = '/var/www/deploy/models/paintane/women_bodytype_model.h5'
+# model_paintane_path_docker = '/var/www/deploy/models/paintane/zan.h5'
 # model_rise_path_docker = '/var/www/deploy/models/rise/riseeeeef.h5'
 # model_shalvar_path_docker = '/var/www/deploy/models/shalvar/womenpants.h5'
 # model_tarh_shalvar_path_docker = '/var/www/deploy/models/tarh_shalvar/wwpantsprint.h5'
@@ -22,7 +22,7 @@ from .yolo import yolo
 base_path = os.path.dirname(__file__)
 model_astin_path = os.path.join(base_path, '../../models/astin/astinwoman.h5')
 model_patern_path = os.path.join(base_path, '../../models/pattern/petternwoman.h5')
-model_paintane_path = os.path.join(base_path, '../../models/paintane/women_bodytype_model.h5')  # FIXME: not available
+model_paintane_path = os.path.join(base_path, '../../models/paintane/zan.h5')  
 model_rise_path = os.path.join(base_path, '../../models/rise/riseeeeef.h5') 
 model_shalvar_path = os.path.join(base_path, '../../models/shalvar/womenpants.h5')
 model_tarh_shalvar_path = os.path.join(base_path, '../../models/tarh_shalvar/wwpantsprint.h5')
