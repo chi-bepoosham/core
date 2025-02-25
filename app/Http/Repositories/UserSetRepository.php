@@ -3,16 +3,16 @@
 namespace App\Http\Repositories;
 
 
-use App\Models\UserClothes;
+use App\Models\UserSet;
 
-class UserClothingRepository extends BaseRepository
+class UserSetRepository extends BaseRepository
 {
     /**
      * @return string
      */
     public function model(): string
     {
-        return UserClothes::class;
+        return UserSet::class;
     }
 
 
@@ -21,6 +21,6 @@ class UserClothingRepository extends BaseRepository
      */
     public function relations(): array
     {
-        return ["sets"];
+        return ["clothes"];
     }
 }

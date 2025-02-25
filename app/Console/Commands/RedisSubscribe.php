@@ -41,7 +41,6 @@ class RedisSubscribe extends Command
                 (new RedisMessageListener(json_decode($message, true)))->handle();
             });
         } catch (\Throwable $exception) {
-            Log::debug($exception->getMessage());
             $this->handle();
         }
     }

@@ -92,7 +92,9 @@ class RedisMessageListener
 
     public function getClothesType(array $imageData): int
     {
-        if ($imageData['paintane'] === 'mpayintane' || $imageData['paintane'] === 'fpayintane' || $imageData['paintane'] === 'ftamamtane') {
+        if ($imageData['paintane'] === 'ftamamtane') {
+            return 3;
+        } elseif ($imageData['paintane'] === 'mpayintane' || $imageData['paintane'] === 'fpayintane') {
             return 2;
         } else {
             return 1;
@@ -773,7 +775,7 @@ class RedisMessageListener
         $point = 0;
 
         if (($data['skirt_and_pants'] ?? null) === 'skirt') {
-            $type =  $data['skirt_type'] ?? '';
+            $type = $data['skirt_type'] ?? '';
             switch ($type) {
                 case 'wrapskirt':
                 case 'balloonskirt':
@@ -1196,7 +1198,7 @@ class RedisMessageListener
         $point = 0;
 
         if (($data['skirt_and_pants'] ?? null) === 'skirt') {
-            $type =  $data['skirt_type'] ?? '';
+            $type = $data['skirt_type'] ?? '';
             switch ($type) {
                 case 'wrapskirt':
                 case 'pencilskirt':

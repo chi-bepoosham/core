@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_clothes_pivot', function (Blueprint $table) {
+        Schema::create('user_sets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('first_user_clothes_id');
-            $table->foreignId('second_user_clothes_id');
-            $table->boolean('matched')->comment('وضعیت مطابقت');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->string('title')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_clothes_pivot');
+        Schema::dropIfExists('user_sets');
     }
 };

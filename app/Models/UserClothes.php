@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Http\Repositories\UserSetRepository;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Log;
 
 class UserClothes extends Model
@@ -40,9 +42,9 @@ class UserClothes extends Model
 
     protected $hidden = ["processed_image_data"];
 
-    public function matchedClothing(): BelongsToMany
+    public function sets(): HasMany
     {
-        return $this->belongsToMany(UserClothes::class, "user_clothes_pivot", "first_user_clothes_id", "second_user_clothes_id")->withPivot('matched');
+        return $this->hasMany(UserSet::class, 'user_id', 'id')->with("clothes");
     }
 
     public function user(): BelongsTo
@@ -314,7 +316,7 @@ class UserClothes extends Model
                     }
 
 
-                }elseif ($currentProcessedImageData->paintane == 'fpayintane' && $clotheProcessedImageData->paintane == 'fbalatane') {
+                } elseif ($currentProcessedImageData->paintane == 'fpayintane' && $clotheProcessedImageData->paintane == 'fbalatane') {
 
                     if ($clotheMnistPrediction == 'over') {
                         // todo check multiple clothes
@@ -1149,30 +1151,29 @@ class UserClothes extends Model
                 }
 
 
+                #match clothes
                 if ($matched) {
-                    UserClothesPivot::query()->insert(
-                        [
-                            "first_user_clothes_id" => $this->id,
-                            "second_user_clothes_id" => $clothe->id,
-                            "matched" => true
-                        ]
-                    );
-                    UserClothesPivot::query()->insert(
-                        [
-                            "first_user_clothes_id" => $clothe->id,
-                            "second_user_clothes_id" => $this->id,
-                            "matched" => true
-                        ]
-                    );
+                    $userSet = $this->createSet($this->user_id);
+                    $this->attachUserClothesSet($userSet, [$this->id, $clothe->id]);
                 }
             }
         }
     }
 
 
-    public function matchClothes($matchedIds)
+    public function matchClothes($first)
     {
 
 
+    }
+
+    public function createSet($userId): UserSet
+    {
+        return (new UserSetRepository())->create(["user_id" => $userId]);
+    }
+
+    public function attachUserClothesSet(UserSet $userSet, array $clotheIds): void
+    {
+        $userSet->clothes()->attach($clotheIds);
     }
 }

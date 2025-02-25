@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserClothesPivot extends Model
+class UserClothesSet extends Model
 {
-    protected $table = 'user_clothes_pivot';
+    protected $table = 'user_clothes_sets';
 
     protected $fillable = [
-        'first_user_clothes_id',
-        'second_user_clothes_id',
-        'matched',
+        'user_set_id',
+        'user_clothe_id',
     ];
 
     /**
@@ -22,9 +22,8 @@ class UserClothesPivot extends Model
     protected function casts(): array
     {
         return [
-            'first_user_clothes_id' => 'integer',
-            'second_user_clothes_id' => 'integer',
-            'matched' => 'boolean',
+            'user_set_id' => 'integer',
+            'user_clothe_id' => 'integer',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
         ];
