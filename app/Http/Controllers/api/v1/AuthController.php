@@ -4,6 +4,8 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Helpers\Response\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ValidateLoginShop;
+use App\Http\Requests\ValidateRegisterShop;
 use Exception;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -100,6 +102,39 @@ class AuthController extends Controller
                 'code' => 403,
                 'message' => $exception->getMessage()
             ]);
+        }
+    }
+
+
+    /**
+     * @param ValidateLoginShop $request
+     * @return JsonResponse
+     */
+    public function shopLogin(ValidateLoginShop $request): JsonResponse
+    {
+        $inputs = $request->validated();
+        try {
+            $result = $this->service->shopLogin($inputs);
+            return ResponseHelper::responseSuccess($result);
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
+            return ResponseHelper::responseCustomError($message);
+        }
+    }
+
+    /**
+     * @param ValidateRegisterShop $request
+     * @return JsonResponse
+     */
+    public function shopRegister(ValidateRegisterShop $request): JsonResponse
+    {
+        $inputs = $request->validated();
+        try {
+            $result = $this->service->shopRegister($inputs);
+            return ResponseHelper::responseSuccess($result);
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
+            return ResponseHelper::responseCustomError($message);
         }
     }
 

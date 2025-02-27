@@ -12,14 +12,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('celebrity_body_types', function (Blueprint $table) {
+        Schema::create('provinces', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->foreignId('body_type_id')->nullable();
-            $table->string('image');
-            $table->timestamps();
+            $table->string('name',40)->index();
+            $table->string('slug',40)->index();
         });
-        DB::unprepared(file_get_contents(database_path('body_type_images.sql')));
+        DB::unprepared(file_get_contents(database_path('provinces.sql')));
     }
 
     /**
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('celebrity_body_types');
+        Schema::dropIfExists('provinces');
     }
 };

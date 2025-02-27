@@ -166,6 +166,14 @@ return [
         "body_image" => "تصویر بدن",
         "clothes_type" => "نوع لباس",
         "process_status" => "وضعیت پردازش",
-
+        "province_id" => "استان",
+        "city_id" => "شهر",
+        "location_lat" => "نقطه جغرافیایی",
+        "location_lng" => "نقطه جغرافیایی",
+        "manager_name" => "نام مدیر",
+        "manager_national_code" => "کد ملی مدیر",
+        "brand_name" => "نام برند",
+        "logo" => "لوگو",
+        "web_site" => "سایت",
     ]
 ];

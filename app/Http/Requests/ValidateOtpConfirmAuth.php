@@ -13,8 +13,8 @@ class ValidateOtpConfirmAuth extends FormRequest
 
     public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
     {
-        $this->set_validator_otp_check_expired_time();
-        $this->set_validator_otp_confirm();
+        $this->setValidatorOtpCheckExpiredTime();
+        $this->setValidatorOtpConfirm();
         parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
@@ -30,7 +30,7 @@ class ValidateOtpConfirmAuth extends FormRequest
     }
 
 
-    private function helper_otp_confirm($attribute, $code_value, $parameters): bool
+    private function helperOtpConfirm($attribute, $code_value, $parameters): bool
     {
         $mobile = request()->get('mobile');
         if (cache()->has($mobile)) {
@@ -42,7 +42,7 @@ class ValidateOtpConfirmAuth extends FormRequest
     }
 
 
-    private function helper_otp_check_expired_time($attribute, $code_value, $parameters): bool
+    private function helperOtpCheckExpiredTime($attribute, $code_value, $parameters): bool
     {
         $mobile = request()->get('mobile');
         if (cache()->has($mobile)) {
@@ -53,17 +53,17 @@ class ValidateOtpConfirmAuth extends FormRequest
         return false;
     }
 
-    private function set_validator_otp_confirm()
+    private function setValidatorOtpConfirm(): void
     {
         Validator::extend('otp_confirm', function ($attribute, $code_value, $parameters) {
-            return $this->helper_otp_confirm(attribute: $attribute, code_value: $code_value, parameters: $parameters);
+            return $this->helperOtpConfirm(attribute: $attribute, code_value: $code_value, parameters: $parameters);
         }, 'کد وارد شده با کد ارسالی مطابقت ندارد');
     }
 
-    private function set_validator_otp_check_expired_time()
+    private function setValidatorOtpCheckExpiredTime(): void
     {
         Validator::extend('otp_check_expired_time', function ($attribute, $code_value, $parameters){
-            return $this->helper_otp_check_expired_time($attribute, $code_value, $parameters);
+            return $this->helperOtpCheckExpiredTime($attribute, $code_value, $parameters);
         }, 'زمان کد منقضی شده است . لطفا دوباره درخواست بدهید');
     }
 

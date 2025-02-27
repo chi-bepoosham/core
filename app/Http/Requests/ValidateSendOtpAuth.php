@@ -10,7 +10,7 @@ class ValidateSendOtpAuth extends FormRequest
 {
     public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null)
     {
-        $this->set_validator_check_allow_send_code();
+        $this->setValidatorCheckAllowSendCode();
         parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
     }
 
@@ -32,7 +32,7 @@ class ValidateSendOtpAuth extends FormRequest
         return true;
     }
 
-    private function set_validator_check_allow_send_code()
+    private function setValidatorCheckAllowSendCode(): void
     {
         # check_allow_send_code
         Validator::extend('check_allow_send_code', function ($attribute, $mobile, $parameters) {

@@ -94,7 +94,7 @@ class ExportSamplesImagesToJson extends Command
 
         $outputSql = array_merge($celebritySql, $clothesSql);
 
-        $sqlPath = storage_path('body_type_images.sql');
+        $sqlPath = database_path('body_type_images.sql');
         File::put($sqlPath, implode("\n", $outputSql));
 
         $this->info("SQL file has been generated: $sqlPath");

@@ -2,9 +2,13 @@
 
 namespace App\Services;
 
+use App\Http\Repositories\ShopRepository;
+use App\Models\Shop;
 use Carbon\Carbon;
 use Exception;
+use Firebase\JWT\JWT;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use JetBrains\PhpStorm\ArrayShape;
 use App\Http\Repositories\UserRepository;
@@ -88,7 +92,7 @@ class AuthenticationsService
                 $inputs["avatar"] = $userService->saveImage($inputs["avatar"], 'avatar');
             }
 
-            $createdItem = $this->create($inputs);
+            $createdItem = $this->createUser($inputs);
             $user = User::query()->find($createdItem->id);
             $userId = $user->id;
             $token = $user->createToken("ChiBepoosham-usr-$userId")->plainTextToken;
@@ -99,24 +103,6 @@ class AuthenticationsService
         } catch (Exception) {
             DB::rollBack();
             throw new Exception(__("custom.user.register_exception"));
-        }
-    }
-
-    /**
-     * @param $inputs
-     * @return array
-     * @throws Exception
-     */
-    public function create($inputs): mixed
-    {
-        DB::beginTransaction();
-        try {
-            $createdItem = $this->repository->create($inputs);
-            DB::commit();
-            return $createdItem;
-        } catch (Exception) {
-            DB::rollBack();
-            throw new Exception(__("custom.user.create_user_exception"));
         }
     }
 
@@ -151,7 +137,7 @@ class AuthenticationsService
             DB::beginTransaction();
             try {
 
-                $createdItem = $this->create($inputs);
+                $createdItem = $this->createUser($inputs);
                 $user = User::query()->find($createdItem->id);
                 $userId = $user->id;
                 $token = $user->createToken("ChiBepoosham-usr-$userId")->plainTextToken;
@@ -167,6 +153,109 @@ class AuthenticationsService
     }
 
 
+    /**
+     * @param array $inputs
+     * @return array
+     * @throws Exception
+     */
+    public function shopLogin(array $inputs): array
+    {
+        $shopRepository = new ShopRepository();
+        $shop = $shopRepository->findBy('uuid', $inputs['user_name']);
+        if ($shop === null) {
+            throw new Exception(__('custom.validation.user_name_or_password_incorrect'));
+        }
+
+        if (!Hash::check($inputs['password'], $shop->password)) {
+            throw new Exception(__('custom.validation.user_name_or_password_incorrect'));
+        }
+
+        $token = $this->generateToken($shop);
+
+        return ['token' => $token, 'shop' => $shop];
+
+    }
+
+
+    /**
+     * @param $inputs
+     * @return array
+     * @throws Exception
+     */
+    #[ArrayShape(['token' => "mixed", 'shop' => "mixed"])]
+    public function shopRegister($inputs): array
+    {
+        DB::beginTransaction();
+        try {
+
+            if (isset($inputs["logo"])) {
+                $shopService = new ShopsService(new ShopRepository());
+                $inputs["logo"] = $shopService->saveImage($inputs["logo"], 'logo');
+            }
+
+            $lastShopId = Shop::query()->orderBy("id", "desc")->first()?->id ?? 0;
+            $inputs["uuid"] = 'shop-' . rand(1111, 9999) . $lastShopId;
+
+            if (isset($inputs["location_lat"]) && isset($inputs["location_lng"])) {
+                $inputs["location_point"] = $inputs["location_lat"] . ',' . $inputs["location_lng"];
+            }
+
+            $inputs["password"] = Hash::make($inputs["mobile"]);
+
+            $createdItem = $this->createShop($inputs);
+            $shop = Shop::query()->find($createdItem->id);
+            $token = $this->generateToken($shop);
+
+            DB::commit();
+
+            return ['token' => $token, 'shop' => $shop];
+
+        } catch (Exception) {
+            DB::rollBack();
+            throw new Exception(__("custom.shop.register_exception"));
+        }
+    }
+
+
+
+    /**
+     * @param $inputs
+     * @return array
+     * @throws Exception
+     */
+    public function createUser($inputs): mixed
+    {
+        DB::beginTransaction();
+        try {
+            $createdItem = $this->repository->create($inputs);
+            DB::commit();
+            return $createdItem;
+        } catch (Exception) {
+            DB::rollBack();
+            throw new Exception(__("custom.user.create_user_exception"));
+        }
+    }
+
+
+    /**
+     * @param $inputs
+     * @return array
+     * @throws Exception
+     */
+    public function createShop($inputs): mixed
+    {
+        DB::beginTransaction();
+        try {
+            $shopRepository = new ShopRepository();
+            $createdItem = $shopRepository->create($inputs);
+            DB::commit();
+            return $createdItem;
+        } catch (Exception) {
+            DB::rollBack();
+            throw new Exception(__("custom.shop.create_shop_exception"));
+        }
+    }
+
     public function generateOtpRandom(): int
     {
         if (env('APP_ENV') == 'production') {
@@ -177,6 +266,36 @@ class AuthenticationsService
             return 11111;
         }
     }
+
+
+    /**
+     * @param $shop
+     * @return string
+     * @throws Exception
+     */
+    public function generateToken($shop): string
+    {
+        $secretKey = env('JWT_SECRET_KEY');
+        $payload = $this->generatePayloadToken($shop);
+        return JWT::encode($payload, $secretKey, 'HS256');
+    }
+
+
+    /**
+     * @param $shop
+     * @return array
+     */
+    private function generatePayloadToken($shop): array
+    {
+        return [
+            'iss' => config('app.url'),
+            'shop_id' => $shop->id,
+            'shop_mobile' => $shop->mobile,
+            'iat' => time(),
+            'exp' => time() + 3600,
+        ];
+    }
+
 
     /**
      * @throws ContainerExceptionInterface
