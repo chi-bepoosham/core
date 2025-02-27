@@ -15,24 +15,24 @@ model_path = os.path.join(base_path, '../../models/yolo/best.pt')
 model = YOLO(model_path)
 model.to("cpu")
 
-def yolo(image_path):
+def yolo(image_path, image=None):
 
     image_file = os.path.basename(image_path)  # Get image file name
 
     # Run YOLOv8 on the image
     results = model.predict(source=image_path, save=False)
-    print(f"Results for {image_file}: {results}")  # Debug
 
     # Check if there are any detections
     if not results or not results[0].boxes:
         print(f"No detections found in {image_file}")
-        return cv2.imread(image_path)
+        return None, None
 
     # Load image for cropping
-    image = cv2.imread(image_path)
     if image is None:
-        print(f"Failed to load image: {image_file}")
-        return None, None
+        image = cv2.imread(image_path)
+        if image is None:
+            print(f"Failed to load image: {image_file}")
+            return None, None
 
     # Initialize the cropped images for 'astin' and 'yaghe'
     crop_image_astin = None
@@ -54,13 +54,7 @@ def yolo(image_path):
             crop_image_astin = cropped_image  # Save first detected 'astin'
         elif label_name == 'collar' and crop_image_yaghe is None:
             crop_image_yaghe = cropped_image  # Save first detected 'yaghe'
-
-    # If no crops were found, print a message
-    if crop_image_astin is None:
-        print("No 'astin' class detected in the image.")
-    if crop_image_yaghe is None:
-        print("No 'yaghe' class detected in the image.")
-
+            
     # Return the cropped images (could be None if not found)
     return crop_image_astin, crop_image_yaghe
 

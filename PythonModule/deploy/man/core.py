@@ -41,22 +41,27 @@ def load_modelll(model_path,class_num,base_model):
 
         if base_model=="mobilenet":
 
-
-            base_model = tf.keras.applications.MobileNet(
-            include_top=False,
-            weights=None,  # استفاده از وزن‌های پیش‌ساخته
-            input_shape=(224, 224, 3)
+            input_shape = (224, 224, 1)
+            base_model = tf.keras.applications.MobileNetV2(
+                weights='imagenet',
+                include_top=False,
+                input_shape=(224, 224, 3)  # MobileNetV2 expects RGB
             )
 
-            # افزودن لایه‌های جدید به مدل
-            x = base_model.output
+            inputs = tf.keras.layers.Input(shape=input_shape)
+            x = tf.keras.layers.Conv2D(3, (1, 1), activation='relu')(inputs)  # Convert grayscale to RGB
+            x = base_model(x, training=False)
             x = tf.keras.layers.GlobalAveragePooling2D()(x)
-            x = tf.keras.layers.Dropout(0.2)(x)
-            x = tf.keras.layers.Dense(256, activation='relu')(x)
+            x = tf.keras.layers.Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01))(x)
             x = tf.keras.layers.Dropout(0.5)(x)
-            predictions = tf.keras.layers.Dense(class_num, activation='softmax')(x)
+            outputs = tf.keras.layers.Dense(class_num, activation='softmax')(x)
 
-            model = tf.keras.Model(inputs=base_model.input, outputs=predictions)
+            model = tf.keras.models.Model(inputs, outputs)
+            
+            # 🔴 Ensure model is created before loading weights
+            if model is None:
+                raise ValueError("Failed to create the model!")
+
             model.load_weights("{0}".format(model_path))
             return model
 
@@ -168,35 +173,44 @@ def load_modelll(model_path,class_num,base_model):
             return model
 
 
+def load_and_preprocess_image_paintane(image_path):
+    img = cv2.resize(image_path, (224, 224))
+    img_array = img_to_array(img)  # Convert to NumPy array
+    img_array = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)  # Convert to grayscale
+    img_array = np.expand_dims(img_array, axis=-1)  # Add channel dimension
+    img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+    img_array = img_array / 255.0  # Normalize
+    return img_array
 
 
+def predict_class(img, model, class_names, reso, model_name=None):
+    """
+    Predicts the class of an image using a given model.
 
+    Args:
+        img: The input image (NumPy array or image path).
+        model: The loaded Keras model for prediction.
+        class_names: A list of class names corresponding to the model's output classes.
+        reso: The resolution (target size) to which the input image will be resized.
+        model_name: (Optional) Name of the model for logging or debugging purposes.
 
+    Returns:
+        str: The predicted class label (string).
+    """
+    # Prepare the image for the model 
+    if model_name == "paintane":
+        img_array = load_and_preprocess_image_paintane(img)
+    else:
+        img_array = prepare_image(img, target_size=(reso, reso))
 
-
-def predict_class(img, model,class_names,reso,model_name=None):
-
-    reso = reso
-    # آماده‌سازی تصویر
-    img_array = prepare_image(img, target_size=(reso, reso))
-
-    # انجام پیش‌بینی
+    # Perform prediction
     predictions = model.predict(img_array)
 
-    # دریافت کلاس پیش‌بینی‌شده
-    predicted_class = np.argmax(predictions, axis=-1)
+    # Get the index of the predicted class (highest probability)
+    predicted_class_index = np.argmax(predictions, axis=-1)
 
-    # لیست کلاس‌ها (این لیست باید با کلاس‌های دیتاست شما همخوانی داشته باشد)
-
-
-    # نمایش نام کلاس پیش‌بینی‌شده
-    predicted_label = class_names[predicted_class[0]]
-
-    if model_name==None:
-
-        print(f"{model.name}:class prediction_name: {predicted_label}")
-    else:
-        print(f"{model_name}:class prediction_name: {predicted_label}")
+    # Get the predicted class label from the class_names list
+    predicted_label = class_names[predicted_class_index[0]]
 
     return predicted_label
 
@@ -220,7 +234,6 @@ def predict_mnist(prepare_output,model,class_names):
 
     # Display predicted class name
     predicted_label = class_names[predicted_class[0]]
-    print(f"mnist: class prediction_name: {predicted_label}")
     return predicted_label
 
 
