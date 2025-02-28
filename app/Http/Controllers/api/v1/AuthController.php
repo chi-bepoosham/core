@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Helpers\Response\ResponseHelper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ValidateLoginAdmin;
 use App\Http\Requests\ValidateLoginShop;
 use App\Http\Requests\ValidateRegisterShop;
 use Exception;
@@ -131,6 +132,24 @@ class AuthController extends Controller
         $inputs = $request->validated();
         try {
             $result = $this->service->shopRegister($inputs);
+            return ResponseHelper::responseSuccess($result);
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
+            return ResponseHelper::responseCustomError($message);
+        }
+    }
+
+
+
+    /**
+     * @param ValidateLoginAdmin $request
+     * @return JsonResponse
+     */
+    public function adminLogin(ValidateLoginAdmin $request): JsonResponse
+    {
+        $inputs = $request->validated();
+        try {
+            $result = $this->service->adminLogin($inputs);
             return ResponseHelper::responseSuccess($result);
         } catch (Exception $exception) {
             $message = $exception->getMessage();

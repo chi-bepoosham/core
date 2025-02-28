@@ -18,6 +18,10 @@ class UserClothingController extends Controller
     {
     }
 
+    /**
+     * @param ValidateGetClothesRequest $request
+     * @return JsonResponse
+     */
     public function index(ValidateGetClothesRequest $request): JsonResponse
     {
         $inputs = $request->validated();
@@ -26,6 +30,10 @@ class UserClothingController extends Controller
     }
 
 
+    /**
+     * @param ValidateUploadImage $request
+     * @return JsonResponse
+     */
     public function uploadClothingImage(ValidateUploadImage $request): JsonResponse
     {
         $inputs = $request->validated();

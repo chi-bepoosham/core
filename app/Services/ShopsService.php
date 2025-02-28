@@ -3,14 +3,13 @@
 namespace App\Services;
 
 use App\Http\Repositories\ShopRepository;
-use App\Jobs\SendRedisMessage;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
@@ -27,11 +26,69 @@ class ShopsService
      */
     public function index($inputs): Collection|LengthAwarePaginator
     {
-        $inputs["user_id"] = Auth::id();
         return $this->repository->resolve_paginate(inputs: $inputs, relations: $this->repository->relations());
     }
 
+    /**
+     * @param $shopId
+     * @return object|null
+     * @throws Exception
+     */
+    public function show($shopId): ?object
+    {
+        if (!isset(request()->userAdmin) && $shopId != Auth::id()) {
+            throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
+        }
 
+        $item = $this->repository->findWithRelations($shopId);
+        if ($item == null) {
+            throw new Exception(__("custom.defaults.not_found"));
+        }
+
+        return $item;
+    }
+
+
+    /**
+     * @param $inputs
+     * @param $shopId
+     * @return mixed
+     * @throws Exception
+     */
+    public function update($inputs, $shopId): mixed
+    {
+        if (!isset(request()->userAdmin) && $shopId != Auth::id()) {
+            throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
+        }
+
+        $item = $this->repository->find($shopId);
+        if (!$item) {
+            throw new Exception(__("custom.defaults.not_found"));
+        }
+
+
+        if (isset($inputs["logo"])) {
+            $inputs["logo"] = $this->saveImage($inputs["logo"], 'logo');
+        }
+
+        if (isset($inputs["location_lat"]) && isset($inputs["location_lng"])) {
+            $inputs["location_point"] = $inputs["location_lat"] . ',' . $inputs["location_lng"];
+        }
+
+        if (isset($inputs["password"])) {
+            $inputs["password"] = Hash::make($inputs["mobile"]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $this->repository->update($item, $inputs);
+            DB::commit();
+            return $item;
+        } catch (Exception) {
+            DB::rollBack();
+            throw new Exception(__("custom.defaults.update_failed"));
+        }
+    }
 
     /**
      * @param $shopId
@@ -40,7 +97,11 @@ class ShopsService
      */
     public function delete($shopId): bool
     {
-        $item = $this->repository->findWithInputs(["id" => $shopId, "user_id" => Auth::id()]);
+        if (!isset(request()->userAdmin)) {
+            throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
+        }
+
+        $item = $this->repository->find($shopId);
         if (!$item) {
             throw new Exception(__("custom.defaults.not_found"));
         }
@@ -50,7 +111,7 @@ class ShopsService
             $this->repository->delete($item);
             DB::commit();
             return true;
-        } catch (Exception $exception) {
+        } catch (Exception) {
             DB::rollBack();
             throw new Exception(__("custom.defaults.delete_failed"));
         }
@@ -75,7 +136,7 @@ class ShopsService
 
                 try {
                     unlink($newFilePath);
-                } catch (Exception $exception) {
+                } catch (Exception) {
                 }
 
                 return "/storage/" . $fullPath;
@@ -83,7 +144,7 @@ class ShopsService
 
             return null;
 
-        } catch (Exception $exception) {
+        } catch (Exception) {
             return null;
         }
     }

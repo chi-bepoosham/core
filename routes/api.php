@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\api\v1\BodyTypeController;
+use App\Http\Controllers\api\v1\ShopController;
 use App\Http\Controllers\api\v1\UserClothingController;
+use App\Http\Middleware\checkAdminAccessMiddleware;
 use App\Http\Middleware\checkApiKeyMiddleware;
+use App\Http\Middleware\checkShopAccessMiddleware;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -37,13 +40,13 @@ Route::prefix('v1')->group(function () {
         });
 
 
-        Route::prefix('body_type')->group(callback: function () {
+        Route::prefix('body_type')->group(function () {
             Route::get("/all", [BodyTypeController::class, "index"]);
             Route::get("/details", [UserController::class, "getBodyTypeDetail"]);
             Route::post("/upload/image", [UserController::class, "uploadBodyImage"]);
         });
 
-        Route::prefix('clothes')->group(callback: function () {
+        Route::prefix('clothes')->group(function () {
             Route::get("/", [UserClothingController::class, "index"]);
             Route::post("/upload/image", [UserClothingController::class, "uploadClothingImage"]);
             Route::delete("/{clothesId}", [UserClothingController::class, "delete"]);
@@ -57,11 +60,35 @@ Route::prefix('v1')->group(function () {
 
 //  -----------------  Shop Section  -----------------
 
-    Route::prefix('shop')->middleware('auth:sanctum')->group(function () {
+    Route::prefix('shop')->middleware(checkShopAccessMiddleware::class)->group(function () {
 
-        Route::prefix('auth')->withoutMiddleware('auth:sanctum')->group(function () {
+        Route::prefix('auth')->withoutMiddleware(checkShopAccessMiddleware::class)->group(function () {
             Route::post("/register", [AuthController::class, "shopRegister"]);
             Route::post("/login", [AuthController::class, "shopLogin"]);
+        });
+
+        Route::prefix('/')->group(function () {
+            Route::get("/{shopId}", [ShopController::class, "show"]);
+            Route::post("/update/{shopId}", [ShopController::class, "update"]);
+        });
+
+    });
+
+
+
+//  -----------------  Admin Section  -----------------
+
+    Route::prefix('admin')->middleware(checkAdminAccessMiddleware::class)->group(function () {
+
+        Route::prefix('auth')->withoutMiddleware(checkAdminAccessMiddleware::class)->group(function () {
+            Route::post("/login", [AuthController::class, "adminLogin"]);
+        });
+
+        Route::prefix('/shop')->group(function () {
+            Route::get("/all", [ShopController::class, "index"]);
+            Route::get("/{shopId}", [ShopController::class, "show"]);
+            Route::post("/update/{shopId}", [ShopController::class, "update"]);
+            Route::delete("/{shopId}", [ShopController::class, "delete"]);
         });
 
     });

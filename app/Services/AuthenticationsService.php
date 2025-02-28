@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Repositories\ShopRepository;
+use App\Http\Repositories\SystemUserRepository;
 use App\Models\Shop;
 use Carbon\Carbon;
 use Exception;
@@ -170,7 +171,7 @@ class AuthenticationsService
             throw new Exception(__('custom.validation.user_name_or_password_incorrect'));
         }
 
-        $token = $this->generateToken($shop);
+        $token = $this->generateToken($shop, 'shop');
 
         return ['token' => $token, 'shop' => $shop];
 
@@ -204,7 +205,7 @@ class AuthenticationsService
 
             $createdItem = $this->createShop($inputs);
             $shop = Shop::query()->find($createdItem->id);
-            $token = $this->generateToken($shop);
+            $token = $this->generateToken($shop, 'shop');
 
             DB::commit();
 
@@ -216,7 +217,28 @@ class AuthenticationsService
         }
     }
 
+    /**
+     * @param array $inputs
+     * @return array
+     * @throws Exception
+     */
+    public function adminLogin(array $inputs): array
+    {
+        $systemUserRepository = new SystemUserRepository();
+        $systemUser = $systemUserRepository->findBy('username', $inputs['user_name']);
+        if ($systemUser === null) {
+            throw new Exception(__('custom.validation.user_name_or_password_incorrect'));
+        }
 
+        if (!Hash::check($inputs['password'], $systemUser->password)) {
+            throw new Exception(__('custom.validation.user_name_or_password_incorrect'));
+        }
+
+        $token = $this->generateToken($systemUser, 'systemUser');
+
+        return ['token' => $token, 'shop' => $systemUser];
+
+    }
 
     /**
      * @param $inputs
@@ -269,31 +291,43 @@ class AuthenticationsService
 
 
     /**
-     * @param $shop
+     * @param $model
+     * @param string $type
      * @return string
      * @throws Exception
      */
-    public function generateToken($shop): string
+    public function generateToken($model, string $type = 'systemUser'): string
     {
         $secretKey = env('JWT_SECRET_KEY');
-        $payload = $this->generatePayloadToken($shop);
+        $payload = $this->generatePayloadToken($model, $type);
         return JWT::encode($payload, $secretKey, 'HS256');
     }
 
 
     /**
-     * @param $shop
+     * @param $model
+     * @param string $type
      * @return array
      */
-    private function generatePayloadToken($shop): array
+    private function generatePayloadToken($model, string $type = 'systemUser'): array
     {
+        if ($type == 'systemUser') {
+            return [
+                'iss' => config('app.url'),
+                'auth_slug' => encrypt($model->username),
+                'iat' => time(),
+                'exp' => Carbon::now()->addMonths(6)->timestamp,
+            ];
+        }
+
         return [
             'iss' => config('app.url'),
-            'shop_id' => $shop->id,
-            'shop_mobile' => $shop->mobile,
+            'shop_id' => encrypt($model->id),
+            'shop_mobile' => encrypt($model->mobile),
             'iat' => time(),
-            'exp' => time() + 3600,
+            'exp' => Carbon::now()->addMonths(6)->timestamp,
         ];
+
     }
 
 

@@ -17,6 +17,9 @@ class BodyTypeController extends Controller
     }
 
 
+    /**
+     * @return JsonResponse
+     */
     public function index(): JsonResponse
     {
         $result = $this->service->index();

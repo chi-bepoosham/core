@@ -17,6 +17,9 @@ class UserController extends Controller
     }
 
 
+    /**
+     * @return JsonResponse
+     */
     public function splash(): JsonResponse
     {
         try {
@@ -29,6 +32,10 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @param ValidateUpdateUser $request
+     * @return JsonResponse
+     */
     public function updateUser(ValidateUpdateUser $request): JsonResponse
     {
         $inputs = $request->validated();
@@ -43,6 +50,10 @@ class UserController extends Controller
     }
 
 
+    /**
+     * @param ValidateUploadImage $request
+     * @return JsonResponse
+     */
     public function uploadBodyImage(ValidateUploadImage $request): JsonResponse
     {
         $inputs = $request->validated();
@@ -56,6 +67,9 @@ class UserController extends Controller
         }
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function getBodyTypeDetail(): JsonResponse
     {
         try {

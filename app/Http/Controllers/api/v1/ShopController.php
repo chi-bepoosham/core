@@ -4,21 +4,23 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Helpers\Response\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ValidateGetClothesRequest;
-use App\Http\Requests\ValidateUploadImage;
-use App\Http\Requests\ValidateUpdateUser;
-use App\Services\UserClothesService;
+use App\Http\Requests\ValidateGetAllShopsRequest;
+use App\Http\Requests\ValidateUpdateShop;
+use App\Services\ShopsService;
+use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use App\Services\UsersService;
 
 class ShopController extends Controller
 {
-    public function __construct(public UserClothesService $service)
+    public function __construct(public ShopsService $service)
     {
     }
 
-    public function index(ValidateGetClothesRequest $request): JsonResponse
+    /**
+     * @param ValidateGetAllShopsRequest $request
+     * @return JsonResponse
+     */
+    public function index(ValidateGetAllShopsRequest $request): JsonResponse
     {
         $inputs = $request->validated();
         $result = $this->service->index($inputs);
@@ -26,30 +28,51 @@ class ShopController extends Controller
     }
 
 
-    public function uploadClothingImage(ValidateUploadImage $request): JsonResponse
+    /**
+     * @param int $shopId
+     * @return JsonResponse
+     */
+    public function show(int $shopId): JsonResponse
     {
-        $inputs = $request->validated();
         try {
-            $result = $this->service->uploadClothingImage($inputs);
-            $message = __("custom.defaults.upload_success");
-            return ResponseHelper::responseSuccess($result, $message);
-        } catch (\Exception $exception) {
-            $message = __("custom.defaults.upload_failed");
+            $data = $this->service->show($shopId);
+            return ResponseHelper::responseSuccess($data);
+        } catch (Exception $exception) {
+            $message = $exception->getMessage();
             return ResponseHelper::responseCustomError($message);
         }
     }
 
+
     /**
-     * @param $clothesId
+     * @param ValidateUpdateShop $request
+     * @param int $shopId
      * @return JsonResponse
      */
-    public function delete($clothesId): JsonResponse
+    public function update(ValidateUpdateShop $request, int $shopId): JsonResponse
+    {
+        $inputs = $request->validated();
+        try {
+            $data = $this->service->update($inputs, $shopId);
+            return ResponseHelper::responseSuccess($data);
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            return ResponseHelper::responseCustomError($message);
+        }
+
+    }
+
+    /**
+     * @param int $shopId
+     * @return JsonResponse
+     */
+    public function delete(int $shopId): JsonResponse
     {
         try {
-            $this->service->delete($clothesId);
+            $this->service->delete($shopId);
             $message = __("custom.defaults.delete_success");
-            return ResponseHelper::responseSuccess([],$message);
-        } catch (\Exception $exception) {
+            return ResponseHelper::responseSuccess([], $message);
+        } catch (Exception $exception) {
             $message = $exception->getMessage();
             return ResponseHelper::responseCustomError($message);
         }
