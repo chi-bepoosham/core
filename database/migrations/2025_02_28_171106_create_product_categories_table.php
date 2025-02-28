@@ -12,13 +12,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('provinces', function (Blueprint $table) {
+        Schema::create('product_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name',40)->index();
-            $table->string('slug',40)->index();
+            $table->string('name',50)->index();
+            $table->timestamps();
             $table->softDeletes();
         });
-        DB::unprepared(file_get_contents(database_path('provinces.sql')));
+        DB::unprepared(file_get_contents(database_path('product_categories.sql')));
     }
 
     /**
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('provinces');
+        Schema::dropIfExists('product_categories');
     }
 };

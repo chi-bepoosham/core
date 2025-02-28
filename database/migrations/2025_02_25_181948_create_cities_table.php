@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name',40)->index();
             $table->string('slug',40)->index();
             $table->foreignId('province_id')->constrained('provinces')->onDelete('no action')->onUpdate('no action');
+            $table->softDeletes();
         });
         DB::unprepared(file_get_contents(database_path('cities.sql')));
     }

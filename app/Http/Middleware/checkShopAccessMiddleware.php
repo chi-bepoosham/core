@@ -36,7 +36,7 @@ class checkShopAccessMiddleware
         }
 
         $shopId = decrypt($verifiedToken->shop_id);
-        $shop = Shop::query()->find($shopId)->first() ?? null;
+        $shop = Shop::query()->find($shopId) ?? null;
         if ($shop === null) {
             return ResponseHelper::responseCustomError(__('exceptions.exceptionErrors.accessDenied'));
         }

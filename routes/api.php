@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\v1\BodyTypeController;
+use App\Http\Controllers\api\v1\ProductController;
 use App\Http\Controllers\api\v1\ShopController;
 use App\Http\Controllers\api\v1\UserClothingController;
 use App\Http\Middleware\checkAdminAccessMiddleware;
@@ -72,8 +73,15 @@ Route::prefix('v1')->group(function () {
             Route::post("/update/{shopId}", [ShopController::class, "update"]);
         });
 
-    });
+        Route::prefix('/product')->group(function () {
+            Route::get("/all", [ProductController::class, "index"]);
+            Route::get("/{productId}", [ProductController::class, "show"]);
+            Route::post("/", [ProductController::class, "create"]);
+            Route::post("/update/{productId}", [ProductController::class, "update"]);
+            Route::delete("/{productId}", [ProductController::class, "delete"]);
+        });
 
+    });
 
 
 //  -----------------  Admin Section  -----------------

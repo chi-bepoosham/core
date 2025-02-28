@@ -3,16 +3,16 @@
 namespace App\Http\Repositories;
 
 
-use App\Models\Shop;
+use App\Models\Product;
 
-class ShopRepository extends BaseRepository
+class ProductRepository extends BaseRepository
 {
     /**
      * @return string
      */
     public function model(): string
     {
-        return Shop::class;
+        return Product::class;
     }
 
 
@@ -21,6 +21,6 @@ class ShopRepository extends BaseRepository
      */
     public function relations(): array
     {
-        return ['province', 'city','products'];
+        return ['category', 'images'];
     }
 }

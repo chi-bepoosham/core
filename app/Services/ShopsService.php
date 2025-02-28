@@ -26,7 +26,7 @@ class ShopsService
      */
     public function index($inputs): Collection|LengthAwarePaginator
     {
-        return $this->repository->resolve_paginate(inputs: $inputs, relations: $this->repository->relations());
+        return $this->repository->resolve_paginate(inputs: $inputs, relations: ['province', 'city']);
     }
 
     /**
