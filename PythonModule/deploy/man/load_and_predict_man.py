@@ -73,11 +73,6 @@ def process_clothing_image(img_path):
     results["color_tone"] = get_color_tone(img)
     print(f"Color tone prediction: {results.get('color_tone')}")
 
-    # MNIST prediction for under/over clothing
-    mnist_image = mnist_prepar(image=img) 
-    results["mnist_prediction"] = predict_mnist(mnist_image, model=model_mnist, class_names=["Under", "Over"])
-    print(f"MNIST prediction: {results.get('mnist_prediction')}")
-
     # Predict clothing type (paintane or balatane)
     results["paintane"] = predict_class(img, model=model_paintane, class_names=["mbalatane", 'mpayintane'], reso=224, model_name="paintane")
     print(f"Paintane prediction: {results.get('paintane')}")
@@ -90,6 +85,11 @@ def process_clothing_image(img_path):
         # Crop astin and yaghe
         crop_image_astin, crop_image_yaghe = yolo(img_path, img)
         print(f"YOLO detection completed. astin crop: {crop_image_astin is not None}, yaghe crop: {crop_image_yaghe is not None}")
+
+        # MNIST prediction for under/over clothing
+        mnist_image = mnist_prepar(image=img) 
+        results["mnist_prediction"] = predict_mnist(mnist_image, model=model_mnist, class_names=["Under", "Over"])
+        print(f"MNIST prediction: {results.get('mnist_prediction')}")
 
         # Predict sleeve type (astin)
         results["astin"] = predict_class(crop_image_astin, model=model_astin,
