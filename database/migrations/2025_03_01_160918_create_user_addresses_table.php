@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('full_name')->comment('نام کامل گیرنده');
-            $table->string('phone',10)->comment('شماره تلفن');
+            $table->string('phone',11)->comment('شماره تلفن');
             $table->foreignId('province_id')->constrained('provinces')->onDelete('no action')->onUpdate('no action');
             $table->foreignId('city_id')->constrained('cities')->onDelete('no action');
             $table->string('address')->comment('آدرس');
-            $table->string('postal_code',10)->comment('کد پستی');
+            $table->string('postal_code',10)->nullable()->comment('کد پستی');
             $table->timestamps();
             $table->softDeletes();
         });

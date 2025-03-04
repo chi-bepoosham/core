@@ -85,7 +85,7 @@ class ProductsService
             return $product;
         } catch (Exception $exception) {
             DB::rollBack();
-            throw new Exception(__("custom.defaults.create_failed"));
+            throw new Exception(__("custom.defaults.store_failed"));
         }
     }
 

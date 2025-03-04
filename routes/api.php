@@ -3,12 +3,11 @@
 use App\Http\Controllers\api\v1\BodyTypeController;
 use App\Http\Controllers\api\v1\ProductController;
 use App\Http\Controllers\api\v1\ShopController;
+use App\Http\Controllers\api\v1\UserAddressController;
 use App\Http\Controllers\api\v1\UserClothingController;
 use App\Http\Middleware\checkAdminAccessMiddleware;
 use App\Http\Middleware\checkApiKeyMiddleware;
 use App\Http\Middleware\checkShopAccessMiddleware;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\api\v1\AuthController;
 use App\Http\Controllers\api\v1\UserController;
@@ -51,6 +50,14 @@ Route::prefix('v1')->group(function () {
             Route::get("/", [UserClothingController::class, "index"]);
             Route::post("/upload/image", [UserClothingController::class, "uploadClothingImage"]);
             Route::delete("/{clothesId}", [UserClothingController::class, "delete"]);
+        });
+
+        Route::prefix('/address')->group(function () {
+            Route::get("/all", [UserAddressController::class, "index"]);
+            Route::get("/{addressId}", [UserAddressController::class, "show"]);
+            Route::post("/", [UserAddressController::class, "create"]);
+            Route::post("/update/{addressId}", [UserAddressController::class, "update"]);
+            Route::delete("/{addressId}", [UserAddressController::class, "delete"]);
         });
 
         Route::prefix('/shop')->group(function () {
