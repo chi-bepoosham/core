@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('no action');
-            $table->foreignId('user_address_id')->nullable()->constrained('user_address')->onDelete('no action');
+            $table->foreignId('user_address_id')->nullable()->constrained('user_addresses')->onDelete('no action');
             $table->enum('delivery_type', ['store', 'shipping'])->comment('نوع ارسال');
             $table->string('tracking_number')->unique()->comment('شماره پیگیری');
             $table->enum('status', ['inProgress', 'delivered', 'returned', 'canceled'])->default('inProgress')->comment('وضعیت سفارش');

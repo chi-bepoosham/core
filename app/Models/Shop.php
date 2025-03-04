@@ -30,6 +30,7 @@ class Shop extends Model
         'phone',
         'web_site',
         'email',
+        'shipping_fee',
     ];
 
     /**
@@ -59,6 +60,7 @@ class Shop extends Model
             'phone' => 'string',
             'web_site' => 'string',
             'email' => 'string',
+            'shipping_fee' => 'integer',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
             'deleted_at' => 'timestamp',

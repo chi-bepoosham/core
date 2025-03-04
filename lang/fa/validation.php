@@ -175,6 +175,7 @@ return [
         "brand_name" => "نام برند",
         "logo" => "لوگو",
         "web_site" => "سایت",
+        "shipping_fee" => "هزینه ارسال",
         "category_id" => "دسته بندی",
         "main_id" => "آیدی محصول اصلی",
         "color" => "رنگ",

@@ -38,6 +38,7 @@ class ValidateUpdateShop extends FormRequest
             'email' => 'nullable|email|unique:shops,email,' . $this->route('shopId'),
             'web_site' => 'nullable|url',
             'password' => 'nullable|string',
+            'shipping_fee' => 'nullable|integer',
         ];
 
         if (isset(request()->userAdmin)) {

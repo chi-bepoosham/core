@@ -37,6 +37,7 @@ class ValidateRegisterShop extends FormRequest
             'phone' => 'nullable|string|regex:/(0)[0-9]{10}/|size:11',
             'email' => 'nullable|email|unique:shops,email',
             'web_site' => 'nullable|url',
+            'shipping_fee' => 'nullable|integer',
         ];
     }
 
