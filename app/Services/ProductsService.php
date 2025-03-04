@@ -10,7 +10,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 use Throwable;
@@ -29,6 +28,9 @@ class ProductsService
      */
     public function index($inputs, array $relations = []): Collection|LengthAwarePaginator
     {
+        $sizes = [];
+        $colors = [];
+        $filterPrices = [];
         if (isset(request()->userShop)) {
             $inputs["shop_id"] = Auth::id();
         }
@@ -37,7 +39,42 @@ class ProductsService
             $relations = ['category', 'images'];
         }
 
-        return $this->repository->resolve_paginate(inputs: $inputs, relations: $relations);
+        if(isset($inputs['sizes'])){
+            $sizes = $inputs['sizes'];
+            unset($inputs['sizes']);
+        }
+
+        if(isset($inputs['colors'])){
+            $colors = $inputs['colors'];
+            unset($inputs['colors']);
+        }
+
+        if(isset($inputs['from_price']) && isset($inputs['to_price'])){
+            $filterPrices = [$inputs['from_price'], $inputs['to_price']];
+            unset($inputs['from_price']);
+            unset($inputs['to_price']);
+        }
+
+        $query = $this->repository->queryFull(inputs: $inputs, relations: $relations);
+
+        if (!empty($sizes)) {
+            $query->where(function ($query) use ($sizes) {
+                foreach ($sizes as $size) {
+                    $query->orWhereJsonContains('sizes', $size);
+                }
+            });
+        }
+
+        if (!empty($colors)) {
+            $query->whereIn('color', $colors);
+        }
+
+        if (!empty($filterPrices)) {
+            $query->whereBetween('price', $filterPrices);
+        }
+
+
+        return $this->repository->resolve_paginate(query: $query);
     }
 
     /**
@@ -83,7 +120,7 @@ class ProductsService
             $product = $this->repository->findWithRelations($createdItem->id);
             DB::commit();
             return $product;
-        } catch (Exception $exception) {
+        } catch (Exception) {
             DB::rollBack();
             throw new Exception(__("custom.defaults.store_failed"));
         }
