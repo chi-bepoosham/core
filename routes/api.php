@@ -53,6 +53,15 @@ Route::prefix('v1')->group(function () {
             Route::delete("/{clothesId}", [UserClothingController::class, "delete"]);
         });
 
+        Route::prefix('/shop')->group(function () {
+
+            Route::prefix('/product')->group(function () {
+                Route::get("/all", [ProductController::class, "indexUsers"]);
+                Route::get("/{productId}", [ProductController::class, "show"]);
+            });
+
+        });
+
         Route::get("/splash", [UserController::class, "splash"]);
         Route::post("/update/profile", [UserController::class, "updateUser"]);
 

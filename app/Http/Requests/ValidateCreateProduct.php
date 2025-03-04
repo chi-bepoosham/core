@@ -20,7 +20,7 @@ class ValidateCreateProduct extends FormRequest
             'title'=>'required|string',
             'category_id'=>'required|integer|exists:product_categories,id',
             'main_id'=>'nullable|integer|exists:products,id',
-            'color'=>'nullable|string|regex:/^(#(?:[0-9a-f]{2}){2,4}|#[0-9a-f]{3}|(?:rgba?|hsla?)\((?:\d+%?(?:deg|rad|grad|turn)?(?:,|\s)+){2,3}[\s\/]*[\d\.]+%?\))$/i',
+            'color' => ['nullable', 'string', 'regex:/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/'],
             'gender'=>'required|string|in:male,female,unisex',
             'sizes'=>'nullable|array',
             'description'=>'nullable|string',

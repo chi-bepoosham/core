@@ -24,12 +24,20 @@ class ProductsService
 
     /**
      * @param $inputs
+     * @param array $relations
      * @return Collection|LengthAwarePaginator
      */
-    public function index($inputs): Collection|LengthAwarePaginator
+    public function index($inputs, array $relations = []): Collection|LengthAwarePaginator
     {
-        $inputs["shop_id"] = Auth::id();
-        return $this->repository->resolve_paginate(inputs: $inputs, relations: $this->repository->relations());
+        if (isset(request()->userShop)) {
+            $inputs["shop_id"] = Auth::id();
+        }
+
+        if (empty($relations)) {
+            $relations = ['category', 'images'];
+        }
+
+        return $this->repository->resolve_paginate(inputs: $inputs, relations: $relations);
     }
 
     /**
@@ -44,9 +52,11 @@ class ProductsService
             throw new Exception(__("custom.defaults.not_found"));
         }
 
-        if (!isset(request()->userAdmin) && $item->shop_id != Auth::id()) {
+        if (isset(request()->userShop) && $item->shop_id != Auth::id()) {
             throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
         }
+
+        $item->related_products = $item->relatedProducts()->get();
 
         return $item;
     }

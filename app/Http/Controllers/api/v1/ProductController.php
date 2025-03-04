@@ -30,15 +30,27 @@ class ProductController extends Controller
         return ResponseHelper::responseSuccess($result);
     }
 
-
     /**
-     * @param int $shopId
+     * @param ValidateGetAllProductsRequest $request
      * @return JsonResponse
      */
-    public function show(int $shopId): JsonResponse
+    public function indexUsers(ValidateGetAllProductsRequest $request): JsonResponse
+    {
+        $inputs = $request->validated();
+        $relations = ['category', 'images'];
+        $result = $this->service->index($inputs, $relations);
+        return ResponseHelper::responseSuccess($result);
+    }
+
+
+    /**
+     * @param int $productId
+     * @return JsonResponse
+     */
+    public function show(int $productId): JsonResponse
     {
         try {
-            $data = $this->service->show($shopId);
+            $data = $this->service->show($productId);
             return ResponseHelper::responseSuccess($data);
         } catch (Exception $exception) {
             $message = $exception->getMessage();
@@ -67,14 +79,14 @@ class ProductController extends Controller
 
     /**
      * @param ValidateUpdateProduct $request
-     * @param int $shopId
+     * @param int $productId
      * @return JsonResponse
      */
-    public function update(ValidateUpdateProduct $request, int $shopId): JsonResponse
+    public function update(ValidateUpdateProduct $request, int $productId): JsonResponse
     {
         $inputs = $request->validated();
         try {
-            $data = $this->service->update($inputs, $shopId);
+            $data = $this->service->update($inputs, $productId);
             return ResponseHelper::responseSuccess($data);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
@@ -84,13 +96,13 @@ class ProductController extends Controller
     }
 
     /**
-     * @param int $shopId
+     * @param int $productId
      * @return JsonResponse
      */
-    public function delete(int $shopId): JsonResponse
+    public function delete(int $productId): JsonResponse
     {
         try {
-            $this->service->delete($shopId);
+            $this->service->delete($productId);
             $message = __("custom.defaults.delete_success");
             return ResponseHelper::responseSuccess([], $message);
         } catch (Exception $exception) {
