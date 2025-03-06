@@ -14,6 +14,7 @@ class Order extends Model
 
 
     protected $fillable = [
+        'shop_id',
         'user_id',
         'user_address_id',
         'delivery_type',
@@ -36,6 +37,7 @@ class Order extends Model
     protected function casts(): array
     {
         return [
+            'shop_id' => 'integer',
             'user_id' => 'integer',
             'user_address_id' => 'integer',
             'delivery_type' => 'string',
@@ -52,6 +54,11 @@ class Order extends Model
             'updated_at' => 'timestamp',
             'deleted_at' => 'timestamp',
         ];
+    }
+
+    public function shop(): BelongsTo
+    {
+        return $this->belongsTo(Shop::class,'shop_id')->withTrashed();
     }
 
     public function user(): BelongsTo

@@ -349,7 +349,7 @@ abstract class BaseRepository
         return $this->model->where($col, $value)->first();
     }
 
-    public function findWithInputs($inputs, $relations = []): null|object
+    public function findWithInputs($inputs, $relations = [],$withTrashed = false): null|object
     {
         /** @var Builder $query */
         $query = $this->model->query();
@@ -362,7 +362,7 @@ abstract class BaseRepository
             $query = $this->queryByRelations($query, $relations);
         }
 
-        return $query->first();
+        return $withTrashed ? $query->withTrashed()->first() : $query->first();
     }
 
     public function findFull($inputs, $relations = [], $selects = []): null|object

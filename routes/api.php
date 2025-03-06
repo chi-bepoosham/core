@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\api\v1\BodyTypeController;
+use App\Http\Controllers\api\v1\OrderController;
 use App\Http\Controllers\api\v1\ProductController;
 use App\Http\Controllers\api\v1\ShopController;
 use App\Http\Controllers\api\v1\UserAddressController;
@@ -62,9 +63,17 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('/shop')->group(function () {
 
+            Route::get("/search/all", [ProductController::class, "searchAll"]);
+
             Route::prefix('/product')->group(function () {
                 Route::get("/all", [ProductController::class, "indexUsers"]);
                 Route::get("/{productId}", [ProductController::class, "show"]);
+            });
+
+            Route::prefix('/orders')->group(function () {
+                Route::post("/register", [OrderController::class, "register"]);
+                Route::get("/{orderId}", [OrderController::class, "show"]);
+
             });
 
         });

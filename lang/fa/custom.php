@@ -55,5 +55,9 @@ return [
         'mobile_not_exist' => 'شماره موبایل انتخاب شده در سیستم وجود ندارد. لطفا ابتدا ثبت نام کنید',
         'register_exception' => 'هنگام ثبت نام خطایی پیش آمده است. لطفا دوباره تلاش کنید',
         'create_shop_exception' => 'هنگام ثبت فروشگاه جدید خطایی پیش آمده است. لطفا دوباره تلاش کنید',
+        'not_access_register_order_shop_not_found' => 'فروشگاه :shop در حال حاضر در دسترس نمی‌باشد',
+        'not_access_register_order_product_not_found' => 'محصول :product در حال حاضر در دسترس نمی‌باشد',
+        'not_access_register_order_product_size_not_found' => 'سایز انتخابی محصول :product در حال حاضر در دسترس نمی‌باشد',
+        'not_access_register_order_user_address' => 'شما اجازه ثبت سفارش برای این آدرس را ندارید',
     ],
 ];

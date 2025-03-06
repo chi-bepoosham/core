@@ -7,16 +7,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ValidateCreateProduct;
 use App\Http\Requests\ValidateGetAllProductsRequest;
 use App\Http\Requests\ValidateGetAllShopsRequest;
+use App\Http\Requests\ValidateRegisterOrder;
 use App\Http\Requests\ValidateSearchAllRequest;
 use App\Http\Requests\ValidateUpdateProduct;
 use App\Http\Requests\ValidateUpdateShop;
+use App\Services\OrdersService;
 use App\Services\ProductsService;
 use Exception;
 use Illuminate\Http\JsonResponse;
 
-class ProductController extends Controller
+class OrderController extends Controller
 {
-    public function __construct(public ProductsService $service)
+    public function __construct(public OrdersService $service)
     {
     }
 
@@ -31,38 +33,15 @@ class ProductController extends Controller
         return ResponseHelper::responseSuccess($result);
     }
 
-    /**
-     * @param ValidateGetAllProductsRequest $request
-     * @return JsonResponse
-     */
-    public function indexUsers(ValidateGetAllProductsRequest $request): JsonResponse
-    {
-        $inputs = $request->validated();
-        $relations = ['category', 'images'];
-        $result = $this->service->index($inputs, $relations);
-        return ResponseHelper::responseSuccess($result);
-    }
 
     /**
-     * @param ValidateSearchAllRequest $request
+     * @param int $orderId
      * @return JsonResponse
      */
-    public function searchAll(ValidateSearchAllRequest $request): JsonResponse
-    {
-        $inputs = $request->validated();
-        $result = $this->service->searchAll($inputs);
-        return ResponseHelper::responseSuccess($result);
-    }
-
-
-    /**
-     * @param int $productId
-     * @return JsonResponse
-     */
-    public function show(int $productId): JsonResponse
+    public function show(int $orderId): JsonResponse
     {
         try {
-            $data = $this->service->show($productId);
+            $data = $this->service->show($orderId);
             return ResponseHelper::responseSuccess($data);
         } catch (Exception $exception) {
             $message = $exception->getMessage();
@@ -72,14 +51,14 @@ class ProductController extends Controller
 
 
     /**
-     * @param ValidateCreateProduct $request
+     * @param ValidateRegisterOrder $request
      * @return JsonResponse
      */
-    public function create(ValidateCreateProduct $request): JsonResponse
+    public function register(ValidateRegisterOrder $request): JsonResponse
     {
         $inputs = $request->validated();
         try {
-            $data = $this->service->create($inputs);
+            $data = $this->service->register($inputs);
             return ResponseHelper::responseSuccess($data);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
@@ -91,14 +70,14 @@ class ProductController extends Controller
 
     /**
      * @param ValidateUpdateProduct $request
-     * @param int $productId
+     * @param int $orderId
      * @return JsonResponse
      */
-    public function update(ValidateUpdateProduct $request, int $productId): JsonResponse
+    public function update(ValidateUpdateProduct $request, int $orderId): JsonResponse
     {
         $inputs = $request->validated();
         try {
-            $data = $this->service->update($inputs, $productId);
+            $data = $this->service->update($inputs, $orderId);
             return ResponseHelper::responseSuccess($data);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
@@ -108,13 +87,13 @@ class ProductController extends Controller
     }
 
     /**
-     * @param int $productId
+     * @param int $orderId
      * @return JsonResponse
      */
-    public function delete(int $productId): JsonResponse
+    public function delete(int $orderId): JsonResponse
     {
         try {
-            $this->service->delete($productId);
+            $this->service->delete($orderId);
             $message = __("custom.defaults.delete_success");
             return ResponseHelper::responseSuccess([], $message);
         } catch (Exception $exception) {

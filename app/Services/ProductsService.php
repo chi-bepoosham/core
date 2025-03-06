@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Repositories\ProductRepository;
+use App\Http\Repositories\ShopRepository;
 use App\Models\ProductImage;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -75,6 +76,33 @@ class ProductsService
 
 
         return $this->repository->resolve_paginate(query: $query);
+    }
+
+
+    /**
+     * @param $inputs
+     * @return array
+     */
+    public function searchAll($inputs): array
+    {
+        $contentSearch = $inputs["content_search"];
+
+        $productInputs = $inputs;
+        $productInputs["title"] = $contentSearch;
+
+        $shopInputs = $inputs;
+        $shopInputs["name"] = $contentSearch;
+        $shopRepo = new ShopRepository();
+
+        $products = $this->repository->resolve_paginate(inputs: $productInputs);
+
+        $shops = $shopRepo->resolve_paginate(inputs: $shopInputs);
+
+
+        return [
+            "products"=>$products,
+            "shops"=>$shops,
+        ];
     }
 
     /**

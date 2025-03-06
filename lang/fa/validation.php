@@ -188,5 +188,13 @@ return [
         "images" => "تصاویر",
         "from_price" => "قیمت از",
         "to_price" => "قیمت تا",
+        "content_search" => "جستجو",
+        "shop_id" => "شناسه فروشگاه",
+        "user_address_id" => "شناسه آدرس کاربر",
+        "delivery_type" => "نوع ارسال",
+        "items" => "آیتم ها",
+        "items.*.product_id" => "شناسه محصول",
+        "items.*.selected_size" => "سایز انتخاب شده",
+        "items.*.count" => "تعداد",
     ]
 ];
