@@ -5,10 +5,12 @@ namespace App\Http\Controllers\api\v1;
 use App\Helpers\Response\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ValidateCreateProduct;
+use App\Http\Requests\ValidateGetAllOrdersRequest;
 use App\Http\Requests\ValidateGetAllProductsRequest;
 use App\Http\Requests\ValidateGetAllShopsRequest;
 use App\Http\Requests\ValidateRegisterOrder;
 use App\Http\Requests\ValidateSearchAllRequest;
+use App\Http\Requests\ValidateUpdateOrder;
 use App\Http\Requests\ValidateUpdateProduct;
 use App\Http\Requests\ValidateUpdateShop;
 use App\Services\OrdersService;
@@ -23,10 +25,10 @@ class OrderController extends Controller
     }
 
     /**
-     * @param ValidateGetAllProductsRequest $request
+     * @param ValidateGetAllOrdersRequest $request
      * @return JsonResponse
      */
-    public function index(ValidateGetAllProductsRequest $request): JsonResponse
+    public function index(ValidateGetAllOrdersRequest $request): JsonResponse
     {
         $inputs = $request->validated();
         $result = $this->service->index($inputs);
@@ -69,11 +71,11 @@ class OrderController extends Controller
 
 
     /**
-     * @param ValidateUpdateProduct $request
+     * @param ValidateUpdateOrder $request
      * @param int $orderId
      * @return JsonResponse
      */
-    public function update(ValidateUpdateProduct $request, int $orderId): JsonResponse
+    public function update(ValidateUpdateOrder $request, int $orderId): JsonResponse
     {
         $inputs = $request->validated();
         try {

@@ -7,15 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 
 class UserClothes extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'user_clothes';
 
     protected $fillable = [
         'user_id',
         'image',
+        'title',
         'match_percentage',
         'clothes_type',
         'process_status',
@@ -32,6 +36,7 @@ class UserClothes extends Model
         return [
             'user_id' => 'integer',
             'image' => 'string',
+            'title' => 'string',
             'match_percentage' => 'integer',
             'clothes_type' => 'integer',
             'process_status' => 'integer',

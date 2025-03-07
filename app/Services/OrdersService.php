@@ -7,6 +7,7 @@ use App\Http\Repositories\ProductRepository;
 use App\Http\Repositories\ShopRepository;
 use App\Http\Repositories\UserAddressRepository;
 use App\Models\OrderItem;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -27,8 +28,29 @@ class OrdersService
      */
     public function index($inputs, array $relations = []): Collection|LengthAwarePaginator
     {
-        $inputs["user_id"] = Auth::id();
-        return $this->repository->resolve_paginate(inputs: $inputs, relations: $relations);
+        if (isset(request()->userShop)) {
+            $inputs["shop_id"] = Auth::id();
+        } elseif (!isset(request()->userAdmin) && !isset(request()->userShop)) {
+            $inputs["user_id"] = Auth::id();
+        }
+
+        $filterDates = [];
+
+        if (empty($relations)) {
+            $relations = ['shop', 'items'];
+        }
+
+        if (isset($inputs['from_date']) && isset($inputs['to_date'])) {
+            $filterDates = [Carbon::parse($inputs['from_date'])->startOfDay(), Carbon::parse($inputs['to_date'])->endOfDay()];
+        }
+
+        $query = $this->repository->queryFull(inputs: $inputs, relations: $relations);
+
+        if (!empty($filterDates)) {
+            $query->whereBetween('created_at', $filterDates);
+        }
+
+        return $this->repository->resolve_paginate(query: $query);
     }
 
 
@@ -44,9 +66,12 @@ class OrdersService
             throw new Exception(__("custom.defaults.not_found"));
         }
 
-        if ($item->user_id != Auth::id()) {
+        if (isset(request()->userShop) && $item->shop_id != Auth::id()) {
+            throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
+        } elseif (!isset(request()->userAdmin) && !isset(request()->userShop) && $item->user_id != Auth::id()) {
             throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
         }
+
 
         return $item;
     }
@@ -102,9 +127,53 @@ class OrdersService
             throw new Exception(__("custom.defaults.not_found"));
         }
 
-        if ($item->user_id != Auth::id()) {
+        if (isset(request()->userShop) && $item->shop_id != Auth::id()) {
+            throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
+        } elseif (!isset(request()->userAdmin) && !isset(request()->userShop)  && $item->user_id != Auth::id()) {
             throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
         }
+
+        if (isset($inputs["user_address_id"])) {
+            if (!isset(request()->userShop) && !isset(request()->userAdmin) ) {
+                $userAddress = (new UserAddressRepository())->find($inputs["user_address_id"]);
+                if ($userAddress == null || $userAddress->user_id != Auth::id()) {
+                    throw new Exception(__("custom.shop.not_access_register_order_user_address"));
+                }
+            }
+        }
+
+        if (isset($inputs["status"])) {
+
+            if (!isset(request()->userAdmin)) {
+
+                if ($item->status != $inputs["status"] && $item->status != "inProgress") {
+
+                    if ($item->status == "delivered") {
+                        throw new Exception(__("custom.shop.not_access_update_order_delivered"));
+                    }
+                    if ($item->status == "returned") {
+                        throw new Exception(__("custom.shop.not_access_update_order_returned"));
+                    }
+                    if ($item->status == "canceled") {
+                        throw new Exception(__("custom.shop.not_access_update_order_canceled"));
+                    }
+
+                }
+
+            }
+
+            if ($inputs["status"] == "delivered") {
+                $inputs["progress_status"] = "delivered";
+            }
+            if ($inputs["status"] == "returned") {
+                $inputs["progress_status"] = "returned";
+            }
+            if ($inputs["status"] == "canceled") {
+                $inputs["progress_status"] = "canceled";
+            }
+
+        }
+
 
 
         DB::beginTransaction();
@@ -131,7 +200,7 @@ class OrdersService
             throw new Exception(__("custom.defaults.not_found"));
         }
 
-        if ($item->user_id != Auth::id()) {
+        if (!isset(request()->userAdmin)) {
             throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
         }
 

@@ -4,10 +4,20 @@ namespace App\Http\Requests;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class ValidateCreateProduct extends FormRequest
 {
+
+    public function prepareForValidation(): void
+    {
+        if (isset(request()->userShop)){
+            $this->merge([
+                'shop_id' => Auth::id()
+            ]);
+        }
+    }
 
 
 
@@ -17,9 +27,10 @@ class ValidateCreateProduct extends FormRequest
     public function rules(): array
     {
         return [
+            'shop_id' => 'required|integer|exists:shops,id,deleted_at,NULL',
             'title'=>'required|string',
-            'category_id'=>'required|integer|exists:product_categories,id',
-            'main_id'=>'nullable|integer|exists:products,id',
+            'category_id'=>'required|integer|exists:product_categories,id,deleted_at,NULL',
+            'main_id'=>'nullable|integer|exists:products,id,deleted_at,NULL',
             'color' => ['nullable', 'string', 'regex:/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/'],
             'gender'=>'required|string|in:male,female,unisex',
             'sizes'=>'nullable|array',

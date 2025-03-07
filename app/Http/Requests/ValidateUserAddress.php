@@ -16,8 +16,8 @@ class ValidateUserAddress extends FormRequest
         return [
             'full_name' => 'required|string',
             'phone' => 'required|regex:/^(0){1}[0-9]{10}+$/|',
-            'province_id' => 'required|integer|exists:provinces,id',
-            'city_id' => 'required|integer|exists:cities,id',
+            'province_id' => 'required|integer|exists:provinces,id,deleted_at,NULL',
+            'city_id' => 'required|integer|exists:cities,id,deleted_at,NULL',
             'address' => 'required|string',
             'postal_code' => 'nullable|string|size:10',
         ];

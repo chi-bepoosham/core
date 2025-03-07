@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\SendRedisMessage;
+use App\Models\UserBodyTypeHistory;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -37,6 +38,7 @@ class UsersService
 
         $data = new \stdClass();
         $data->user = $user;
+        $data->user->body_type = $user->bodyType;
         return $data;
     }
 
@@ -67,7 +69,7 @@ class UsersService
         $inputs["email"] = $inputs["email"] ?? null;
 
 
-        if ($inputs["email"] != null){
+        if ($inputs["email"] != null) {
             $existUserItem = User::query()->whereNot("id", Auth::id())->where("email", $inputs["email"])->first();
             if ($existUserItem != null) {
                 throw new Exception(__("custom.user.email_exist"));
@@ -103,11 +105,7 @@ class UsersService
             throw new Exception(__("custom.user.not_exist"));
         }
 
-        if ($userItem->process_body_image_status == 1){
-            throw new Exception(__("custom.user.body_type_not_detected"));
-        }
-
-        if ($userItem->process_body_image_status == 2){
+        if ($userItem->process_body_image_status == 1) {
             throw new Exception(__("custom.user.body_type_not_detected"));
         }
 
@@ -117,6 +115,12 @@ class UsersService
         DB::beginTransaction();
         try {
             $createdItem = $this->repository->update($userItem, $inputs);
+
+            UserBodyTypeHistory::query()->create([
+                "user_id" => $userItem->id,
+                "body_image" => $inputs["body_image"],
+                "user_data" => json_encode($userItem),
+            ]);
 
             $data = [
                 "action" => "body_type",
@@ -154,7 +158,7 @@ class UsersService
             return $result;
         }
 
-        throw new Exception(__("custom.user.body_type_not_detected"),409);
+        throw new Exception(__("custom.user.body_type_not_detected"), 409);
     }
 
 
@@ -170,7 +174,7 @@ class UsersService
                 $image = new UploadedFile($imageEncoded->basePath(), $imageFile->getFilename());
 
 
-                $imageName = sha1(md5(Auth::id())) . '.' . $extension;
+                $imageName = sha1(md5(Auth::id())) . time() . rand(100, 999) . '.' . $extension;
                 $path = 'user/' . $folder;
                 $fullPath = Storage::putFileAs(path: $path, file: $image, name: $imageName, options: ['visibility' => 'public', 'directory_visibility' => 'public']);
 

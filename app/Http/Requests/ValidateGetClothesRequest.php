@@ -15,7 +15,7 @@ class ValidateGetClothesRequest extends FormRequest
     {
         return [
             'clothes_type'=>'nullable|integer|min:1|max:3',
-            'process_status'=>'nullable|integer|min:1|max:2',
+            'process_status'=>'nullable|integer|min:1|max:3',
             'paginate'=>'nullable|boolean',
             'page'=>'nullable|integer|min:1',
             'per_page'=>'nullable|integer|min:1',

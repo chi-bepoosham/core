@@ -17,6 +17,7 @@ class ValidateUploadImage extends FormRequest
     {
         return [
             'image' => 'required|file|mimes:jpg,jpeg,png,wep,webp',
+            'title' => 'nullable|string',
         ];
     }
 

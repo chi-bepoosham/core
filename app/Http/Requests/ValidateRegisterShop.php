@@ -23,8 +23,8 @@ class ValidateRegisterShop extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'province_id' => 'required|integer|exists:provinces,id',
-            'city_id' => 'required|integer|exists:cities,id',
+            'province_id' => 'required|integer|exists:provinces,id,deleted_at,NULL',
+            'city_id' => 'required|integer|exists:cities,id,deleted_at,NULL',
             'address' => 'required|string',
             'location_lat' => 'nullable|string|regex:/^[-]?[\d]+[.][\d]*$/|min:6|max:20',
             'location_lng' => 'nullable|string|regex:/^[-]?[\d]+[.][\d]*$/|min:6|max:20',

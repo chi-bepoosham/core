@@ -133,7 +133,6 @@ class ProductsService
      */
     public function create($inputs): mixed
     {
-        $inputs["shop_id"] = Auth::id();
         $inputs["sizes"] = $inputs["sizes"] ?? [];
 
 

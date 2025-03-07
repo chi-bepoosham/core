@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('image');
             $table->integer('match_percentage')->nullable()->comment('درصد مطابقت');
             $table->tinyInteger('clothes_type')->nullable()->comment('نوع لباس :  1-بالا پوش  2-پایین پوش 3-تمام پوش');
-            $table->tinyInteger('process_status')->default(1)->comment('وضعیت پردازش:  1-در حال پردازش  2-پردازش شده');
+            $table->tinyInteger('process_status')->default(1)->comment('وضعیت پردازش:  1-در حال پردازش  2-پردازش شده 3- خطا در اعتبار سنجی تصویر');
             $table->timestamps();
         });
     }

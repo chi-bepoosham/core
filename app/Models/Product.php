@@ -66,6 +66,11 @@ class Product extends Model
 
     protected $appends = ['other_colors'];
 
+    public function shop(): BelongsTo
+    {
+        return $this->belongsTo(Shop::class,'shop_id')->withTrashed();
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class)->withTrashed();

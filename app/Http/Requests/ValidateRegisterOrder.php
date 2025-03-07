@@ -17,11 +17,11 @@ class ValidateRegisterOrder extends FormRequest
     {
         return [
             'shop_id' => 'required|integer|exists:shops,id,deleted_at,NULL',
-            'user_address_id' => 'required|integer|exists:user_addresses,id',
+            'user_address_id' => 'required|integer|exists:user_addresses,id,deleted_at,NULL',
             'delivery_type' => 'required|string|in:store,shipping',
             'description' => 'nullable|string',
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|integer|exists:products,id',
+            'items.*.product_id' => 'required|integer|exists:products,id,deleted_at,NULL',
             'items.*.selected_size' => 'required|string',
             'items.*.count' => 'required|integer|min:1',
         ];

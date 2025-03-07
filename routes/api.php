@@ -6,6 +6,7 @@ use App\Http\Controllers\api\v1\ProductController;
 use App\Http\Controllers\api\v1\ShopController;
 use App\Http\Controllers\api\v1\UserAddressController;
 use App\Http\Controllers\api\v1\UserClothingController;
+use App\Http\Controllers\api\v1\UserMarkedProductController;
 use App\Http\Middleware\checkAdminAccessMiddleware;
 use App\Http\Middleware\checkApiKeyMiddleware;
 use App\Http\Middleware\checkShopAccessMiddleware;
@@ -48,7 +49,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('clothes')->group(function () {
-            Route::get("/", [UserClothingController::class, "index"]);
+            Route::get("/all", [UserClothingController::class, "index"]);
             Route::post("/upload/image", [UserClothingController::class, "uploadClothingImage"]);
             Route::delete("/{clothesId}", [UserClothingController::class, "delete"]);
         });
@@ -68,12 +69,18 @@ Route::prefix('v1')->group(function () {
             Route::prefix('/product')->group(function () {
                 Route::get("/all", [ProductController::class, "indexUsers"]);
                 Route::get("/{productId}", [ProductController::class, "show"]);
+
+                Route::prefix('/marked')->group(function () {
+                    Route::get("/all", [UserMarkedProductController::class, "index"]);
+                    Route::patch("/{productId}/{markedStatus}", [UserMarkedProductController::class, "changeMarkedStatus"]);
+                });
             });
 
             Route::prefix('/orders')->group(function () {
-                Route::post("/register", [OrderController::class, "register"]);
+                Route::get("/all", [OrderController::class, "index"]);
                 Route::get("/{orderId}", [OrderController::class, "show"]);
-
+                Route::post("/register", [OrderController::class, "register"]);
+                Route::put("/{orderId}", [OrderController::class, "update"]);
             });
 
         });
@@ -106,6 +113,13 @@ Route::prefix('v1')->group(function () {
             Route::delete("/{productId}", [ProductController::class, "delete"]);
         });
 
+        Route::prefix('/orders')->group(function () {
+            Route::get("/all", [OrderController::class, "index"]);
+            Route::get("/{orderId}", [OrderController::class, "show"]);
+            Route::put("/{orderId}", [OrderController::class, "update"]);
+        });
+
+
     });
 
 
@@ -122,6 +136,21 @@ Route::prefix('v1')->group(function () {
             Route::get("/{shopId}", [ShopController::class, "show"]);
             Route::post("/update/{shopId}", [ShopController::class, "update"]);
             Route::delete("/{shopId}", [ShopController::class, "delete"]);
+        });
+
+        Route::prefix('/product')->group(function () {
+            Route::get("/all", [ProductController::class, "index"]);
+            Route::get("/{productId}", [ProductController::class, "show"]);
+            Route::post("/", [ProductController::class, "create"]);
+            Route::post("/update/{productId}", [ProductController::class, "update"]);
+            Route::delete("/{productId}", [ProductController::class, "delete"]);
+        });
+
+        Route::prefix('/orders')->group(function () {
+            Route::get("/all", [OrderController::class, "index"]);
+            Route::get("/{orderId}", [OrderController::class, "show"]);
+            Route::put("/{orderId}", [OrderController::class, "update"]);
+            Route::delete("/{orderId}", [OrderController::class, "delete"]);
         });
 
     });

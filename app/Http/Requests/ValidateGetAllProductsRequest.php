@@ -15,9 +15,9 @@ class ValidateGetAllProductsRequest extends FormRequest
     {
         return [
             'title' => 'nullable|string',
-            'shop_id' => 'nullable|integer|exists:shops,id',
-            'category_id' => 'nullable|integer|exists:product_categories,id',
-            'main_id' => 'nullable|integer|exists:products,id',
+            'shop_id' => 'nullable|integer|exists:shops,id,deleted_at,NULL',
+            'category_id' => 'nullable|integer|exists:product_categories,id,deleted_at,NULL',
+            'main_id' => 'nullable|integer|exists:products,id,deleted_at,NULL',
             'gender' => 'nullable|string|in:male,female,unisex',
             'is_available' => 'nullable|integer|min:0|max:1',
             'sizes' => 'nullable|array',

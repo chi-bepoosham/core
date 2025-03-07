@@ -17,8 +17,8 @@ class ValidateUpdateProduct extends FormRequest
     {
         return [
             'title' => 'required|string',
-            'category_id' => 'required|integer|exists:product_categories,id',
-            'main_id' => 'nullable|integer|exists:products,id',
+            'category_id' => 'required|integer|exists:product_categories,id,deleted_at,NULL',
+            'main_id' => 'nullable|integer|exists:products,id,deleted_at,NULL',
             'color' => ['nullable', 'string', 'regex:/^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/'],
             'gender' => 'required|string|in:male,female,unisex',
             'sizes' => 'nullable|array',

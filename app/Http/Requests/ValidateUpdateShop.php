@@ -23,8 +23,8 @@ class ValidateUpdateShop extends FormRequest
     {
         $rules = [
             'name' => 'required|string',
-            'province_id' => 'required|integer|exists:provinces,id',
-            'city_id' => 'required|integer|exists:cities,id',
+            'province_id' => 'required|integer|exists:provinces,id,deleted_at,NULL',
+            'city_id' => 'required|integer|exists:cities,id,deleted_at,NULL',
             'address' => 'required|string',
             'location_lat' => 'nullable|string|regex:/^[-]?[\d]+[.][\d]*$/|min:6|max:20',
             'location_lng' => 'nullable|string|regex:/^[-]?[\d]+[.][\d]*$/|min:6|max:20',
@@ -44,7 +44,7 @@ class ValidateUpdateShop extends FormRequest
         if (isset(request()->userAdmin)) {
             return $rules +
                 [
-                    'main_id' => 'nullable|integer|exists:shops,id',
+                    'main_id' => 'nullable|integer|exists:shops,id,deleted_at,NULL',
                     'is_active' => 'nullable|integer|min:0|max:1',
                     'is_verified' => 'nullable|integer|min:0|max:1',
                 ];
