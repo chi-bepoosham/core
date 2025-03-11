@@ -188,6 +188,8 @@ return [
         "price" => "قیمت",
         "is_available" => "وضعیت موجود بودن",
         "images" => "تصاویر",
+        "date_time" => "تاریخ و ساعت",
+        "wallet_id" => "شناسه کیف پول",
         "from_price" => "قیمت از",
         "to_price" => "قیمت تا",
         "content_search" => "جستجو",

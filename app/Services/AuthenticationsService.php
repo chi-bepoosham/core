@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Repositories\ShopRepository;
 use App\Http\Repositories\SystemUserRepository;
+use App\Http\Repositories\WalletRepository;
 use App\Models\Shop;
 use Carbon\Carbon;
 use Exception;
@@ -204,6 +205,10 @@ class AuthenticationsService
             $inputs["password"] = Hash::make($inputs["mobile"]);
 
             $createdItem = $this->createShop($inputs);
+
+            # create default wallet
+            $this->createShopWallet($createdItem->id);
+
             $shop = Shop::query()->find($createdItem->id);
             $token = $this->generateToken($shop, 'shop');
 
@@ -276,6 +281,18 @@ class AuthenticationsService
             DB::rollBack();
             throw new Exception(__("custom.shop.create_shop_exception"));
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function createShopWallet($shopId): void
+    {
+        (new WalletsService(new WalletRepository()))->create(
+            [
+                "shop_id" => $shopId,
+            ]
+        );
     }
 
     public function generateOtpRandom(): int

@@ -7,6 +7,8 @@ use App\Http\Controllers\api\v1\ShopController;
 use App\Http\Controllers\api\v1\UserAddressController;
 use App\Http\Controllers\api\v1\UserClothingController;
 use App\Http\Controllers\api\v1\UserMarkedProductController;
+use App\Http\Controllers\api\v1\WalletController;
+use App\Http\Controllers\api\v1\WalletTransactionController;
 use App\Http\Middleware\checkAdminAccessMiddleware;
 use App\Http\Middleware\checkApiKeyMiddleware;
 use App\Http\Middleware\checkShopAccessMiddleware;
@@ -153,6 +155,20 @@ Route::prefix('v1')->group(function () {
             Route::post("/register", [OrderController::class, "register"]);
             Route::put("/{orderId}", [OrderController::class, "update"]);
             Route::delete("/{orderId}", [OrderController::class, "delete"]);
+        });
+
+        Route::prefix('/wallet')->group(function () {
+            Route::get("/all", [WalletController::class, "index"]);
+            Route::get("/{shopId}", [WalletController::class, "show"]);
+            Route::delete("/{shopId}", [WalletController::class, "delete"]);
+
+            Route::prefix('/transaction')->group(function () {
+                Route::get("/all", [WalletTransactionController::class, "index"]);
+                Route::post("/", [WalletTransactionController::class, "create"]);
+                Route::get("/{walletTransactionId}", [WalletTransactionController::class, "show"]);
+                Route::put("/{walletTransactionId}", [WalletTransactionController::class, "update"]);
+                Route::delete("/{walletTransactionId}", [WalletTransactionController::class, "delete"]);
+            });
         });
 
     });
