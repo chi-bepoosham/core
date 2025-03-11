@@ -30,6 +30,7 @@ class ShopsService
 
         $data = new \stdClass();
         $data->shop = $shop;
+        $data->shop->wallet = $shop->wallet;
         $data->shop->province = $shop->province;
         $data->shop->city = $shop->city;
         return $data;

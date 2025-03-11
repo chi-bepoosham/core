@@ -122,6 +122,15 @@ Route::prefix('v1')->group(function () {
             Route::put("/{orderId}", [OrderController::class, "update"]);
         });
 
+        Route::prefix('/wallet')->group(function () {
+            Route::get("/{shopId}", [WalletController::class, "show"]);
+
+            Route::prefix('/transaction')->group(function () {
+                Route::get("/all", [WalletTransactionController::class, "index"]);
+                Route::get("/{walletTransactionId}", [WalletTransactionController::class, "show"]);
+            });
+        });
+
 
     });
 

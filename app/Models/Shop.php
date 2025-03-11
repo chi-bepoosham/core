@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Shop extends Model
@@ -85,5 +86,10 @@ class Shop extends Model
     public function products():HasMany
     {
         return $this->hasMany(Product::class,'shop_id');
+    }
+
+    public function wallet():HasOne
+    {
+        return $this->hasOne(Wallet::class,'shop_id');
     }
 }

@@ -4,9 +4,20 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class ValidateGetAllWalletTransactionsRequest extends FormRequest
 {
+    public function prepareForValidation(): void
+    {
+        if (isset(request()->userShop)) {
+            $this->merge([
+                'shop_id' => Auth::id(),
+                'wallet_id' => null
+            ]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
