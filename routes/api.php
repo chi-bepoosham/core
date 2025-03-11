@@ -101,6 +101,7 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('/')->group(function () {
+            Route::get("/splash", [ShopController::class, "splash"]);
             Route::get("/{shopId}", [ShopController::class, "show"]);
             Route::post("/update/{shopId}", [ShopController::class, "update"]);
         });
@@ -149,6 +150,7 @@ Route::prefix('v1')->group(function () {
         Route::prefix('/orders')->group(function () {
             Route::get("/all", [OrderController::class, "index"]);
             Route::get("/{orderId}", [OrderController::class, "show"]);
+            Route::post("/register", [OrderController::class, "register"]);
             Route::put("/{orderId}", [OrderController::class, "update"]);
             Route::delete("/{orderId}", [OrderController::class, "delete"]);
         });

@@ -15,7 +15,7 @@ class ValidateRegisterOrder extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'shop_id' => 'required|integer|exists:shops,id,deleted_at,NULL',
             'user_address_id' => 'required|integer|exists:user_addresses,id,deleted_at,NULL',
             'delivery_type' => 'required|string|in:store,shipping',
@@ -25,6 +25,15 @@ class ValidateRegisterOrder extends FormRequest
             'items.*.selected_size' => 'required|string',
             'items.*.count' => 'required|integer|min:1',
         ];
+
+        if (isset(request()->userAdmin)) {
+            return $rules +
+                [
+                    'user_id' => 'required|integer|exists:users,id,deleted_at,NULL',
+                ];
+        }
+
+        return $rules;
     }
 
 

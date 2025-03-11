@@ -31,6 +31,8 @@ class Shop extends Model
         'web_site',
         'email',
         'shipping_fee',
+        'card_number',
+        'sheba_number',
     ];
 
     /**
@@ -61,6 +63,8 @@ class Shop extends Model
             'web_site' => 'string',
             'email' => 'string',
             'shipping_fee' => 'integer',
+            'card_number' => 'string',
+            'sheba_number' => 'string',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
             'deleted_at' => 'timestamp',

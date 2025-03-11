@@ -39,6 +39,8 @@ class ValidateUpdateShop extends FormRequest
             'web_site' => 'nullable|url',
             'password' => 'nullable|string',
             'shipping_fee' => 'nullable|integer',
+            'card_number' => 'nullable|string|size:16',
+            'sheba_number' => 'nullable|string|min:24|max:26',
         ];
 
         if (isset(request()->userAdmin)) {

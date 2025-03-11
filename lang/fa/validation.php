@@ -176,6 +176,8 @@ return [
         "logo" => "لوگو",
         "web_site" => "سایت",
         "shipping_fee" => "هزینه ارسال",
+        "card_number" => "شماره کارت",
+        "sheba_number" => "شماره شبا",
         "category_id" => "دسته بندی",
         "main_id" => "آیدی محصول اصلی",
         "color" => "رنگ",

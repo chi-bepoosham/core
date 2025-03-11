@@ -1,11 +1,24 @@
 <?php
 
+use App\Http\Repositories\UserRepository;
+use App\Services\AuthenticationsService;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    public function createSystemUser(): void
+    {
+        (new AuthenticationsService(new UserRepository()))->createUser(
+            [
+                'first_name' => 'System',
+                'last_name' => 'User',
+                'mobile' => '09000000000',
+            ]
+        );
+    }
+
     /**
      * Run the migrations.
      */
@@ -25,6 +38,8 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
+
+        $this->createSystemUser();
     }
 
     /**

@@ -16,6 +16,24 @@ class ShopController extends Controller
     {
     }
 
+
+
+    /**
+     * @return JsonResponse
+     */
+    public function splash(): JsonResponse
+    {
+        try {
+            $result = $this->service->splash();
+            return ResponseHelper::responseSuccess($result);
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            $code = $exception->getCode();
+            return ResponseHelper::responseCustomError($message, $code);
+        }
+    }
+
+
     /**
      * @param ValidateGetAllShopsRequest $request
      * @return JsonResponse

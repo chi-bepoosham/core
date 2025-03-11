@@ -20,6 +20,22 @@ class ShopsService
     {
     }
 
+
+    /**
+     * @return \stdClass
+     */
+    public function splash(): \stdClass
+    {
+        $shop = $this->repository->find(Auth::id());
+
+        $data = new \stdClass();
+        $data->shop = $shop;
+        $data->shop->province = $shop->province;
+        $data->shop->city = $shop->city;
+        return $data;
+    }
+
+
     /**
      * @param $inputs
      * @return Collection|LengthAwarePaginator

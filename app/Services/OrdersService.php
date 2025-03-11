@@ -83,12 +83,18 @@ class OrdersService
      */
     public function register($inputs): mixed
     {
-        $inputs["user_id"] = Auth::id();
+        if (isset(request()->userAdmin)) {
+            $userId = $inputs["user_id"];
+        }else{
+            $userId = Auth::id();
+        }
+
+        $inputs["user_id"] = $userId;
 
         $shop = (new ShopRepository())->find($inputs["shop_id"]);
 
         $userAddress = (new UserAddressRepository())->find($inputs["user_address_id"]);
-        if ($userAddress == null || $userAddress->user_id != Auth::id()) {
+        if ($userAddress == null || $userAddress->user_id != $userId) {
             throw new Exception(__("custom.shop.not_access_register_order_user_address"));
         }
         $inputs["tracking_number"] = $this->generateTrackingCode();
