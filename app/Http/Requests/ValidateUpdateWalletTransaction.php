@@ -16,11 +16,11 @@ class ValidateUpdateWalletTransaction extends FormRequest
     public function rules(): array
     {
         return [
-            'order_id'=>'nullable|integer|exists:orders,id,deleted_at,NULL',
-            'type' => 'required|string|in:order,ads,withdraw',
-            'amount'=>'required|integer|min:1000',
-            'date_time'=>'nullable|date_format:Y-m-d H:i:s',
-            'description'=>'nullable|string',
+            'order_id' => 'nullable|integer|exists:orders,id,deleted_at,NULL',
+            'type' => 'required|string|in:order,cancel_order,return_order,ads,withdraw',
+            'amount' => 'required|integer|min:1000',
+            'date_time' => 'nullable|date_format:Y-m-d H:i:s',
+            'description' => 'nullable|string',
         ];
     }
 

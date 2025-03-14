@@ -59,6 +59,9 @@ class OrderPaymentsService
                 'progress_status' => 'waitingForConfirm'
             ]);
 
+            # deposit to shop wallet
+            WalletsService::depositToWallet($orderPayment->order_id);
+
             DB::commit();
 
             $result['status'] = 'success';

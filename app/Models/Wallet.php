@@ -30,6 +30,7 @@ class Wallet extends Model
             'balance' => 'integer',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
         ];
     }
 

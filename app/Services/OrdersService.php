@@ -190,6 +190,7 @@ class OrdersService
             throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
         }
 
+
         if (isset($inputs["user_address_id"])) {
             if (!isset(request()->userShop) && !isset(request()->userAdmin)) {
                 $userAddress = (new UserAddressRepository())->find($inputs["user_address_id"]);
@@ -201,41 +202,41 @@ class OrdersService
 
         if (isset($inputs["status"])) {
 
-            if (!isset(request()->userAdmin)) {
+            if ($item->status != $inputs["status"] && $item->status != "inProgress") {
 
-                if ($item->status != $inputs["status"] && $item->status != "inProgress") {
-
-                    if ($item->status == "delivered") {
-                        throw new Exception(__("custom.shop.not_access_update_order_delivered"));
-                    }
-                    if ($item->status == "returned") {
-                        throw new Exception(__("custom.shop.not_access_update_order_returned"));
-                    }
-                    if ($item->status == "canceled") {
-                        throw new Exception(__("custom.shop.not_access_update_order_canceled"));
-                    }
-
+                if ($item->status == config('order.Status.Delivered')) {
+                    throw new Exception(__("custom.shop.not_access_update_order_delivered"));
+                }
+                if ($item->status == config('order.Status.Returned')) {
+                    throw new Exception(__("custom.shop.not_access_update_order_returned"));
+                }
+                if ($item->status == config('order.Status.Canceled')) {
+                    throw new Exception(__("custom.shop.not_access_update_order_canceled"));
                 }
 
             }
 
-            if ($inputs["status"] == "delivered") {
-                $inputs["progress_status"] = "delivered";
+            if ($inputs["status"] == config('order.Status.Delivered')) {
+                $inputs["progress_status"] = config('order.ProgressStatus.Delivered');
             }
-            if ($inputs["status"] == "returned") {
-                $inputs["progress_status"] = "returned";
+            if ($inputs["status"] == config('order.Status.Returned')) {
+                $inputs["progress_status"] = config('order.ProgressStatus.Returned');
             }
-            if ($inputs["status"] == "canceled") {
-                $inputs["progress_status"] = "canceled";
+            if ($inputs["status"] == config('order.Status.Canceled')) {
+                $inputs["progress_status"] = config('order.ProgressStatus.Canceled');
             }
 
         }
-
 
         DB::beginTransaction();
         try {
             $this->repository->update($item, $inputs);
             $order = $this->repository->findWithRelations($orderId);
+
+            if (isset($inputs["progress_status"]) && $inputs["progress_status"] == config('order.ProgressStatus.Canceled')) {
+                WalletsService::withdrawalFromWallet($orderId, config('wallet.TransactionTypes.CancelOrder'));
+            }
+
             DB::commit();
             return $order;
         } catch (Exception) {

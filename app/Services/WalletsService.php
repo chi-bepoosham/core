@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Http\Repositories\OrderRepository;
 use App\Http\Repositories\WalletRepository;
+use App\Http\Repositories\WalletTransactionRepository;
 use Exception;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -89,6 +91,89 @@ class WalletsService
             DB::rollBack();
             throw new Exception(__("custom.defaults.delete_failed"));
         }
+    }
+
+
+    /**
+     * @throws Exception
+     */
+    public static function withdrawalFromWallet($orderId, $type): mixed
+    {
+        $order = (new OrderRepository())->find($orderId);
+        $walletTransaction = (new WalletTransactionRepository())->findWithInputs(['order_id' => $orderId]);
+
+        if ($type == config('wallet.TransactionTypes.CancelOrder')) {
+            $descriptionTitle = config('wallet.Descriptions.CancelOrder');
+        } else {
+            $descriptionTitle = config('wallet.Descriptions.ReturnOrder');
+        }
+
+        $walletId = $walletTransaction->wallet_id;
+        $finalAmount = $walletTransaction->amount;
+
+        $description = __($descriptionTitle,
+            [
+                'Amount' => $finalAmount,
+                'OrderId' => $order->tracking_number,
+            ]);
+
+
+        $inputs = [
+            'wallet_id' => $walletId,
+            'type' => $type,
+            'order_id' => $orderId,
+            'amount' => $finalAmount,
+            'date_time' => now(),
+            'description' => $description,
+        ];
+
+
+        $newWalletTransaction = (new WalletTransactionRepository())->create($inputs);
+
+        # remove revenues
+        RevenuesService::RemoveRevenues($walletTransaction->id);
+
+        return $newWalletTransaction;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public static function depositToWallet($orderId): mixed
+    {
+        $order = (new OrderRepository())->find($orderId);
+        $shop = $order->shop;
+        $wallet = (new WalletRepository())->findWithInputs(['shop_id' => $shop->id]);
+        $commissionPercent = $shop->commission_percent;
+        $amount = $order->final_price;
+        $type = config('wallet.TransactionTypes.Order');
+
+        $commissionAmount = ceil($amount * $commissionPercent / 100);
+        $finalAmount = $amount - $commissionAmount;
+
+        $description = __(config('wallet.Descriptions.DepositOrder'),
+            [
+                'Amount' => $finalAmount,
+                'OrderId' => $order->tracking_number,
+                'CommissionAmount' => $commissionAmount,
+            ]);
+
+        $inputs = [
+            'wallet_id' => $wallet->id,
+            'type' => $type,
+            'order_id' => $orderId,
+            'amount' => $finalAmount,
+            'date_time' => now(),
+            'description' => $description,
+        ];
+
+
+        $walletTransaction = (new WalletTransactionRepository())->create($inputs);
+
+        # register revenues
+        RevenuesService::RegisterRevenues($walletTransaction->id, config('revenues.RevenuesTypes.Order'), $commissionAmount);
+
+        return $walletTransaction;
     }
 
 }

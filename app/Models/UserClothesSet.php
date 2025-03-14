@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserClothesSet extends Model
@@ -29,6 +28,7 @@ class UserClothesSet extends Model
             'user_clothe_id' => 'integer',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
         ];
     }
 

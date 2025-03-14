@@ -49,6 +49,7 @@ class ValidateUpdateShop extends FormRequest
                     'main_id' => 'nullable|integer|exists:shops,id,deleted_at,NULL',
                     'is_active' => 'nullable|integer|min:0|max:1',
                     'is_verified' => 'nullable|integer|min:0|max:1',
+                    'commission_percent' => 'nullable|numeric',
                 ];
         }
 

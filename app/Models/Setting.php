@@ -4,14 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProductImage extends Model
+class Setting extends Model
 {
     protected $fillable = [
-        'product_id',
-        'image',
-        'is_selected',
-        'is_processed',
+        'key',
+        'value',
     ];
+
 
     /**
      * Get the attributes that should be cast.
@@ -21,13 +20,13 @@ class ProductImage extends Model
     protected function casts(): array
     {
         return [
-            'product_id' => 'integer',
-            'image' => 'string',
-            'is_selected' => 'boolean',
-            'is_processed' => 'boolean',
+            'key' => 'string',
+            'value' => 'string',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
         ];
     }
+
+    public $timestamps = false;
 
 }

@@ -10,11 +10,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('wallet_transactions', function (Blueprint $table) {
+        Schema::create('revenues', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('wallet_id')->constrained('wallets');
-            $table->enum('type', ['order', 'cancel_order', 'return_order', 'ads', 'withdraw'])->default('order');
-            $table->foreignId('order_id')->nullable()->constrained('orders');
+            $table->foreignId('wallet_transaction_id')->constrained('wallet_transactions');
+            $table->enum('type', ['order', 'ads'])->default('order');
             $table->integer('amount');
             $table->timestamp('date_time');
             $table->string('description')->nullable();
@@ -28,6 +27,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('wallet_transactions');
+        Schema::dropIfExists('revenues');
     }
 };

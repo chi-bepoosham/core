@@ -28,7 +28,7 @@ class ValidateGetAllWalletTransactionsRequest extends FormRequest
         return [
             'shop_id' => 'nullable|integer|exists:shops,id,deleted_at,NULL',
             'wallet_id' => 'nullable|integer|exists:wallets,id,deleted_at,NULL',
-            'type' => 'nullable|string|in:order,ads,withdraw',
+            'type' => 'nullable|string|in:order,cancel_order,return_order,ads,withdraw',
             'order_id' => 'nullable|integer|exists:orders,id,deleted_at,NULL',
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|required_with:from_date|date',

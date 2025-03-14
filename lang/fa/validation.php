@@ -178,6 +178,7 @@ return [
         "shipping_fee" => "هزینه ارسال",
         "card_number" => "شماره کارت",
         "sheba_number" => "شماره شبا",
+        "commission_percent" => "درصد پورسانت",
         "category_id" => "دسته بندی",
         "main_id" => "آیدی محصول اصلی",
         "color" => "رنگ",

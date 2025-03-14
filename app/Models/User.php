@@ -56,6 +56,7 @@ class User extends Authenticatable
             'body_type_id' => 'integer',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
         ];
     }
 

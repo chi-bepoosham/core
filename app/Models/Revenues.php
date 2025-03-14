@@ -6,22 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class WalletTransaction extends Model
+class Revenues extends Model
 {
     use SoftDeletes;
 
-    /**
-     * @var string[]
-     */
     protected $fillable = [
-        'wallet_id',
+        'wallet_transaction_id',
         'type',
-        'order_id',
         'amount',
         'date_time',
         'description',
     ];
-
 
     /**
      * Get the attributes that should be cast.
@@ -31,9 +26,8 @@ class WalletTransaction extends Model
     protected function casts(): array
     {
         return [
-            'wallet_id' => 'integer',
+            'wallet_transaction_id' => 'integer',
             'type' => 'string',
-            'order_id' => 'integer',
             'amount' => 'integer',
             'date_time' => 'timestamp',
             'description' => 'string',
@@ -43,14 +37,8 @@ class WalletTransaction extends Model
         ];
     }
 
-    public function wallet():BelongsTo
+    public function walletTransaction():BelongsTo
     {
-        return $this->belongsTo(Wallet::class,'wallet_id');
+        return $this->belongsTo(WalletTransaction::class)->withTrashed()->with('order');
     }
-
-    public function order():BelongsTo
-    {
-        return $this->belongsTo(Order::class, 'order_id');
-    }
-
 }

@@ -164,8 +164,8 @@ class WalletTransactionsService
     {
 
         $allTransactions = WalletTransaction::query()->where('wallet_id', $walletId)->get();
-        $sumDeposit = $allTransactions->whereIn('type', ['order', 'ads'])->sum('amount');
-        $sumWithdrawal = $allTransactions->where('type', 'withdraw')->sum('amount');
+        $sumDeposit = $allTransactions->whereIn('type', ['order'])->sum('amount');
+        $sumWithdrawal = $allTransactions->whereIn('type', ['cancel_order', 'return_order', 'ads', 'withdraw'])->sum('amount');
 
         $finalWalletBalance = $sumDeposit - $sumWithdrawal;
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\api\v1\BodyTypeController;
 use App\Http\Controllers\api\v1\OrderController;
 use App\Http\Controllers\api\v1\OrderPaymentController;
 use App\Http\Controllers\api\v1\ProductController;
+use App\Http\Controllers\api\v1\RevenuesController;
 use App\Http\Controllers\api\v1\ShopController;
 use App\Http\Controllers\api\v1\UserAddressController;
 use App\Http\Controllers\api\v1\UserClothingController;
@@ -32,7 +33,6 @@ use App\Http\Controllers\api\v1\UserController;
 Route::prefix('v1')->group(function () {
 
     Route::get("payment/verify", [OrderPaymentController::class, "verifyPayment"]);
-
 
 
     Route::prefix('user')->middleware('auth:sanctum')->group(function () {
@@ -184,6 +184,13 @@ Route::prefix('v1')->group(function () {
                 Route::put("/{walletTransactionId}", [WalletTransactionController::class, "update"]);
                 Route::delete("/{walletTransactionId}", [WalletTransactionController::class, "delete"]);
             });
+        });
+
+        Route::prefix('/revenues')->group(function () {
+            Route::get("/all", [RevenuesController::class, "index"]);
+            Route::post("/", [RevenuesController::class, "create"]);
+            Route::get("/{revenuesId}", [RevenuesController::class, "show"]);
+            Route::delete("/{revenuesId}", [RevenuesController::class, "delete"]);
         });
 
     });

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class ValidateCreateWalletTransaction extends FormRequest
+class ValidateCreateRevenues extends FormRequest
 {
 
     /**
@@ -16,10 +16,8 @@ class ValidateCreateWalletTransaction extends FormRequest
     public function rules(): array
     {
         return [
-            'shop_id' => 'nullable|required_without:wallet_id|integer|exists:shops,id,deleted_at,NULL',
-            'wallet_id' => 'nullable|required_without:shop_id|integer|exists:wallets,id,deleted_at,NULL',
-            'order_id' => 'nullable|integer|exists:orders,id,deleted_at,NULL',
-            'type' => 'required|string|in:order,cancel_order,return_order,ads,withdraw',
+            'wallet_transaction_id' => 'nullable|required_without:shop_id|integer|exists:wallet_transactions,id,deleted_at,NULL',
+            'type' => 'required|string|in:order,ads',
             'amount' => 'required|integer|min:1000',
             'date_time' => 'nullable|date_format:Y-m-d H:i:s',
             'description' => 'nullable|string',

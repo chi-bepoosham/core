@@ -34,6 +34,7 @@ class Shop extends Model
         'shipping_fee',
         'card_number',
         'sheba_number',
+        'commission_percent',
     ];
 
     /**
@@ -66,6 +67,7 @@ class Shop extends Model
             'shipping_fee' => 'integer',
             'card_number' => 'string',
             'sheba_number' => 'string',
+            'commission_percent' => 'float',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
             'deleted_at' => 'timestamp',

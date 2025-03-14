@@ -42,6 +42,7 @@ class UserClothes extends Model
             'process_status' => 'integer',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
+            'deleted_at' => 'timestamp',
         ];
     }
 

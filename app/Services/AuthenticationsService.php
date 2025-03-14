@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Repositories\ShopRepository;
 use App\Http\Repositories\SystemUserRepository;
 use App\Http\Repositories\WalletRepository;
+use App\Models\Setting;
 use App\Models\Shop;
 use Carbon\Carbon;
 use Exception;
@@ -187,6 +188,8 @@ class AuthenticationsService
     #[ArrayShape(['token' => "mixed", 'shop' => "mixed"])]
     public function shopRegister($inputs): array
     {
+        $commissionPercent = (float)Setting::query()->where('key', 'commission_percent')->first()?->value ?? 0;
+
         DB::beginTransaction();
         try {
 
@@ -197,6 +200,7 @@ class AuthenticationsService
 
             $lastShopId = Shop::query()->orderBy("id", "desc")->first()?->id ?? 0;
             $inputs["uuid"] = 'shop-' . rand(1111, 9999) . $lastShopId;
+            $inputs["commission_percent"] = $commissionPercent;
 
             if (isset($inputs["location_lat"]) && isset($inputs["location_lng"])) {
                 $inputs["location_point"] = $inputs["location_lat"] . ',' . $inputs["location_lng"];

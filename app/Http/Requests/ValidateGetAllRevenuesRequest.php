@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ValidateGetAllOrdersRequest extends FormRequest
+class ValidateGetAllRevenuesRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -15,17 +15,8 @@ class ValidateGetAllOrdersRequest extends FormRequest
      */
     public function rules(): array
     {
-        $statuses = implode(',', array_values(config('order.Status')));
-        $progressStatuses = implode(',', array_values(config('order.ProgressStatus')));
-
         return [
-            'shop_id' => 'nullable|integer|exists:shops,id,deleted_at,NULL',
-            'user_id' => 'nullable|integer|exists:users,id,deleted_at,NULL',
-            'user_address_id' => 'nullable|integer|exists:user_addresses,id,deleted_at,NULL',
-            'delivery_type' => 'nullable|string|in:store,shipping',
-            'tracking_number' => 'nullable|string',
-            'status' => 'nullable|string|in:' . $statuses,
-            'progress_status' => 'nullable|string|in:' . $progressStatuses,
+            'type' => 'nullable|string|in:order,ads',
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|required_with:from_date|date',
             'paginate' => 'nullable|boolean',

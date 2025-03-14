@@ -3,16 +3,16 @@
 namespace App\Http\Repositories;
 
 
-use App\Models\WalletTransaction;
+use App\Models\Revenues;
 
-class WalletTransactionRepository extends BaseRepository
+class RevenuesRepository extends BaseRepository
 {
     /**
      * @return string
      */
     public function model(): string
     {
-        return WalletTransaction::class;
+        return Revenues::class;
     }
 
 
@@ -21,6 +21,6 @@ class WalletTransactionRepository extends BaseRepository
      */
     public function relations(): array
     {
-        return ["wallet", "order"];
+        return ["walletTransaction"];
     }
 }
