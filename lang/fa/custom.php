@@ -60,6 +60,7 @@ return [
         'not_access_register_order_product_not_found' => 'محصول :product در حال حاضر در دسترس نمی‌باشد',
         'not_access_register_order_product_size_not_found' => 'سایز انتخابی محصول :product در حال حاضر در دسترس نمی‌باشد',
         'not_access_register_order_user_address' => 'شما اجازه ثبت سفارش برای این آدرس را ندارید',
+        'not_access_pay_order_progress_status' => 'امکان پرداخت سفارش به دلیل وضعیت آن، امکان پذیر نیست',
         'not_access_update_order_delivered' => 'سفارش شما تحویل شده است و امکان ویرایش وضعیت را ندارید. در صورت بروز مشکل با پشتیبانی تماس بگیرید.',
         'not_access_update_order_returned' => 'سفارش شما برگشت داده شده است و امکان ویرایش وضعیت را ندارید. در صورت بروز مشکل با پشتیبانی تماس بگیرید.',
         'not_access_update_order_canceled' => 'سفارش شما لغو شده است و امکان ویرایش وضعیت را ندارید. در صورت بروز مشکل با پشتیبانی تماس بگیرید.',

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Repositories\OrderPaymentRepository;
 use App\Http\Repositories\OrderRepository;
 use App\Http\Repositories\ProductRepository;
 use App\Http\Repositories\ShopRepository;
@@ -13,6 +14,9 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Shetabit\Multipay\Invoice;
+use Shetabit\Payment\Facade\Payment;
+use stdClass;
 
 class OrdersService
 {
@@ -78,14 +82,14 @@ class OrdersService
 
     /**
      * @param $inputs
-     * @return mixed
+     * @return stdClass
      * @throws Exception
      */
-    public function register($inputs): mixed
+    public function register($inputs): stdClass
     {
         if (isset(request()->userAdmin)) {
             $userId = $inputs["user_id"];
-        }else{
+        } else {
             $userId = Auth::id();
         }
 
@@ -111,12 +115,59 @@ class OrdersService
 
             $createdItem->items()->saveMany($items);
 
+            $payment = $this->createOrderPayment($createdItem);
+
             DB::commit();
 
-            return $this->show($createdItem->id);
-        } catch (Exception $exception) {
+            $order = $this->show($createdItem->id);
+
+            $result = new stdClass();
+            $result->payment_gateway = json_decode($payment);
+            $result->order = $order;
+
+            return $result;
+        } catch (Exception) {
             DB::rollBack();
             throw new Exception(__("custom.defaults.store_failed"));
+        }
+    }
+
+
+    /**
+     * @param $orderId
+     * @return stdClass
+     * @throws Exception
+     */
+    public function payOrder($orderId): stdClass
+    {
+        $item = $this->repository->findWithRelations($orderId);
+        if (!$item) {
+            throw new Exception(__("custom.defaults.not_found"));
+        }
+
+        if ($item->progress_status != 'pendingForPayment') {
+            throw new Exception(__("custom.shop.not_access_pay_order_progress_status"));
+        }
+
+        if (!isset(request()->userAdmin) && $item->user_id != Auth::id()) {
+            throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
+        }
+
+        DB::beginTransaction();
+        try {
+
+            $payment = $this->createOrderPayment($item);
+
+            DB::commit();
+
+            $result = new stdClass();
+            $result->payment_gateway = json_decode($payment);
+            $result->order = $item;
+
+            return $result;
+        } catch (Exception) {
+            DB::rollBack();
+            throw new Exception(__("custom.defaults.index_failed"));
         }
     }
 
@@ -135,12 +186,12 @@ class OrdersService
 
         if (isset(request()->userShop) && $item->shop_id != Auth::id()) {
             throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
-        } elseif (!isset(request()->userAdmin) && !isset(request()->userShop)  && $item->user_id != Auth::id()) {
+        } elseif (!isset(request()->userAdmin) && !isset(request()->userShop) && $item->user_id != Auth::id()) {
             throw new Exception(__("exceptions.exceptionErrors.accessDenied"));
         }
 
         if (isset($inputs["user_address_id"])) {
-            if (!isset(request()->userShop) && !isset(request()->userAdmin) ) {
+            if (!isset(request()->userShop) && !isset(request()->userAdmin)) {
                 $userAddress = (new UserAddressRepository())->find($inputs["user_address_id"]);
                 if ($userAddress == null || $userAddress->user_id != Auth::id()) {
                     throw new Exception(__("custom.shop.not_access_register_order_user_address"));
@@ -179,7 +230,6 @@ class OrdersService
             }
 
         }
-
 
 
         DB::beginTransaction();
@@ -252,6 +302,24 @@ class OrdersService
         }
 
         return $allItems;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function createOrderPayment($order): string
+    {
+        $orderInvoice = new Invoice();
+        $orderInvoice->uuid($order->id);
+        $orderInvoice->amount($order->final_price);
+        return Payment::purchase($orderInvoice, function ($driver, $transactionId) use ($order) {
+            $orderPaymentRepository = new OrderPaymentRepository();
+            $orderPaymentRepository->create([
+                "order_id" => $order->id,
+                "transaction_id" => $transactionId,
+                "amount" => $order->final_price,
+            ]);
+        })->pay()->toJson();
     }
 
     /**

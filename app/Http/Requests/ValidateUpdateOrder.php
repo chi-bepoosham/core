@@ -18,7 +18,7 @@ class ValidateUpdateOrder extends FormRequest
         if (isset(request()->userShop)) {
             return [
                 'status' => 'nullable|string|in:inProgress,delivered,returned,canceled',
-                'progress_status' => 'nullable|string|in:waitingForConform,waitingForPacking,readyForDelivery,waitingForConfirmReturning,waitingForProcessReturning,delivered,returned,canceled',
+                'progress_status' => 'nullable|string|in:waitingForConfirm,waitingForPacking,readyForDelivery,waitingForConfirmReturning,waitingForProcessReturning,delivered,returned,canceled',
             ];
         }elseif (isset(request()->userAdmin)) {
             return [
@@ -26,7 +26,7 @@ class ValidateUpdateOrder extends FormRequest
                 'delivery_type' => 'nullable|string|in:store,shipping',
                 'description' => 'nullable|string',
                 'status' => 'nullable|string|in:inProgress,delivered,returned,canceled',
-                'progress_status' => 'nullable|string|in:pendingForPayment,waitingForConform,waitingForPacking,readyForDelivery,waitingForConfirmReturning,waitingForProcessReturning,delivered,returned,canceled,canceledSystemically',
+                'progress_status' => 'nullable|string|in:pendingForPayment,waitingForConfirm,waitingForPacking,readyForDelivery,waitingForConfirmReturning,waitingForProcessReturning,delivered,returned,canceled,canceledSystemically',
             ];
         }else{
             return [

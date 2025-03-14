@@ -3,16 +3,16 @@
 namespace App\Http\Repositories;
 
 
-use App\Models\Order;
+use App\Models\OrderPayment;
 
-class OrderRepository extends BaseRepository
+class OrderPaymentRepository extends BaseRepository
 {
     /**
      * @return string
      */
     public function model(): string
     {
-        return Order::class;
+        return OrderPayment::class;
     }
 
 
@@ -21,6 +21,6 @@ class OrderRepository extends BaseRepository
      */
     public function relations(): array
     {
-        return ['shop', 'user', 'userAddress', 'items', 'payments'];
+        return ['order'];
     }
 }

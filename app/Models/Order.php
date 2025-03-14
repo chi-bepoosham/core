@@ -58,12 +58,12 @@ class Order extends Model
 
     public function shop(): BelongsTo
     {
-        return $this->belongsTo(Shop::class,'shop_id')->withTrashed();
+        return $this->belongsTo(Shop::class, 'shop_id')->withTrashed();
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class,'user_id')->withTrashed();
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
 
     public function userAddress(): BelongsTo
@@ -73,11 +73,11 @@ class Order extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(OrderItem::class,'order_id')->withTrashed();
+        return $this->hasMany(OrderItem::class, 'order_id')->withTrashed();
     }
 
-    public function payment(): HasOne
+    public function payments(): HasMany
     {
-        return $this->hasOne(OrderPayment::class,'order_id')->withTrashed();
+        return $this->hasMany(OrderPayment::class, 'order_id')->withTrashed();
     }
 }

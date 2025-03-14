@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->enum('delivery_type', ['store', 'shipping'])->comment('نوع ارسال');
             $table->string('tracking_number')->unique()->comment('شماره پیگیری');
             $table->enum('status', ['inProgress', 'delivered', 'returned', 'canceled'])->default('inProgress')->comment('وضعیت سفارش');
-            $table->enum('progress_status', ['pendingForPayment', 'waitingForConform', 'waitingForPacking', 'readyForDelivery', 'waitingForConfirmReturning', 'waitingForProcessReturning', 'delivered', 'returned', 'canceled', 'canceledSystemically'])->default('pendingForPayment')->comment('وضعیت پردازش');
+            $table->enum('progress_status', ['pendingForPayment', 'waitingForConfirm', 'waitingForPacking', 'readyForDelivery', 'waitingForConfirmReturning', 'waitingForProcessReturning', 'delivered', 'returned', 'canceled', 'canceledSystemically'])->default('pendingForPayment')->comment('وضعیت پردازش');
             $table->integer('total_price')->comment('قیمت کل بدون تخفیف و مالیات');
             $table->integer('discount')->default(0)->comment('مقدار تخفیف');
             $table->integer('vat')->default(0)->comment('ارزش افزوده');

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->enum('payment_method', ['zarinpal', 'cash_on_delivery'])->default('zarinpal')->comment('روش پرداخت');
             $table->enum('status', ['pending', 'failed', 'completed'])->default('pending')->comment('وضعیت پرداخت');
             $table->string('transaction_id')->comment('شناسه تراکنش');
-            $table->string('reference_id')->comment('کد مرجع تراکنش خريد');
+            $table->string('reference_id')->nullable()->comment('کد مرجع تراکنش خريد');
             $table->integer('amount')->comment('مبلغ پرداخت شده');
             $table->json('payment_details')->nullable()->comment('اطلاعات تکمیلی پرداخت');
             $table->timestamps();

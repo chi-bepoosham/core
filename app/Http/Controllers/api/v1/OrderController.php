@@ -71,6 +71,24 @@ class OrderController extends Controller
 
 
     /**
+     * @param int $orderId
+     * @return JsonResponse
+     */
+    public function payOrder(int $orderId): JsonResponse
+    {
+        try {
+            $data = $this->service->payOrder($orderId);
+            return ResponseHelper::responseSuccess($data);
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            return ResponseHelper::responseCustomError($message);
+        }
+
+    }
+
+
+
+    /**
      * @param ValidateUpdateOrder $request
      * @param int $orderId
      * @return JsonResponse

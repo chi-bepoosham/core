@@ -22,7 +22,7 @@ class ValidateGetAllOrdersRequest extends FormRequest
             'delivery_type' => 'nullable|string|in:store,shipping',
             'tracking_number' => 'nullable|string',
             'status' => 'nullable|string|in:inProgress,delivered,returned,canceled',
-            'progress_status' => 'nullable|string|in:pendingForPayment,waitingForConform,waitingForPacking,readyForDelivery,waitingForConfirmReturning,waitingForProcessReturning,delivered,returned,canceled,canceledSystemically',
+            'progress_status' => 'nullable|string|in:pendingForPayment,waitingForConfirm,waitingForPacking,readyForDelivery,waitingForConfirmReturning,waitingForProcessReturning,delivered,returned,canceled,canceledSystemically',
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|required_with:from_date|date',
             'paginate' => 'nullable|boolean',

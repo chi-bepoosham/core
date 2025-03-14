@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\api\v1\BodyTypeController;
 use App\Http\Controllers\api\v1\OrderController;
+use App\Http\Controllers\api\v1\OrderPaymentController;
 use App\Http\Controllers\api\v1\ProductController;
 use App\Http\Controllers\api\v1\ShopController;
 use App\Http\Controllers\api\v1\UserAddressController;
@@ -29,6 +30,9 @@ use App\Http\Controllers\api\v1\UserController;
 
 
 Route::prefix('v1')->group(function () {
+
+    Route::get("payment/verify", [OrderPaymentController::class, "verifyPayment"]);
+
 
 
     Route::prefix('user')->middleware('auth:sanctum')->group(function () {
@@ -82,6 +86,7 @@ Route::prefix('v1')->group(function () {
                 Route::get("/all", [OrderController::class, "index"]);
                 Route::get("/{orderId}", [OrderController::class, "show"]);
                 Route::post("/register", [OrderController::class, "register"]);
+                Route::post("/{orderId}/pay", [OrderController::class, "payOrder"]);
                 Route::put("/{orderId}", [OrderController::class, "update"]);
             });
 
@@ -162,6 +167,7 @@ Route::prefix('v1')->group(function () {
             Route::get("/all", [OrderController::class, "index"]);
             Route::get("/{orderId}", [OrderController::class, "show"]);
             Route::post("/register", [OrderController::class, "register"]);
+            Route::post("/{orderId}/pay", [OrderController::class, "payOrder"]);
             Route::put("/{orderId}", [OrderController::class, "update"]);
             Route::delete("/{orderId}", [OrderController::class, "delete"]);
         });
