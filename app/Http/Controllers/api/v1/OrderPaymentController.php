@@ -6,11 +6,10 @@ use App\Helpers\Response\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Services\OrderPaymentsService;
 use Exception;
-use Illuminate\Foundation\Application;
+use Illuminate\Http\Client\Response;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
+use Illuminate\Support\Facades\Http;
 
 class OrderPaymentController extends Controller
 {
@@ -21,16 +20,15 @@ class OrderPaymentController extends Controller
 
     /**
      * @param Request $request
-     * @return Application|RedirectResponse|Redirector|JsonResponse
+     * @return Response|JsonResponse
      */
-    public function verifyPayment(Request $request): Application|RedirectResponse|Redirector|JsonResponse
+    public function verifyPayment(Request $request): Response|JsonResponse
     {
         try {
             $inputs = $request->all();
-            $params = $this->service->verifyPayment($inputs);
-            $queryString = http_build_query($params);
+            $data = $this->service->verifyPayment($inputs);
             $returnUrl = 'https://chibepoosham.app/payment/status';
-            return redirect()->away($returnUrl . '?' . $queryString);
+            return Http::post($returnUrl, $data);
         } catch (Exception $exception) {
             $message = $exception->getMessage();
             return ResponseHelper::responseCustomError($message);

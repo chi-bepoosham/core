@@ -33,3 +33,11 @@ if (!function_exists('sendSms')) {
         }
     }
 }
+
+if (!function_exists('is_string_persian')) {
+    function is_string_persian(string $string): bool|int
+    {
+        $pattern = '/^[\x{0600}-\x{06FF}\x{FB50}-\x{FDFF}\x{06F0}-\x{06F9}0-9\s\.,،]+$/u';
+        return preg_match($pattern, $string) === 1;
+    }
+}
