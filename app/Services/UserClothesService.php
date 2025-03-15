@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Repositories\UserClothingRepository;
 use App\Http\Repositories\UserRepository;
 use App\Jobs\SendRedisMessage;
+use App\Jobs\SendRequestProcessImage;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -61,14 +62,20 @@ class UserClothesService
             $createdItem = $this->repository->create($inputs);
 
             $data = [
-                "action" => "process",
-                "user_id" => $this->user->id,
-                "image_link" => asset($inputs["image"]),
+                "image_url" => asset($inputs["image"]),
                 "gender" => $this->user->gender,
-                "clothes_id" => $createdItem->id,
-                "time" => Carbon::now()->format("H:i:s"),
             ];
-            SendRedisMessage::dispatch($data);
+            SendRequestProcessImage::dispatch(data: $data, type: 'process', userId: $this->user->id, clothesId: $createdItem->id);
+
+//            $data = [
+//                "action" => "process",
+//                "user_id" => $this->user->id,
+//                "image_link" => asset($inputs["image"]),
+//                "gender" => $this->user->gender,
+//                "clothes_id" => $createdItem->id,
+//                "time" => Carbon::now()->format("H:i:s"),
+//            ];
+//            SendRedisMessage::dispatch($data);
 
             DB::commit();
             return $createdItem;

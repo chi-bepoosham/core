@@ -24,6 +24,7 @@ class UserClothes extends Model
         'clothes_type',
         'process_status',
         'processed_image_data',
+        'error_clothes',
     ];
 
     /**
@@ -40,6 +41,7 @@ class UserClothes extends Model
             'match_percentage' => 'integer',
             'clothes_type' => 'integer',
             'process_status' => 'integer',
+            'error_clothes' => 'json',
             'created_at' => 'timestamp',
             'updated_at' => 'timestamp',
             'deleted_at' => 'timestamp',

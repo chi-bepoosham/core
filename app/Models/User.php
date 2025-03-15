@@ -31,6 +31,7 @@ class User extends Authenticatable
         'status',
         'body_image',
         'process_body_image_status',
+        'error_body_image',
         'body_type_id',
     ];
 
@@ -52,6 +53,7 @@ class User extends Authenticatable
             'gender' => 'integer',
             'body_image' => 'string',
             'process_body_image_status' => 'integer',
+            'error_body_image' => 'json',
             'status' => 'integer',
             'body_type_id' => 'integer',
             'created_at' => 'timestamp',

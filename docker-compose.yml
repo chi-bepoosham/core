@@ -146,41 +146,41 @@ services:
             - './:/var/www:rw'
         networks:
             - main
-    application_redis_subscribe:
-        image: chibepoosham_application_1:latest
-        container_name: application_redis_subscribe
-        working_dir: /var/www
-        command: sh -c "php artisan redis:subscribe"
-        restart: always
-        user: "root"
-        depends_on:
-            redis:
-                condition: service_healthy
-            application_queue:
-                    condition: service_started
-        volumes:
-            - './:/var/www:rw'
-        networks:
-            - main
-    application_python:
-        build:
-            context: .
-            dockerfile: PythonModule/Dockerfile
-        image: chibepoosham_application_python:latest
-        container_name: application_python
-        working_dir: /var/www
-        restart: on-failure
-        volumes:
-            - './PythonModule/:/var/www'
-        expose:
-            - "8000"
-        depends_on:
-            redis:
-                condition: service_healthy
-            application_queue:
-                condition: service_started
-        networks:
-            - main
+#    application_redis_subscribe:
+#        image: chibepoosham_application_1:latest
+#        container_name: application_redis_subscribe
+#        working_dir: /var/www
+#        command: sh -c "php artisan redis:subscribe"
+#        restart: always
+#        user: "root"
+#        depends_on:
+#            redis:
+#                condition: service_healthy
+#            application_queue:
+#                    condition: service_started
+#        volumes:
+#            - './:/var/www:rw'
+#        networks:
+#            - main
+#    application_python:
+#        build:
+#            context: .
+#            dockerfile: PythonModule/Dockerfile
+#        image: chibepoosham_application_python:latest
+#        container_name: application_python
+#        working_dir: /var/www
+#        restart: on-failure
+#        volumes:
+#            - './PythonModule/:/var/www'
+#        expose:
+#            - "8000"
+#        depends_on:
+#            redis:
+#                condition: service_healthy
+#            application_queue:
+#                condition: service_started
+#        networks:
+#            - main
 #        deploy:
 #            resources:
 #                reservations:
@@ -188,9 +188,9 @@ services:
 #                        - driver: nvidia
 #                          device_ids: ['all']
 #                          capabilities: [ gpu ]
-        environment:
-            - NVIDIA_VISIBLE_DEVICES='all'  # Use 'all' to expose all GPUs
-            - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+#        environment:
+#            - NVIDIA_VISIBLE_DEVICES='all'  # Use 'all' to expose all GPUs
+#            - NVIDIA_DRIVER_CAPABILITIES=compute,utility
 networks:
     main:
         driver: bridge

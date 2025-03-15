@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('process_body_image_status')->nullable()->comment('وضعیت پردازش:  1-در حال پردازش  2-پردازش شده 3-خطای پردازش');
+            $table->jsonb('error_body_image')->nullable()->comment('خطای پردازش');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('process_body_image_status');
+            $table->dropColumn('error_body_image');
         });
     }
 };

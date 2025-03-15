@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\SendRedisMessage;
+use App\Jobs\SendRequestProcessImage;
 use App\Models\UserBodyTypeHistory;
 use Carbon\Carbon;
 use Exception;
@@ -123,14 +124,21 @@ class UsersService
             ]);
 
             $data = [
-                "action" => "body_type",
-                "user_id" => $userItem->id,
-                "image_link" => asset($inputs["body_image"]),
+                "image_url" => asset($inputs["body_image"]),
                 "gender" => $userItem->gender,
-                "clothes_id" => null,
-                "time" => Carbon::now()->format("H:i:s"),
             ];
-            SendRedisMessage::dispatch($data);
+            SendRequestProcessImage::dispatch(data: $data, type: 'bodyType', userId: $userItem->id);
+
+//            $data = [
+//                "action" => "body_type",
+//                "user_id" => $userItem->id,
+//                "image_link" => asset($inputs["body_image"]),
+//                "gender" => $userItem->gender,
+//                "clothes_id" => null,
+//                "time" => Carbon::now()->format("H:i:s"),
+//            ];
+//            SendRedisMessage::dispatch($data);
+
 
             DB::commit();
             return $createdItem;

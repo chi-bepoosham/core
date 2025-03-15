@@ -25,51 +25,48 @@ class RedisMessageListener
         $data = $this->data;
 
         // Access specific fields from the payload
-        $action = $data['action'] ?? null;
+        $category = $data['category'] ?? null;
         $userId = $data['user_id'] ?? null;
-        $gender = $data['gender'] ?? null;
         $clothesId = $data['clothes_id'] ?? null;
-        $imageLink = $data['image_link'] ?? null;
-        $time = $data['time'] ?? null;
-        $processImageData = $data['process_image'] ?? null;
+        $processImageData = $data['result'] ?? null;
 
 
         Log::info('process Image : ', $processImageData);
-        Log::info('action : ' . $action);
+        Log::info('category : ' . $category);
         Log::info('user_id : ' . $userId);
-        Log::info('image Link : ' . $imageLink);
-        Log::info('time : ' . $time);
         Log::info('----------------------------');
 
 
         $userRepository = new UserRepository();
         $userItem = $userRepository->find($userId);
         if ($userItem != null) {
-            if ($action == 'body_type') {
-                if ($processImageData["process_data"] != "No human detected") {
-                    $bodyType = BodyType::query()->where("predict_value", trim($processImageData["process_data"]))->first();
+            if ($category == 'bodyType') {
+                if (isset($processImageData["data"]) && $processImageData["data"] != null) {
+                    $bodyType = BodyType::query()->where("predict_value", trim($processImageData["data"]))->first();
                     if ($bodyType != null) {
                         $userRepository->update($userItem, [
                             "body_type_id" => $bodyType->id,
                             "process_body_image_status" => 2,
+                            "error_body_image" => null,
                         ]);
                     }
                 } else {
                     $userRepository->update($userItem, [
                         "process_body_image_status" => 3,
+                        "error_body_image" => json_encode($processImageData["error"]),
                     ]);
                 }
             } else {
-                if ($processImageData["process_data"] != "No Cloth detected") {
+                if (isset($processImageData["data"]) && $processImageData["data"] != null) {
                     $userItemBodyType = $userItem?->bodyType?->predict_value ?? null;
 
                     if ($userItemBodyType != null) {
                         try {
-                            $clothesType = $this->getClothesType($processImageData["process_data"]);
-                            $matchScore = $this->calculateScore($processImageData["process_data"], trim($userItemBodyType));
+                            $clothesType = $this->getClothesType($processImageData["data"]);
+                            $matchScore = $this->calculateScore($processImageData["data"], trim($userItemBodyType));
                             $clothes = UserClothes::query()->find($clothesId);
                             if ($clothes != null) {
-                                $clothes->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["process_data"]), "match_percentage" => $matchScore, "clothes_type" => $clothesType]);
+                                $clothes->update(["process_status" => 2, "processed_image_data" => json_encode($processImageData["data"]), "match_percentage" => $matchScore, "clothes_type" => $clothesType]);
                                 sleep(2);
                                 $clothes->matchWithOtherClothes();
                             }
@@ -82,7 +79,10 @@ class RedisMessageListener
                 } else {
                     $clothes = UserClothes::query()->find($clothesId);
                     if ($clothes != null) {
-                        $clothes->update(["process_status" => 3]);
+                        $clothes->update([
+                            "process_status" => 3,
+                            "error_clothes" => json_encode($processImageData["error"]),
+                        ]);
                     }
                 }
             }
