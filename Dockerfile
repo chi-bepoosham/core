@@ -1,7 +1,7 @@
 FROM php:8.2-fpm
 
 # Copy composer.lock and composer.json
-COPY ./core/composer.json /var/www/
+COPY /core/composer.json /var/www/
 
 # Set working directory
 WORKDIR /var/www
@@ -48,6 +48,7 @@ RUN useradd -u 1000 -ms /bin/bash -g www www
 
 # Copy existing application directory contents
 #COPY . /var/www
+
 
 # set application directory permissions
 RUN chown www:www  /var/www
