@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('image');
             $table->timestamps();
         });
-        DB::unprepared(file_get_contents(database_path('body_type_images.sql')));
     }
 
     /**

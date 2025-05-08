@@ -33,8 +33,31 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install extensions
 
-RUN pecl install -D 'enable-openssl="yes"' swoole && pecl install redis
-RUN docker-php-ext-enable swoole && docker-php-ext-enable redis
+# Clone and build Swoole from source
+RUN cd /tmp && \
+    git clone https://github.com/swoole/swoole-src.git && \
+    cd swoole-src && \
+    git checkout v5.1.0 && \
+    phpize && \
+    ./configure --enable-openssl && \
+    make -j$(nproc) && \
+    make install && \
+    docker-php-ext-enable swoole && \
+    cd / && rm -rf /tmp/swoole-src
+
+RUN cd /tmp && \
+    git clone https://github.com/phpredis/phpredis.git && \
+    cd phpredis && \
+    phpize && \
+    ./configure && \
+    make -j$(nproc) && \
+    make install && \
+    docker-php-ext-enable redis && \
+    cd / && rm -rf /tmp/phpredis
+
+
+#RUN pecl install -D 'enable-openssl="yes"' swoole && pecl install redis
+#RUN docker-php-ext-enable swoole && docker-php-ext-enable redis
 RUN docker-php-ext-configure gd --with-webp --with-jpeg
 RUN docker-php-ext-install gd pgsql pdo_pgsql mbstring zip exif pcntl bcmath soap curl sockets
 
@@ -48,6 +71,7 @@ RUN useradd -u 1000 -ms /bin/bash -g www www
 
 # Copy existing application directory contents
 #COPY . /var/www
+
 
 # set application directory permissions
 RUN chown www:www  /var/www
