@@ -1,3 +1,3 @@
-CREATE USER chebepoosham;
-CREATE DATABASE api_chebepoosham;
-GRANT ALL PRIVILEGES ON DATABASE api_chebepoosham TO chebepoosham;
+CREATE USER root;
+CREATE DATABASE core;
+GRANT ALL PRIVILEGES ON DATABASE core TO root;

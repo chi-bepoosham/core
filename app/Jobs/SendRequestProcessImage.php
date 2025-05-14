@@ -17,7 +17,7 @@ class SendRequestProcessImage implements ShouldQueue
     public string $type;
     public int $userId;
     public int $clothesId;
-    public string $serviceEndPoint= 'http://localhost:8080';
+    public string $serviceEndPoint= 'model_handler:5001';
     public string $serviceUrl;
     public int $timeout = 300;
     public int $tries = 3;
