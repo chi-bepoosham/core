@@ -61,9 +61,10 @@ class UserClothesService
         try {
             $createdItem = $this->repository->create($inputs);
 
+            $gender = $this->user->gender == 1 ? 0 : 1;
             $data = [
                 "image_url" => asset($inputs["image"]),
-                "gender" => $this->user->gender,
+                "gender" => $gender,
             ];
             SendRequestProcessImage::dispatch(data: $data, type: 'process', userId: $this->user->id, clothesId: $createdItem->id);
 

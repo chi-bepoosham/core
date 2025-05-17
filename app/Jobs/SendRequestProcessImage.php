@@ -15,8 +15,8 @@ class SendRequestProcessImage implements ShouldQueue
 
     public array $data;
     public string $type;
-    public int $userId;
-    public int $clothesId;
+    public ?int $userId;
+    public ?int $clothesId;
     public string $serviceEndPoint= 'model_handler:5001';
     public string $serviceUrl;
     public int $timeout = 300;
@@ -39,7 +39,7 @@ class SendRequestProcessImage implements ShouldQueue
     public function handle(): void
     {
         if ($this->type == 'bodyType'){
-            $this->serviceUrl = $this->serviceEndPoint . '/body_type';
+            $this->serviceUrl = $this->serviceEndPoint . '/bodytype';
         }else{
             $this->serviceUrl = $this->serviceEndPoint . '/clothing';
         }
@@ -47,7 +47,7 @@ class SendRequestProcessImage implements ShouldQueue
 
         try {
             $response = Http::timeout(180)->post($this->serviceUrl, $this->data);
-            $data["result"] = json_decode($response->json(), true);
+            $data["result"] = $response->json();
             $data["user_id"] = $this->userId;
             $data["clothes_id"] = $this->clothesId;
             $data["category"] = $this->type;

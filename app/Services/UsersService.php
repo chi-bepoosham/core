@@ -123,9 +123,10 @@ class UsersService
                 "user_data" => json_encode($userItem),
             ]);
 
+            $gender = $userItem->gender == 1 ? 0 : 1;
             $data = [
                 "image_url" => asset($inputs["body_image"]),
-                "gender" => $userItem->gender,
+                "gender" => $gender,
             ];
             SendRequestProcessImage::dispatch(data: $data, type: 'bodyType', userId: $userItem->id);
 
