@@ -42,7 +42,7 @@ class RedisMessageListener
         if ($userItem != null) {
             if ($category == 'bodyType') {
                 if (isset($processImageData["data"]) && $processImageData["data"] != null) {
-                    $bodyType = BodyType::query()->where("predict_value", trim($processImageData["data"]))->first();
+                    $bodyType = BodyType::query()->where("predict_value", trim($processImageData["data"]["body_type"]))->first();
                     if ($bodyType != null) {
                         $userRepository->update($userItem, [
                             "body_type_id" => $bodyType->id,
