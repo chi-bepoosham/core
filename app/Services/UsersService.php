@@ -123,7 +123,7 @@ class UsersService
                 "user_data" => json_encode($userItem),
             ]);
 
-            $gender = $userItem->gender == 1 ? 0 : 1;
+            $gender = $userItem->gender;
             $data = [
                 "image_url" => asset($inputs["body_image"]),
                 "gender" => $gender,
