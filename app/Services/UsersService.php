@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Jobs\SendRedisMessage;
 use App\Jobs\SendRequestProcessImage;
+use App\Jobs\UpdateActivateVision;
 use App\Models\UserBodyTypeHistory;
+use App\Models\Vision;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\UploadedFile;
@@ -37,9 +39,50 @@ class UsersService
     {
         $user = Auth::user();
 
+        $allVisions = Vision::all();
+        $activeVisionCount = $allVisions->where("is_active", true)->count();
+        $activeVision = null;
+        switch ($activeVisionCount) {
+            case 0:
+                $userCount = User::query()->count();
+                $activeVision = $allVisions->where("target_count", ">", $userCount)->sortByDesc("target_count")->first();
+                if ($activeVision) {
+                    UpdateActivateVision::dispatch($activeVision, true);
+                    $activeVision->is_active = true;
+                    if (is_null($activeVision->current_count)) {
+                        $activeVision->current_count = $userCount;
+                    }
+                }
+
+                break;
+            case 1:
+                $activeVision = $allVisions->first();
+                if (is_null($activeVision->current_count)) {
+                    $userCount = User::query()->count();
+                    $activeVision->current_count = $userCount;
+                }
+
+                break;
+            case $activeVisionCount > 1 :
+                $userCount = User::query()->count();
+                $activeVision = $allVisions->where("is_active", true)->where("target_count", ">", $userCount)->sortByDesc("target_count")->first();
+
+                if (is_null($activeVision->current_count)) {
+                    $activeVision->current_count = $userCount;
+                }
+
+                $notActiveVisions = $allVisions->where("id", "!=", $activeVision->id);
+                foreach ($notActiveVisions as $notActiveVision) {
+                    UpdateActivateVision::dispatch($notActiveVision, false);
+                }
+
+                break;
+        }
+
         $data = new \stdClass();
         $data->user = $user;
         $data->user->body_type = $user->bodyType;
+        $data->vision = $activeVision;
         return $data;
     }
 
