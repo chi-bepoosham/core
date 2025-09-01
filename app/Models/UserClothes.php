@@ -50,9 +50,14 @@ class UserClothes extends Model
 
     protected $hidden = ["processed_image_data"];
 
-    public function sets(): HasMany
+    public function sets(): BelongsToMany
     {
-        return $this->hasMany(UserSet::class, 'user_id', 'user_id')->with("clothes");
+        return $this->belongsToMany(
+            UserSet::class,
+            'user_clothes_sets',
+            'user_clothe_id',
+            'user_set_id'
+        )->with('clothes');
     }
 
     public function user(): BelongsTo
