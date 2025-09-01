@@ -231,7 +231,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 0 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -282,7 +282,7 @@ class RedisMessageListener
 
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 0 : 0;
@@ -342,7 +342,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 0 : 0;
@@ -395,7 +395,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 0 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -457,7 +457,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 0 : 0;
@@ -507,7 +507,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 0 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -584,7 +584,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -679,7 +679,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -761,7 +761,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -866,7 +866,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -946,7 +946,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 0 : 0;
@@ -1006,7 +1006,7 @@ class RedisMessageListener
 
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 0 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -1055,7 +1055,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 0 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
@@ -1138,7 +1138,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 0 : 0;
@@ -1184,7 +1184,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 10 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 0 : 0;
@@ -1270,7 +1270,7 @@ class RedisMessageListener
         }
 
         // Color
-        $color = $data['color'] ?? $data['color_tone'] ?? [];
+        $color = $data['color'] ?? $data['color_tone'] ?? '';
         $tones = explode('_', $color);
         $point += (in_array('muted', $tones) || in_array('dark', $tones)) ? 0 : 0;
         $point += (in_array('bright', $tones) || in_array('light', $tones)) ? 10 : 0;
