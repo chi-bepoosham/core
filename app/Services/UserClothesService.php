@@ -61,7 +61,7 @@ class UserClothesService
         try {
             $createdItem = $this->repository->create($inputs);
 
-            $gender = $this->user->gender == 1 ? 0 : 1;
+            $gender = $this->user->gender == 1 ? 1 : 0;
             $data = [
                 "image_url" => asset($inputs["image"]),
                 "gender" => $gender,
