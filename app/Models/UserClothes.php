@@ -50,9 +50,14 @@ class UserClothes extends Model
 
     protected $hidden = ["processed_image_data"];
 
-    public function sets(): HasMany
+    public function sets(): BelongsToMany
     {
-        return $this->hasMany(UserSet::class, 'user_id', 'id')->with("clothes");
+        return $this->belongsToMany(
+            UserSet::class,
+            'user_clothes_sets',
+            'user_clothe_id',
+            'user_set_id'
+        )->with('clothes');
     }
 
     public function user(): BelongsTo
@@ -97,8 +102,8 @@ class UserClothes extends Model
                     $clotheAstin = $clotheProcessedImageData?->astin ?? '';
                     $clotheAstin = strtolower($clotheAstin);
 
-                    switch ($userBodyType) {
-                        case 'women_hourglass':
+                    switch ((int)$userBodyType) {
+                        case 11:
 
                             if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
                                 if ($clotheAstin == 'toppuffy') {
@@ -144,7 +149,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_rectangle':
+                        case 21:
 
                             if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
                                 if ($clotheAstin == 'toppuffy') {
@@ -185,7 +190,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_inverted_triangle':
+                        case 31:
 
                             if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
                                 $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
@@ -232,7 +237,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_triangle':
+                        case 41:
                             if ($shalvar == 'wbaggy' || $shalvar == 'wcargo' ||
                                 $shalvar == 'wcargoshorts' || $shalvar == 'wbootcut' ||
                                 $shalvar == 'wmom' || $skirtType == 'balloonskirt' || $skirtType == 'mermaidskirt') {
@@ -274,7 +279,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_round':
+                        case 51:
                             if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
                                 $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
                                 $skirtType == 'shortaskirt') {
@@ -345,8 +350,8 @@ class UserClothes extends Model
                     $clotheAstin = $clotheProcessedImageData?->astin ?? '';
                     $clotheAstin = strtolower($clotheAstin);
 
-                    switch ($userBodyType) {
-                        case 'women_hourglass':
+                    switch ((int)$userBodyType) {
+                        case 11:
 
                             if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
                                 if ($clotheAstin == 'toppuffy') {
@@ -392,7 +397,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_rectangle':
+                        case 21:
 
                             if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
                                 if ($clotheAstin == 'toppuffy') {
@@ -433,7 +438,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_inverted_triangle':
+                        case 31:
 
                             if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
                                 $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
@@ -480,7 +485,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_triangle':
+                        case 41:
                             if ($shalvar == 'wbaggy' || $shalvar == 'wcargo' ||
                                 $shalvar == 'wcargoshorts' || $shalvar == 'wbootcut' ||
                                 $shalvar == 'wmom' || $skirtType == 'balloonskirt' || $skirtType == 'mermaidskirt') {
@@ -522,7 +527,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_round':
+                        case 51:
                             if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
                                 $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
                                 $skirtType == 'shortaskirt') {
@@ -612,8 +617,8 @@ class UserClothes extends Model
                     $astin = $currentProcessedImageData?->astin ?? '';
                     $astin = strtolower($astin);
 
-                    switch ($userBodyType) {
-                        case 'women_hourglass':
+                    switch ((int)$userBodyType) {
+                        case 1:
                             if ($astin == 'toppuffy') {
                                 if ($clotheShalvar == 'wbootcut' || $clotheShalvar == 'wbaggy' || $clotheSkirtType == 'balloonskirt') {
                                     $matched = true;
@@ -658,7 +663,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_rectangle':
+                        case 21:
 
                             if ($astin == 'toppuffy') {
                                 if ($clotheShalvar == 'wbootcut' || $clotheShalvar == 'wbaggy' || $clotheSkirtType == 'balloonskirt') {
@@ -702,7 +707,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_inverted_triangle':
+                        case 31:
 
                             if ($astin == 'fshortsleeve' || $astin == 'toppuffy') {
                                 if ($clotheShalvar == 'wbaggy' || $clotheShalvar == 'wcargo' ||
@@ -746,7 +751,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_triangle':
+                        case 41:
 
                             if ($astin == 'flongsleeve' || $astin == 'bottompuffy' ||
                                 $astin == 'fsleeveless' || $astin == 'fhalfsleeve') {
@@ -793,7 +798,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_round':
+                        case 51:
 
                             if ($astin == 'fshortsleeve' || $astin == 'toppuffy') {
                                 if ($clotheShalvar == 'wbaggy' || $clotheShalvar == 'wcargo' ||
@@ -857,8 +862,8 @@ class UserClothes extends Model
                     $clotheAstin = $clotheProcessedImageData?->astin ?? '';
                     $clotheAstin = strtolower($clotheAstin);
 
-                    switch ($userBodyType) {
-                        case 'men_rectangle':
+                    switch ((int)$userBodyType) {
+                        case 0:
 
                             if ($shalvar == 'mcargo' || $shalvar == 'mcargoshorts' || $shalvar == 'mmom') {
                                 if ($clotheAstin == 'shortsleeve') {
@@ -899,7 +904,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'men_inverted_triangle':
+                        case 1:
 
                             if ($shalvar == 'mslimfit' || $shalvar == 'mshorts') {
                                 if ($clotheAstin == 'longsleeve') {
@@ -943,7 +948,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'men_oval':
+                        case 2:
 
                             if ($shalvar == 'mslimfit' || $shalvar == 'mstraight') {
                                 if ($clotheAstin == 'longsleeve') {
@@ -1025,8 +1030,8 @@ class UserClothes extends Model
                     $astin = strtolower($astin);
 
 
-                    switch ($userBodyType) {
-                        case 'men_rectangle':
+                    switch ((int)$userBodyType) {
+                        case 0:
                             if ($astin == 'longsleeve') {
                                 if ($clotheShalvar == 'mshorts' || $clotheShalvar == 'mslimfit' || $clotheShalvar == 'mstraight') {
                                     $matched = true;
@@ -1068,7 +1073,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'men_inverted_triangle':
+                        case 1:
                             if ($astin == 'shortsleeve') {
                                 if ($clotheShalvar == 'mcargo' || $clotheShalvar == 'mcargoshorts' || $clotheShalvar == 'mmom') {
                                     $matched = true;
@@ -1109,7 +1114,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'men_oval':
+                        case 2:
                             if ($astin == 'longsleeve') {
                                 if ($clotheShalvar == 'mshorts' || $clotheShalvar == 'mslimfit' || $clotheShalvar == 'mstraight') {
                                     $matched = true;
@@ -1229,8 +1234,8 @@ class UserClothes extends Model
                     }
 
 
-                    switch ($userBodyType) {
-                        case 'women_hourglass':
+                    switch ((int)$userBodyType) {
+                        case 11:
 
                             if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
                                 if ($userClotheAstin == 'toppuffy') {
@@ -1276,7 +1281,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_rectangle':
+                        case 21:
 
                             if ($shalvar == 'wbootcut' || $shalvar == 'wbaggy' || $skirtType == 'balloonskirt') {
                                 if ($userClotheAstin == 'toppuffy') {
@@ -1317,7 +1322,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_inverted_triangle':
+                        case 31:
 
                             if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
                                 $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
@@ -1364,7 +1369,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_triangle':
+                        case 41:
                             if ($shalvar == 'wbaggy' || $shalvar == 'wcargo' ||
                                 $shalvar == 'wcargoshorts' || $shalvar == 'wbootcut' ||
                                 $shalvar == 'wmom' || $skirtType == 'balloonskirt' || $skirtType == 'mermaidskirt') {
@@ -1406,7 +1411,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_round':
+                        case 51:
                             if ($shalvar == 'wskinny' || $shalvar == 'wstraight' ||
                                 $shalvar == 'wshorts' || $skirtType == 'alineskirt' || $skirtType == 'pencilskirt' ||
                                 $skirtType == 'shortaskirt') {
@@ -1482,8 +1487,8 @@ class UserClothes extends Model
                         }
                     }
 
-                    switch ($userBodyType) {
-                        case 'women_hourglass':
+                    switch ((int)$userBodyType) {
+                        case 11:
                             if ($astin == 'toppuffy') {
                                 if ($userClotheShalvar == 'wbootcut' || $userClotheShalvar == 'wbaggy' || $userClotheSkirtType == 'balloonskirt') {
                                     $matched = true;
@@ -1528,7 +1533,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_rectangle':
+                        case 21:
 
                             if ($astin == 'toppuffy') {
                                 if ($userClotheShalvar == 'wbootcut' || $userClotheShalvar == 'wbaggy' || $userClotheSkirtType == 'balloonskirt') {
@@ -1572,7 +1577,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'women_inverted_triangle':
+                        case 31:
 
                             if ($astin == 'fshortsleeve' || $astin == 'toppuffy') {
                                 if ($userClotheShalvar == 'wbaggy' || $userClotheShalvar == 'wcargo' ||
@@ -1616,7 +1621,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_triangle':
+                        case 41:
 
                             if ($astin == 'flongsleeve' || $astin == 'bottompuffy' ||
                                 $astin == 'fsleeveless' || $astin == 'fhalfsleeve') {
@@ -1663,7 +1668,7 @@ class UserClothes extends Model
                             }
 
                             break;
-                        case 'women_round':
+                        case 51:
 
                             if ($astin == 'fshortsleeve' || $astin == 'toppuffy') {
                                 if ($userClotheShalvar == 'wbaggy' || $userClotheShalvar == 'wcargo' ||
@@ -1730,8 +1735,8 @@ class UserClothes extends Model
                         }
                     }
 
-                    switch ($userBodyType) {
-                        case 'men_rectangle':
+                    switch ((int)$userBodyType) {
+                        case 0:
 
                             if ($shalvar == 'mcargo' || $shalvar == 'mcargoshorts' || $shalvar == 'mmom') {
                                 if ($userClotheAstin == 'shortsleeve') {
@@ -1772,7 +1777,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'men_inverted_triangle':
+                        case 1:
 
                             if ($shalvar == 'mslimfit' || $shalvar == 'mshorts') {
                                 if ($userClotheAstin == 'longsleeve') {
@@ -1816,7 +1821,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'men_oval':
+                        case 2:
 
                             if ($shalvar == 'mslimfit' || $shalvar == 'mstraight') {
                                 if ($userClotheAstin == 'longsleeve') {
@@ -1887,8 +1892,8 @@ class UserClothes extends Model
                         }
                     }
 
-                    switch ($userBodyType) {
-                        case 'men_rectangle':
+                    switch ((int)$userBodyType) {
+                        case 0:
                             if ($astin == 'longsleeve') {
                                 if ($userClotheShalvar == 'mshorts' || $userClotheShalvar == 'mslimfit' || $userClotheShalvar == 'mstraight') {
                                     $matched = true;
@@ -1930,7 +1935,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'men_inverted_triangle':
+                        case 1:
                             if ($astin == 'shortsleeve') {
                                 if ($userClotheShalvar == 'mcargo' || $userClotheShalvar == 'mcargoshorts' || $userClotheShalvar == 'mmom') {
                                     $matched = true;
@@ -1971,7 +1976,7 @@ class UserClothes extends Model
 
                             break;
 
-                        case 'men_oval':
+                        case 2:
                             if ($astin == 'longsleeve') {
                                 if ($userClotheShalvar == 'mshorts' || $userClotheShalvar == 'mslimfit' || $userClotheShalvar == 'mstraight') {
                                     $matched = true;
