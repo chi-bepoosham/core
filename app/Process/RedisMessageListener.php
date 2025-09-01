@@ -107,27 +107,27 @@ class RedisMessageListener
 
         if ($imageData['paintane'] === 'mpayintane' || $imageData['paintane'] === 'mbalatane') {
             if ($imageData['paintane'] === 'mbalatane') {
-                switch ($userBodyType) {
-                    case 'men_rectangle':
+                switch ((int)$userBodyType) {
+                    case 0:
                         $score += $this->menBalataneZero($imageData);
                         break;
-                    case 'men_inverted_triangle':
+                    case 1:
                         $score += $this->menBalataneTwo($imageData);
                         break;
-                    case 'men_oval':
+                    case 2:
                         $score += $this->menBalataneFive($imageData);
                         break;
                 }
 
             } elseif ($imageData['paintane'] === 'mpayintane') {
-                switch ($userBodyType) {
-                    case 'men_rectangle':
+                switch ((int)$userBodyType) {
+                    case 0:
                         $score += $this->menPayintaneZero($imageData);
                         break;
-                    case 'men_inverted_triangle':
+                    case 1:
                         $score += $this->menPayintaneTwo($imageData);
                         break;
-                    case 'men_oval':
+                    case 2:
                         $score += $this->menPayintaneFive($imageData);
                         break;
                 }
@@ -135,39 +135,39 @@ class RedisMessageListener
             }
         } elseif ($imageData['paintane'] === 'fbalatane' || $imageData['paintane'] === 'fpayintane' || $imageData['paintane'] === 'ftamamtane') {
             if ($imageData['paintane'] === 'fbalatane') {
-                switch ($userBodyType) {
-                    case 'women_hourglass':
+                switch ((int)$userBodyType) {
+                    case 11:
                         $score += $this->womenBalataneOneOne($imageData);
                         break;
-                    case 'women_rectangle':
+                    case 21:
                         $score += $this->womenBalataneTwoOne($imageData);
                         break;
-                    case 'women_inverted_triangle':
+                    case 31:
                         $score += $this->womenBalataneThreeOne($imageData);
                         break;
-                    case 'women_triangle':
+                    case 41:
                         $score += $this->womenBalataneFourOne($imageData);
                         break;
-                    case 'women_round':
+                    case 51:
                         $score += $this->womenBalataneFiveOne($imageData);
                         break;
                 }
 
             } else {
-                switch ($userBodyType) {
-                    case 'women_hourglass':
+                switch ((int)$userBodyType) {
+                    case 11:
                         $score += $this->womenPayintaneOneOne($imageData);
                         break;
-                    case 'women_rectangle':
+                    case 21:
                         $score += $this->womenPayintaneTwoOne($imageData);
                         break;
-                    case 'women_inverted_triangle':
+                    case 31:
                         $score += $this->womenPayintaneThreeOne($imageData);
                         break;
-                    case 'women_triangle':
+                    case 41:
                         $score += $this->womenPayintaneFourOne($imageData);
                         break;
-                    case 'women_round':
+                    case 51:
                         $score += $this->womenPayintaneFiveOne($imageData);
                         break;
                 }

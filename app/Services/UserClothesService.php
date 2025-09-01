@@ -94,7 +94,7 @@ class UserClothesService
      */
     public function delete($clothesId): bool
     {
-        $item = $this->repository->findWithInputs(["id" => $clothesId, "user_id" => Auth::id()]);
+        $item = $this->repository->findWithInputs(["id" => $clothesId, "user_id" => Auth::id()],['sets']);
         if (!$item) {
             throw new Exception(__("custom.defaults.not_found"));
         }
@@ -102,6 +102,9 @@ class UserClothesService
         DB::beginTransaction();
         try {
             $this->repository->delete($item);
+
+            $item->sets()->delete();
+
             DB::commit();
             return true;
         } catch (Exception $exception) {
