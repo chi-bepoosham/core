@@ -14,7 +14,7 @@ class ValidateGetClothesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'=>'nullable|integer|string',
+            'title'=>'nullable|string',
             'clothes_type'=>'nullable|integer|min:1|max:3',
             'process_status'=>'nullable|integer|min:1|max:3',
             'paginate'=>'nullable|boolean',
