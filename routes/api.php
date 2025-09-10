@@ -37,6 +37,8 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('user')->middleware('auth:sanctum')->group(function () {
 
+        Route::post("/auth/logout", [AuthController::class, "userLogout"]);
+
         Route::prefix('auth')->withoutMiddleware('auth:sanctum')->group(function () {
             Route::post("/otp/send", [AuthController::class, "sendOtp"]);
             Route::post("/otp/confirm", [AuthController::class, "otpConfirm"]);
