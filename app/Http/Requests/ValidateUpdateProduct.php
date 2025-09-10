@@ -27,7 +27,7 @@ class ValidateUpdateProduct extends FormRequest
             'is_available' => 'required|integer|min:0|max:1',
             'deleted_image_ids' => 'nullable|array',
             'images' => 'nullable|array',
-            'images.*.file' => 'required|file|mimes:jpg,jpeg,png,wep,webp',
+            'images.*.file' => 'required|file|mimes:jpg,jpeg,png,wep,webp,heic',
             'images.*.is_selected' => 'required|integer|min:0|max:1',
             'images.*.is_processed' => 'required|integer|min:0|max:1',
         ];

@@ -33,7 +33,7 @@ class ValidateRegisterShop extends FormRequest
             'mobile' => 'required|regex:/^(09){1}[0-9]{9}+$/|unique:shops,mobile',
             'brand_name' => 'nullable|string',
             'description' => 'nullable|string',
-            'logo' => 'nullable|file|mimes:jpg,jpeg,png,wep,webp',
+            'logo' => 'nullable|file|mimes:jpg,jpeg,png,wep,webp,heic',
             'phone' => 'nullable|string|regex:/(0)[0-9]{10}/|size:11',
             'email' => 'nullable|email|unique:shops,email',
             'web_site' => 'nullable|url',
