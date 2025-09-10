@@ -29,6 +29,20 @@ class UserClothingController extends Controller
         return ResponseHelper::responseSuccess($result);
     }
 
+    /**
+     * @param $clothesId
+     * @return JsonResponse
+     */
+    public function show($clothesId): JsonResponse
+    {
+        try {
+            $date = $this->service->show($clothesId);
+            return ResponseHelper::responseSuccess($date);
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            return ResponseHelper::responseCustomError($message);
+        }
+    }
 
     /**
      * @param ValidateUploadImage $request

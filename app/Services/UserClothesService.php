@@ -42,7 +42,22 @@ class UserClothesService
     public function index($inputs): Collection|LengthAwarePaginator
     {
         $inputs["user_id"] = Auth::id();
-        return $this->repository->resolve_paginate(inputs: $inputs, relations: $this->repository->relations());
+        return $this->repository->resolve_paginate(inputs: $inputs);
+    }
+
+    /**
+     * @param $clothesId
+     * @return mixed
+     * @throws Exception
+     */
+    public function show($clothesId): mixed
+    {
+        $item = $this->repository->findWithInputs(["id" => $clothesId, "user_id" => Auth::id()], $this->repository->relations());
+        if (!$item) {
+            throw new Exception(__("custom.defaults.not_found"));
+        }
+
+        return $item;
     }
 
 
@@ -94,7 +109,7 @@ class UserClothesService
      */
     public function delete($clothesId): bool
     {
-        $item = $this->repository->findWithInputs(["id" => $clothesId, "user_id" => Auth::id()],['sets']);
+        $item = $this->repository->findWithInputs(["id" => $clothesId, "user_id" => Auth::id()], ['sets']);
         if (!$item) {
             throw new Exception(__("custom.defaults.not_found"));
         }

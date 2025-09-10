@@ -56,6 +56,7 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('clothes')->group(function () {
             Route::get("/all", [UserClothingController::class, "index"]);
+            Route::get("/{clothesId}", [UserClothingController::class, "show"]);
             Route::post("/upload/image", [UserClothingController::class, "uploadClothingImage"]);
             Route::delete("/{clothesId}", [UserClothingController::class, "delete"]);
         });
