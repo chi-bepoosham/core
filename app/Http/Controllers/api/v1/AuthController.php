@@ -157,4 +157,16 @@ class AuthController extends Controller
         }
     }
 
+
+    /**
+     * @return JsonResponse
+     */
+    public function userLogout(): JsonResponse
+    {
+        $this->service->userLogout();
+        $message = __("custom.user.logout_successfully");
+        return ResponseHelper::responseSuccess([], $message);
+    }
+
+
 }

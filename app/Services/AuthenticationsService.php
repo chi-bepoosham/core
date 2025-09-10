@@ -10,6 +10,7 @@ use App\Models\Shop;
 use Carbon\Carbon;
 use Exception;
 use Firebase\JWT\JWT;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -297,6 +298,15 @@ class AuthenticationsService
                 "shop_id" => $shopId,
             ]
         );
+    }
+
+    /**
+     * @return void
+     */
+    public function userLogout(): void
+    {
+        $user = Auth::user();
+        Auth::user()->tokens()->where('id', $user->currentAccessToken()->id)->delete();
     }
 
     public function generateOtpRandom(): int
